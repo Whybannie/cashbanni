@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Cash Banni — кейсы TG подарков</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous" ></script>
+<script>
+window.addEventListener('error',function(e){
+  var d=document.createElement('div');
+  d.style.cssText='position:fixed;bottom:10px;left:10px;right:10px;background:#380606;color:#ff8080;padding:10px;border-radius:12px;z-index:9999;font-size:12px;white-space:pre-wrap;border:1px solid #f44';
+  d.textContent='JS ERROR: '+e.message+' ('+e.filename+':'+e.lineno+')';
+  document.body.appendChild(d);
+});
+</script>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="bubbles" id="bubbles"></div>
+
+<header class="header">
+  <div class="logo">Cash <span>Banni</span></div>
+  <div class="hdr-right">
+    <div class="lvl-chip"><div class="lvl-bar"><div class="lvl-fill" id="lvlFill"></div></div><span id="lvlText">1 ур.</span></div>
+    <button class="daily-btn" id="dailyBtn" onclick="claimDaily()">🎁</button>
+    <div class="balance">⭐ <span id="balanceValue">0</span><button class="add-btn" onclick="addStars()">+</button></div>
+  </div>
+</header>
+
+<div class="feed"><div class="feed-track" id="feedTrack"></div></div>
+
+<nav class="tabs" id="tabs">
+  <button class="tab active" data-tab="cases">🎁 Кейсы</button>
+  <button class="tab" data-tab="upgrade">⚡ Апгрейд</button>
+  <button class="tab" data-tab="battles">⚔️ Баттлы</button>
+  <button class="tab" data-tab="market">🛒 Маркет</button>
+  <button class="tab" data-tab="inventory">🎒 Инвентарь <b class="badge" id="invCount">0</b></button>
+  <button class="tab" data-tab="quests">📜 Квесты <b class="badge hide" id="questBadge">0</b></button>
+  <button class="tab" data-tab="top">🏆 Топ</button>
+  <button class="tab" data-tab="profile">👤 Профиль</button>
+</nav>
+
+<main class="container">
+  <section class="section active" id="sec-cases">
+    <div class="sec-head"><h2>🔥 Кейсы</h2><span class="muted" id="casesStat"></span></div>
+    <div class="cases-grid" id="casesGrid"></div>
+  </section>
+
+  <section class="section" id="sec-upgrade">
+    <h2>⚡ Апгрейд</h2>
+    <div class="up-grid">
+      <div class="up-col">
+        <h3>Твой предмет</h3>
+        <div class="up-slot" id="upFrom">— выбери —</div>
+        <button class="btn btn-secondary" onclick="openPicker('from')">Выбрать</button>
+      </div>
+      <div class="up-mid">
+        <div class="wheel-wrap">
+          <div class="wheel-pointer"></div>
+          <div class="wheel" id="upWheel"></div>
+          <div class="wheel-center" id="upChance">0%</div>
+        </div>
+        <button class="btn btn-primary mt" id="upBtn" onclick="doUpgrade()">Улучшить</button>
+      </div>
+      <div class="up-col">
+        <h3>Цель</h3>
+        <div class="up-slot" id="upTo">— выбери —</div>
+        <button class="btn btn-secondary" onclick="openPicker('to')">Выбрать</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="sec-battles">
+    <h2>⚔️ Баттлы</h2>
+    <button class="btn btn-primary mb" onclick="createBattle()">+ Создать баттл</button>
+    <div id="battlesList"></div>
+  </section>
+
+  <section class="section" id="sec-market">
+    <h2>🛒 Маркет</h2>
+    <div class="market-toolbar"><span class="muted" id="marketNote"></span></div>
+    <div class="market-grid" id="marketGrid"></div>
+  </section>
+
+  <section class="section" id="sec-inventory">
+    <h2>🎒 Инвентарь</h2>
+    <div class="inv-toolbar">
+      <span class="muted" id="invValue"></span>
+      <button class="btn btn-sell" onclick="sellAll()">Продать всё</button>
+    </div>
+    <div class="inventory-grid" id="inventoryGrid"></div>
+  </section>
+
+  <section class="section" id="sec-quests">
+    <h2>📜 Квесты</h2>
+    <div id="questsList"></div>
+    <h2 class="mt">🏅 Достижения</h2>
+    <div id="achList"></div>
+  </section>
+
+  <section class="section" id="sec-top">
+    <h2>🏆 Топ игроков</h2>
+    <div id="topList"></div>
+  </section>
+
+  <section class="section" id="sec-profile">
+    <h2>👤 Профиль</h2>
+    <div class="stats-grid" id="statsGrid"></div>
+    <h3 class="mt">🎟 Промокод</h3>
+    <div class="row"><input id="promoInput" placeholder="ВВЕДИ КОД"><button class="btn btn-primary" onclick="applyPromo()">OK</button></div>
+    <h3 class="mt">🤝 Рефералка</h3>
+    <div class="row"><input id="refLink" readonly><button class="btn btn-secondary" onclick="copyRef()">Копировать</button></div>
+    <p class="muted small" id="refStat"></p>
+    <h3 class="mt">⚙️ Настройки</h3>
+    <label class="switch-row"><input type="checkbox" id="soundToggle" onchange="toggleSound()"> Звуки</label>
+    <label class="switch-row"><input type="checkbox" id="fairToggle" onchange="toggleFair()"> Provably Fair</label>
+    <div class="muted small" id="fairInfo"></div>
+    <button class="btn btn-danger mt" onclick="resetAll()">Сбросить прогресс</button>
+  </section>
+</main>
+
+<!-- КЕЙС -->
+<div class="modal-overlay" id="caseModal">
+  <div class="modal wide">
+    <div class="modal-head"><h3 id="cmTitle"></h3><button class="x" onclick="closeCaseModal()">✕</button></div>
+    <div class="roulette-container" id="rouletteBox">
+      <div class="roulette-pointer"></div>
+      <div class="roulette-strip" id="rouletteStrip"></div>
+    </div>
+    <div class="multi-results" id="multiResults"></div>
+    <div class="contents" id="cmContents"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="spin(1)">×1 ⭐<span id="p1"></span></button>
+      <button class="btn btn-secondary" onclick="spin(3)">×3 ⭐<span id="p3"></span></button>
+      <button class="btn btn-primary" onclick="spin(5)">×5 ⭐<span id="p5"></span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ПИКЕР -->
+<div class="modal-overlay" id="pickerModal">
+  <div class="modal">
+    <div class="modal-head"><h3 id="pickerTitle">Выбор</h3><button class="x" onclick="closePicker()">✕</button></div>
+    <div class="picker-grid" id="pickerGrid"></div>
+  </div>
+</div>
+
+<!-- БАТТЛ -->
+<div class="modal-overlay" id="battleModal">
+  <div class="modal">
+    <div class="modal-head"><h3>⚔️ Баттл</h3><button class="x" onclick="closeBattle()">✕</button></div>
+    <div class="battle-pot">Банк: ⭐<span id="battlePot">0</span></div>
+    <div class="wheel-wrap small">
+      <div class="wheel-pointer"></div>
+      <div class="wheel" id="bWheel"></div>
+      <div class="wheel-center">50/50</div>
+    </div>
+    <div class="battle-players" id="battlePlayers"></div>
+    <div class="battle-log" id="battleLog"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

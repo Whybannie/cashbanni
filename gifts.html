@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🛠 Калибровка подарков — Cash Banni</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#07071a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:20px}
+  h1{font-size:22px;margin-bottom:6px}
+  .muted{color:rgba(255,255,255,.5);font-size:13px;margin-bottom:8px}
+  .chain{color:rgba(255,255,255,.65);font-size:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:8px 12px;margin-bottom:18px;display:inline-block}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+  .card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:14px;text-align:center}
+  .anim{width:110px;height:110px;margin:0 auto 8px}
+  .card input,.card select{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:8px;font-size:13px;margin-top:6px;outline:none}
+  .row2{display:flex;gap:6px}
+  .id{font-size:10px;color:rgba(255,255,255,.3);margin-top:6px;word-break:break-all}
+  .bar{position:sticky;bottom:10px;display:flex;gap:10px;justify-content:center;margin:22px 0;flex-wrap:wrap}
+  .bar button{background:linear-gradient(135deg,#a855f7,#ec4899);border:none;color:#fff;font-weight:800;font-size:14px;padding:13px 20px;border-radius:14px;cursor:pointer}
+  .bar button.alt{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
+  pre{background:#101028;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px;font-size:11px;overflow:auto;max-height:300px;display:none;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h1>🛠 Калибровка подарков TG</h1>
+<p class="muted">Смотри на ЖИВУЮ анимацию → впиши имя, эмодзи, цену → редкость подставится по цепочке автоматически (можно поменять вручную) → «💾 Сохранить».</p>
+<div class="chain">🔗 Цепочка: 15–25⭐ = common · 50⭐ = rare · 100⭐ = epic · 100+⭐ = legendary (NFT)</div>
+<div class="grid" id="grid"></div>
+<div class="bar">
+  <button onclick="saveMap()">💾 Сохранить</button>
+  <button class="alt" onclick="copyBlock()">📋 Скопировать блок GIFTS</button>
+  <button class="alt" onclick="resetMap()">♻️ Сбросить калибровку</button>
+</div>
+<pre id="out"></pre>
+
+<script src="js/data.js"></script>
+<script>
+const grid = document.getElementById('grid');
+const saved = (()=>{ try{ return JSON.parse(localStorage.getItem('cb_gift_map')||'[]'); }catch(e){ return []; } })();
+const byId = {}; (Array.isArray(saved)?saved:[]).forEach(o=>byId[o.id]=o);
+
+// редкость из цены по цепочке TG
+function chainRarity(p){
+  p = +p || 0;
+  if (p <= 25)  return 'common';
+  if (p <= 50)  return 'rare';
+  if (p <= 100) return 'epic';
+  return 'legendary';
+}
+
+GIFTS.forEach(g=>{
+  const o = byId[g.id] || {};
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML =
+    '<div class="anim" id="a-'+g.id+'"></div>' +
+    '<input id="n-'+g.id+'" value="'+(o.name||g.name)+'" placeholder="Имя">' +
+    '<div class="row2">' +
+      '<input id="e-'+g.id+'" value="'+(o.emoji||g.emoji)+'" placeholder="Эмодзи" style="width:60px">' +
+      '<input id="p-'+g.id+'" type="number" value="'+(o.price||g.price)+'" placeholder="Цена">' +
+    '</div>' +
+    '<select id="r-'+g.id+'">' +
+      ['common','rare','epic','legendary'].map(r=>'<option value="'+r+'" '+((o.rarity||g.rarity)===r?'selected':'')+'>'+RAR[r].name+'</option>').join('') +
+    '</select>' +
+    '<div class="id">id: '+g.id+'</div>';
+  grid.appendChild(card);
+
+  // авто-редкость при смене цены
+  document.getElementById('p-'+g.id).addEventListener('change', function(){
+    document.getElementById('r-'+g.id).value = chainRarity(this.value);
+  });
+
+  loadAnim(g);
+});
+
+async function loadTgs(url){
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('http '+res.status);
+  const buf = await res.arrayBuffer();
+  if (window.DecompressionStream){
+    const stream = new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'));
+    return JSON.parse(await new Response(stream).text());
+  }
+  return JSON.parse(new TextDecoder().decode(buf));
+}
+async function loadAnim(g){
+  try{
+    const data = await loadTgs(g.tgs);
+    lottie.loadAnimation({animationData:data, renderer:'svg', loop:true, autoplay:true, container:document.getElementById('a-'+g.id)});
+  }catch(e){
+    document.getElementById('a-'+g.id).innerHTML = '<div style="font-size:60px;line-height:110px">'+g.emoji+'</div>';
+  }
+}
+
+function collect(){
+  return GIFTS.map(g=>({
+    id: g.id,
+    name: document.getElementById('n-'+g.id).value.trim() || g.name,
+    emoji: document.getElementById('e-'+g.id).value.trim() || g.emoji,
+    price: parseInt(document.getElementById('p-'+g.id).value) || g.price,
+    rarity: document.getElementById('r-'+g.id).value,
+    tgs: g.tgs
+  }));
+}
+function saveMap(){
+  localStorage.setItem('cb_gift_map', JSON.stringify(collect()));
+  alert('✅ Сохранено! Обнови страницу игры — имена, цены и редкости применятся.');
+}
+function copyBlock(){
+  const m = collect();
+  const txt = 'const GIFTS = [\n' + m.map(o=>
+    "  { id:'"+o.id+"', emoji:'"+o.emoji+"', name:'"+o.name+"', rarity:'"+o.rarity+"', price:"+o.price+", tgs:'"+o.tgs+"' }"
+  ).join(',\n') + '\n];';
+  const pre = document.getElementById('out');
+  pre.style.display='block'; pre.textContent = txt;
+  navigator.clipboard.writeText(txt).then(()=>alert('📋 Скопировано! Вставь в data.js вместо блока GIFTS (пути .tgs теперь полные и рабочие).'));
+}
+function resetMap(){
+  if(confirm('Убрать калибровку и вернуться к базовым значениям из data.js?')){
+    localStorage.removeItem('cb_gift_map'); location.reload();
+  }
+}
+</script>
+</body>
+</html>
