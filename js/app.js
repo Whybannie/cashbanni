@@ -1,4 +1,4 @@
-const BUILD = 5;
+const BUILD = 6;
 const $ = id => document.getElementById(id);
 const fmt = n => n.toLocaleString('ru-RU');
 const rnd = (a,b) => a + Math.random()*(b-a);
@@ -10,7 +10,7 @@ const DEF = () => ({
   balance:ECO.START_BALANCE, xp:0, inv:[], battles:[],
   stats:{opened:0,spent:0,won:0,best:0,upgrades:0,upWins:0,battles:0,bWins:0,sells:0,buys:0},
   qp:{}, qc:[], ac:[], daily:{last:'',streak:0}, promo:[], refs:0,
-  sound:true, fair:false, seed:uid()+uid()
+  sound:true, fair:false, seed:uid()+uid(), serverMode:false
 });
 let S = load();
 function load(){
@@ -25,11 +25,6 @@ function load(){
     return out;
   }catch(e){ return DEF(); }
 }
-function save(){ localStorage.setItem('cashbanni_v2', JSON.stringify(S)); }
-function validInv(){ return S.inv.filter(i=>i&&i.gid&&gift(i.gid)); }
-
-let upFrom=null, upTo=null, curCase=null, spinning=false, upBusy=false;
-const IMG = {};
 
 // ---------- TELEGRAM WEB APP ----------
 const TG = (window.Telegram && window.Telegram.WebApp) || null;
@@ -50,6 +45,41 @@ function haptic(kind){
     else TG.HapticFeedback.impactOccurred('light');
   }catch(e){}
 }
+
+// ---------- API (связь с ботом) ----------
+// ПОМЕНЯЙ на свой адрес VPS/ngrok, когда задеплоишь бэкенд
+const API_BASE = "http://localhost:8080";
+async function api(path, opts = {}) {
+  try {
+    const init = (TG && TG.initData) ? TG.initData : "";
+    const headers = { "Content-Type": "application/json", "X-Telegram-Init-Data": init };
+    const res = await fetch(API_BASE + path, { ...opts, headers });
+    if (!res.ok) return { error: "http " + res.status };
+    return await res.json();
+  } catch (e) { return { error: e.message }; }
+}
+let saveTimer = null;
+function apiSave() {
+  if (!S.serverMode) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    api("/api/save", { method: "POST", body: JSON.stringify({
+      balance: S.balance, inv: S.inv, stats: S.stats, daily: S.daily, xp: S.xp
+    })});
+  }, 800);
+}
+async function apiPay(stars) {
+  const r = await api("/api/pay", { method: "POST", body: JSON.stringify({ stars }) });
+  if (r.ok) toast("💳 Счёт на ⭐" + stars + " отправлен в Telegram", "good");
+  else toast("Не удалось создать счёт", "bad");
+}
+
+// ---------- СОХРАНЕНИЕ (localStorage + сервер) ----------
+function save(){ localStorage.setItem('cashbanni_v2', JSON.stringify(S)); apiSave(); }
+function validInv(){ return S.inv.filter(i=>i&&i.gid&&gift(i.gid)); }
+
+let upFrom=null, upTo=null, curCase=null, spinning=false, upBusy=false;
+const IMG = {};
 
 // ---------- РЕАЛЬНЫЕ TG ПОДАРКИ ----------
 async function loadTgs(url){
@@ -146,7 +176,7 @@ function renderFeed(){
 }
 setInterval(renderFeed,50000);
 
-// ---------- НАВИГАЦИЯ (низ + шапка) ----------
+// ---------- НАВИГАЦИЯ ----------
 function activateTab(t){
   sfx.click();
   document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active', b.dataset.tab===t));
@@ -267,7 +297,7 @@ async function spin(n){
   checkAch(); save();
 }
 
-// ---------- ИНВЕНТАРЬ (продажа по РЕАЛЬНОЙ цене) ----------
+// ---------- ИНВЕНТАРЬ ----------
 function itemCard(g,noActs){
   return '<div class="inv-item">'+
     '<div class="rt" style="background:'+RAR[g.rarity].color+'"></div>'+
@@ -304,7 +334,7 @@ function toUpgrade(u){
   activateTab('upgrade');
 }
 
-// ---------- АПГРЕЙД: ленты вместо модального пикера ----------
+// ---------- АПГРЕЙД ----------
 function upChanceVal(){ return (upFrom&&upTo)?Math.min(85,Math.max(3,Math.floor(gift(upFrom.gid).price/upTo.price*100))):0; }
 function selFrom(u){ upFrom=S.inv.find(i=>i.uid===u)||null; upTo=null; sfx.click(); renderUpgrade(); }
 function selTo(id){ upTo=gift(id)||null; sfx.click(); renderUpgrade(); }
@@ -312,11 +342,9 @@ function renderUpgrade(){
   const items=validInv();
   if(upFrom && !items.some(i=>i.uid===upFrom.uid)) upFrom=null;
   if(upTo && upFrom && upTo.price<=gift(upFrom.gid).price) upTo=null;
-  // лента своих
   $('upMine').innerHTML = items.length ? items.map(i=>{const g=gift(i.gid);
     return '<button class="chip '+(upFrom&&upFrom.uid===i.uid?'sel':'')+'" onclick="selFrom(\''+i.uid+'\')">'+gImg(g)+'<div class="name">'+g.name+'</div><div class="price">⭐'+g.price+'</div></button>';}).join('')
     : '<button class="chip empty" onclick="gotoCases()">Инвентарь пуст — открыть кейс 🎁</button>';
-  // лента целей
   const min=upFrom?gift(upFrom.gid).price:0;
   const targets=GIFTS.filter(g=>g.price>min).sort((a,b)=>a.price-b.price);
   $('upTarget').innerHTML = targets.length ? targets.map(g=>
@@ -441,8 +469,8 @@ function renderProfile(){
   const st=S.stats; const li=levelInfo();
   $('statsGrid').innerHTML=[['Уровень',li.lvl+' ур.'],['Открыто кейсов',st.opened],['Потрачено','⭐'+fmt(st.spent)],['Выиграно','⭐'+fmt(st.won)],
     ['Лучший дроп','⭐'+fmt(st.best)],['Апгрейдов',st.upWins+'/'+st.upgrades],['Баттлов',st.bWins+'/'+st.battles],
-    ['Продаж',st.sells],['Покупок',st.buys],['Сборка','build '+BUILD]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('');
-  $('refLink').value='https://t.me/CashBanniBot?start=ref_'+S.seed.slice(0,8);
+    ['Продаж',st.sells],['Покупок',st.buys],['Режим',S.serverMode?'🟢 онлайн':'⚪ локально'],['Сборка','build '+BUILD]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('');
+  $('refLink').value='https://t.me/CashBanni_bot?start=ref_'+S.seed.slice(0,8);
   $('refStat').textContent='Приглашено: '+S.refs+' · Заработано: ⭐'+(S.refs*25);
   $('soundToggle').checked=S.sound; $('fairToggle').checked=S.fair;
   $('fairInfo').innerHTML=S.fair?'Seed: '+S.seed+'<br>Hash: '+hash(S.seed):'';
@@ -471,7 +499,10 @@ function claimDaily(){
   S.balance+=r; sfx.win(); confetti(60);
   toast('🎁 Дейлик: +⭐'+r+' (серия '+S.daily.streak+' дн.)','good'); save(); renderHeader();
 }
-function addStars(){ S.balance+=100; sfx.click(); toast('⭐ +100 (демо)'); save(); renderHeader(); }
+function addStars(){
+  if (S.serverMode && TG) { apiPay(100); }
+  else { S.balance+=100; sfx.click(); toast('⭐ +100 (демо)'); save(); renderHeader(); }
+}
 
 // ---------- ФОН ----------
 (function(){ const cols=['#a855f7','#ec4899','#3b82f6','#f59e0b'];
@@ -481,9 +512,17 @@ function addStars(){ S.balance+=100; sfx.click(); toast('⭐ +100 (демо)'); 
     d.style.background=pick(cols); d.style.animationDelay=rnd(0,8)+'s';
     $('bubbles').appendChild(d); } })();
 
-// ---------- СТАРТ ----------
-if(S.inv.length!==validInv().length){ S.inv=validInv(); save(); }
-renderHeader(); renderCases(); renderFeed();
-if(!S.battles.length) genBattles();
-save(); buildGiftImages();
-setTimeout(()=>toast('Cash Banni · build '+BUILD),400);
+// ---------- СТАРТ (с синхронизацией с ботом) ----------
+(async function startup(){
+  if(S.inv.length!==validInv().length){ S.inv=validInv(); localStorage.setItem('cashbanni_v2', JSON.stringify(S)); }
+  const me = await api('/api/me');
+  if (me && me.tg_id) {
+    S.balance = me.balance; S.inv = me.inv; S.stats = me.stats; S.daily = me.daily; S.xp = me.xp;
+    S.serverMode = true;
+    localStorage.setItem('cashbanni_v2', JSON.stringify(S));
+  }
+  renderHeader(); renderCases(); renderFeed();
+  if(!S.battles.length) genBattles();
+  save(); buildGiftImages();
+  setTimeout(()=>toast(S.serverMode ? 'Cash Banni · build '+BUILD+' · 🟢 онлайн' : 'Cash Banni · build '+BUILD+' · ⚪ локально'),400);
+})();
