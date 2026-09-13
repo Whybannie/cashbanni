@@ -7,7 +7,6 @@ const RAR = {
   legendary: { name:'Легендарный', color:'#fbbf24', glow:'rgba(251,191,36,.5)' },
 };
 
-// Виртуальные дешёвые дропы (1-5⭐) + реальные подарки TG
 const GIFTS = [
   { id:'dust',    emoji:'✨', name:'Звёздная пыль', rarity:'common', price:1,   tgs:'' },
   { id:'coin',    emoji:'🪙', name:'Монетка',       rarity:'common', price:3,   tgs:'' },
@@ -25,10 +24,9 @@ const GIFTS = [
   { id:'diamond', emoji:'💎', name:'Алмаз',         rarity:'epic',   price:100, tgs:TGS+'5170521118301225164.tgs' },
 ];
 
-// КЕЙСЫ: выплаты урезаны, house edge 22-33%. Казино всегда в плюсе.
 const CASES = [
-  { id:'free',    name:'Бесплатная рулетка', em:'🎡', price:0,   rarity:'common', free:true,
-    drops:[['dust',.70],['coin',.18],['spark',.08],['bear',.03],['heart',.01]] },
+  { id:'free',    name:'Бесплатный', em:'🎁', price:0,   rarity:'common', free:true,
+    drops:[['dust',.55],['coin',.25],['spark',.12],['bear',.05],['heart',.02],['rose',.01]] },
   { id:'mini',    name:'Мини',     em:'🪙', price:5,   rarity:'common',
     drops:[['dust',.40],['coin',.30],['spark',.15],['bear',.10],['heart',.04],['rose',.01]] },
   { id:'starter', name:'Стартер',  em:'⭐', price:20,  rarity:'common',
@@ -45,18 +43,6 @@ const CASE_COLORS = {
   epic:      ['#3b1656','#7e22ce','#c084fc'],
   legendary: ['#4a2c0a','#b45309','#fbbf24'],
 };
-
-// Колесо фортуны: EV ~14⭐ в сутки (экономно)
-const DAILY_WHEEL = [
-  { pct:30, value:5,   label:'5⭐',   color:'#334155' },
-  { pct:25, value:10,  label:'10⭐',  color:'#3f4b63' },
-  { pct:15, value:20,  label:'20⭐',  color:'#4a5878' },
-  { pct:10, value:1,   label:'1⭐',   color:'#2a2a4a' },
-  { pct:8,  value:15,  label:'15⭐',  color:'#55648a' },
-  { pct:7,  value:50,  label:'50⭐',  color:'#6d7ba3' },
-  { pct:3,  value:3,   label:'3⭐',   color:'#8b96b8' },
-  { pct:2,  value:100, label:'100⭐', color:'#fbbf24' },
-];
 
 const QUESTS = [
   { id:'q1', type:'open',        target:3,  reward:10, name:'Открой 3 кейса' },
@@ -78,8 +64,6 @@ const ACHS = [
 
 const PROMOS = { 'START':50, 'CASH':75, 'BANNI2026':150, 'MELLSTROY':250 };
 const CHANNEL = 'https://t.me/CashBanni';
-const CHANNEL_USER = '@CashBanni';
 const REF_REWARD = 5;
-const FREE_CASE_COOLDOWN = 3600 * 1000; // 1 час
-
+const FREE_CASE_COOLDOWN = 24 * 3600 * 1000; // 24 часа
 const ECO = { SELL_BACK:1, DISCOUNT:0.8, START_BALANCE:100, UPGRADE_EDGE:0.85 };
