@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Cash Banni — кейсы TG подарков</title>
-<link rel="stylesheet" href="css/style.css?v=7">
+<title>Cash Banni</title>
+<link rel="stylesheet" href="css/style.css?v=8">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous"></script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -15,21 +15,74 @@
 <header class="header">
   <div class="logo">Cash <span>Banni</span></div>
   <div class="hdr-right">
-    <button class="icon-btn" data-tab="quests">🔔<b class="badge hide" id="questBadge">0</b></button>
-    <button class="icon-btn" data-tab="top">🏆</button>
-    <button class="icon-btn" data-tab="profile">👤</button>
-    <button class="daily-btn" id="dailyBtn" onclick="openDailyWheel()">🎡</button>
     <div class="balance">⭐<span id="balanceValue">0</span><button class="add-btn" onclick="addStars()">+</button></div>
   </div>
   <div class="xp-line"><div id="lvlFill"></div></div>
 </header>
 
 <main class="container">
-  <section class="section active" id="sec-cases">
-    <div class="sec-head"><h2>🔥 Кейсы</h2><span class="muted" id="casesStat"></span></div>
+
+  <!-- ГЛАВНАЯ -->
+  <section class="section active" id="sec-home">
+    <div class="hero-card" onclick="activateTab('crash')">
+      <div class="hero-emoji">🚀</div>
+      <div class="hero-info">
+        <b>CRASH</b>
+        <span>Поймай множитель и забери Stars</span>
+      </div>
+      <div class="hero-go">›</div>
+    </div>
+    <div class="sec-head"><h2>🎁 Кейсы</h2><span class="muted" id="casesStat"></span></div>
     <div class="cases-grid" id="casesGrid"></div>
   </section>
 
+  <!-- КРАШ -->
+  <section class="section" id="sec-crash">
+    <div class="crash-head">
+      <button class="back-btn" onclick="activateTab('home')">‹ Назад</button>
+      <h2>🚀 Crash</h2>
+    </div>
+    <div class="crash-box">
+      <canvas id="crashCanvas"></canvas>
+      <div class="crash-mult" id="crashMult">1.00×</div>
+      <div class="crash-status" id="crashStatus"></div>
+    </div>
+    <div class="crash-controls">
+      <div class="crash-bet">
+        <button class="mini-btn sell" onclick="crashBet(-10)">−10</button>
+        <input id="crashBetInput" type="number" value="20" min="5">
+        <button class="mini-btn sell" onclick="crashBet(10)">+10</button>
+      </div>
+      <button class="btn btn-primary" id="crashBtn" onclick="crashAction()">Начать полёт</button>
+    </div>
+    <div class="crash-history" id="crashHistory"></div>
+  </section>
+
+  <!-- ЗАДАНИЯ -->
+  <section class="section" id="sec-tasks">
+    <h2>📜 Задания</h2>
+    <div class="task-card">
+      <div class="task-ico">🎡</div>
+      <div class="task-info"><b>Колесо фортуны</b><span>Бесплатно раз в 24 часа</span></div>
+      <button class="btn btn-primary task-btn" id="wheelCardBtn" onclick="openDailyWheel()">Крутить</button>
+    </div>
+    <div class="task-card">
+      <div class="task-ico">📢</div>
+      <div class="task-info"><b>Подписка на канал</b><span>Награда: ⭐25</span></div>
+      <button class="btn btn-secondary task-btn" id="subBtn" onclick="doSub()">Подписаться</button>
+    </div>
+    <div class="task-card">
+      <div class="task-ico">🤝</div>
+      <div class="task-info"><b>Пригласи друга</b><span>⭐5 за каждого · <b id="refCount">0</b> приглашено</span></div>
+      <button class="btn btn-secondary task-btn" onclick="copyRef()">Ссылка</button>
+    </div>
+    <h2 class="mt">📋 Квесты</h2>
+    <div id="questsList"></div>
+    <h2 class="mt">🏅 Достижения</h2>
+    <div id="achList"></div>
+  </section>
+
+  <!-- АПГРЕЙД -->
   <section class="section" id="sec-upgrade">
     <h2>⚡ Апгрейд</h2>
     <div class="up-layout">
@@ -41,52 +94,62 @@
       <button class="btn btn-primary mt" id="upBtn">Улучшить</button>
       <h3 class="mt">Твои предметы</h3>
       <div class="h-scroll" id="upMine"></div>
-      <h3>Цель (дороже твоего)</h3>
+      <h3>Цель (зоны шанса появятся на колесе)</h3>
       <div class="h-scroll" id="upTarget"></div>
     </div>
   </section>
 
+  <!-- РЕЖИМЫ -->
+  <section class="section" id="sec-modes">
+    <h2>🎮 Режимы</h2>
+    <div class="task-card" onclick="activateTab('crash')">
+      <div class="task-ico">🚀</div>
+      <div class="task-info"><b>Crash</b><span>Множитель растёт — успей забрать</span></div>
+      <div class="hero-go">›</div>
+    </div>
+    <div class="task-card" onclick="activateTab('battles')">
+      <div class="task-ico">⚔️</div>
+      <div class="task-info"><b>Баттлы 1×1</b><span>Только живые игроки, колесо 50/50</span></div>
+      <div class="hero-go">›</div>
+    </div>
+    <div class="task-card" onclick="activateTab('market')">
+      <div class="task-ico">🛒</div>
+      <div class="task-info"><b>Маркет</b><span>Покупка и продажа по цене TG</span></div>
+      <div class="hero-go">›</div>
+    </div>
+  </section>
+
+  <!-- БАТТЛЫ -->
   <section class="section" id="sec-battles">
-    <h2>⚔️ Баттлы <span class="muted small">только живые игроки</span></h2>
+    <div class="crash-head">
+      <button class="back-btn" onclick="activateTab('modes')">‹ Назад</button>
+      <h2>⚔️ Баттлы</h2>
+    </div>
     <button class="btn btn-primary mb" onclick="createBattle()">+ Создать баттл</button>
     <div id="battlesList"></div>
   </section>
 
+  <!-- МАРКЕТ -->
   <section class="section" id="sec-market">
-    <h2>🛒 Маркет</h2>
+    <div class="crash-head">
+      <button class="back-btn" onclick="activateTab('modes')">‹ Назад</button>
+      <h2>🛒 Маркет</h2>
+    </div>
     <div class="market-note" id="marketNote"></div>
     <div class="market-grid" id="marketGrid"></div>
   </section>
 
-  <section class="section" id="sec-inventory">
-    <div class="sec-head">
-      <h2>🎒 Инвентарь</h2>
-      <button class="btn btn-sell" onclick="sellAll()">Продать всё</button>
-    </div>
-    <div class="muted mb" id="invValue"></div>
-    <div class="inventory-grid" id="inventoryGrid"></div>
-  </section>
-
-  <section class="section" id="sec-quests">
-    <h2>📜 Квесты</h2>
-    <div id="questsList"></div>
-    <h2 class="mt">🏅 Достижения</h2>
-    <div id="achList"></div>
-  </section>
-
-  <section class="section" id="sec-top">
-    <h2>🏆 Топ игроков <span class="muted small">только живые</span></h2>
-    <div id="topList"></div>
-  </section>
-
+  <!-- ПРОФИЛЬ -->
   <section class="section" id="sec-profile">
     <h2>👤 Профиль</h2>
     <div class="stats-grid" id="statsGrid"></div>
+    <h2 class="mt">🎒 Мои предметы</h2>
+    <div class="muted mb" id="invValue"></div>
+    <div class="inventory-grid" id="inventoryGrid"></div>
+    <h2 class="mt">🏆 Топ игроков</h2>
+    <div id="topList"></div>
     <h3 class="mt">🎟 Промокод</h3>
     <div class="row"><input id="promoInput" placeholder="ВВЕДИ КОД"><button class="btn btn-primary" onclick="applyPromo()">OK</button></div>
-    <h3 class="mt">🤝 Рефералка</h3>
-    <div class="row"><input id="refLink" readonly><button class="btn btn-secondary" onclick="copyRef()">Копировать</button></div>
-    <p class="muted small" id="refStat"></p>
     <h3 class="mt">⚙️ Настройки</h3>
     <label class="switch-row"><input type="checkbox" id="soundToggle" onchange="toggleSound()"> Звуки и вибрация</label>
     <label class="switch-row"><input type="checkbox" id="fairToggle" onchange="toggleFair()"> Provably Fair</label>
@@ -96,11 +159,11 @@
 </main>
 
 <nav class="bottom-nav">
-  <button data-tab="cases" class="active"><span class="ni">🎁</span><span class="nl">Кейсы</span></button>
+  <button data-tab="home" class="active"><span class="ni">🏠</span><span class="nl">Главная</span></button>
+  <button data-tab="tasks"><span class="ni">📜</span><span class="nl">Задания</span></button>
   <button data-tab="upgrade"><span class="ni">⚡</span><span class="nl">Апгрейд</span></button>
-  <button data-tab="battles"><span class="ni">⚔️</span><span class="nl">Баттлы</span></button>
-  <button data-tab="market"><span class="ni">🛒</span><span class="nl">Маркет</span></button>
-  <button data-tab="inventory"><span class="ni">🎒</span><span class="nl">Сумка</span><b class="badge" id="invCount">0</b></button>
+  <button data-tab="modes"><span class="ni">🎮</span><span class="nl">Режимы</span></button>
+  <button data-tab="profile"><span class="ni">👤</span><span class="nl">Профиль</span></button>
 </nav>
 
 <!-- КЕЙС -->
@@ -122,20 +185,15 @@
   </div>
 </div>
 
-<!-- КОЛЕСО ФОРТУНЫ (раз в 24ч, за подписку) -->
+<!-- КОЛЕСО ФОРТУНЫ -->
 <div class="modal-overlay" id="dailyModal">
   <div class="modal">
     <div class="sheet-grab"></div>
     <div class="modal-head"><h3>🎡 Колесо фортуны</h3><button class="x" onclick="closeDaily()">✕</button></div>
-    <p class="muted" style="text-align:center">Бесплатно раз в 24 часа для подписчиков канала</p>
     <div class="wheel-wrap">
       <div class="wheel-pointer"></div>
       <div class="wheel" id="dWheel"></div>
       <div class="wheel-center">🎡</div>
-    </div>
-    <div id="dailySubBlock" style="display:none" class="mt">
-      <button class="btn btn-primary" onclick="subscribeChannel()">📢 Подписаться на канал</button>
-      <button class="btn btn-secondary mt" onclick="checkSubAndEnable()">✅ Я подписался</button>
     </div>
     <button class="btn btn-primary mt" id="dailySpinBtn" onclick="spinDaily()">Крутить бесплатно</button>
     <div class="battle-log" id="dailyLog"></div>
@@ -159,7 +217,7 @@
 </div>
 
 <div class="toasts" id="toasts"></div>
-<script src="js/data.js?v=7"></script>
-<script src="js/app.js?v=7"></script>
+<script src="js/data.js?v=8"></script>
+<script src="js/app.js?v=8"></script>
 </body>
 </html>
