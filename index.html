@@ -4,18 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Cash Banni — кейсы TG подарков</title>
-<link rel="stylesheet" href="css/style.css?v=5">
+<link rel="stylesheet" href="css/style.css?v=7">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous"></script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script>
-window.addEventListener('error',function(e){
-  if(!e.message||e.message==='Script Error.')return;
-  var d=document.createElement('div');
-  d.style.cssText='position:fixed;bottom:90px;left:10px;right:10px;background:#380606;color:#ff8080;padding:10px;border-radius:12px;z-index:9999;font-size:12px;white-space:pre-wrap;border:1px solid #f44';
-  d.textContent='JS ERROR: '+e.message+' ('+e.lineno+')';
-  document.body.appendChild(d);
-});
-</script>
 </head>
 <body>
 <canvas id="confetti"></canvas>
@@ -27,13 +18,11 @@ window.addEventListener('error',function(e){
     <button class="icon-btn" data-tab="quests">🔔<b class="badge hide" id="questBadge">0</b></button>
     <button class="icon-btn" data-tab="top">🏆</button>
     <button class="icon-btn" data-tab="profile">👤</button>
-    <button class="daily-btn" id="dailyBtn" onclick="claimDaily()">🎁</button>
+    <button class="daily-btn" id="dailyBtn" onclick="openDailyWheel()">🎡</button>
     <div class="balance">⭐<span id="balanceValue">0</span><button class="add-btn" onclick="addStars()">+</button></div>
   </div>
   <div class="xp-line"><div id="lvlFill"></div></div>
 </header>
-
-<div class="feed"><div class="feed-track" id="feedTrack"></div></div>
 
 <main class="container">
   <section class="section active" id="sec-cases">
@@ -58,7 +47,7 @@ window.addEventListener('error',function(e){
   </section>
 
   <section class="section" id="sec-battles">
-    <h2>⚔️ Баттлы</h2>
+    <h2>⚔️ Баттлы <span class="muted small">только живые игроки</span></h2>
     <button class="btn btn-primary mb" onclick="createBattle()">+ Создать баттл</button>
     <div id="battlesList"></div>
   </section>
@@ -86,7 +75,7 @@ window.addEventListener('error',function(e){
   </section>
 
   <section class="section" id="sec-top">
-    <h2>🏆 Топ игроков</h2>
+    <h2>🏆 Топ игроков <span class="muted small">только живые</span></h2>
     <div id="topList"></div>
   </section>
 
@@ -133,6 +122,26 @@ window.addEventListener('error',function(e){
   </div>
 </div>
 
+<!-- КОЛЕСО ФОРТУНЫ (раз в 24ч, за подписку) -->
+<div class="modal-overlay" id="dailyModal">
+  <div class="modal">
+    <div class="sheet-grab"></div>
+    <div class="modal-head"><h3>🎡 Колесо фортуны</h3><button class="x" onclick="closeDaily()">✕</button></div>
+    <p class="muted" style="text-align:center">Бесплатно раз в 24 часа для подписчиков канала</p>
+    <div class="wheel-wrap">
+      <div class="wheel-pointer"></div>
+      <div class="wheel" id="dWheel"></div>
+      <div class="wheel-center">🎡</div>
+    </div>
+    <div id="dailySubBlock" style="display:none" class="mt">
+      <button class="btn btn-primary" onclick="subscribeChannel()">📢 Подписаться на канал</button>
+      <button class="btn btn-secondary mt" onclick="checkSubAndEnable()">✅ Я подписался</button>
+    </div>
+    <button class="btn btn-primary mt" id="dailySpinBtn" onclick="spinDaily()">Крутить бесплатно</button>
+    <div class="battle-log" id="dailyLog"></div>
+  </div>
+</div>
+
 <!-- БАТТЛ -->
 <div class="modal-overlay" id="battleModal">
   <div class="modal">
@@ -150,7 +159,7 @@ window.addEventListener('error',function(e){
 </div>
 
 <div class="toasts" id="toasts"></div>
-<script src="js/data.js?v=5"></script>
-<script src="js/app.js?v=5"></script>
+<script src="js/data.js?v=7"></script>
+<script src="js/app.js?v=7"></script>
 </body>
 </html>
