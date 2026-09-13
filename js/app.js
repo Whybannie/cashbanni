@@ -43,7 +43,7 @@ function haptic(k){ try{ if(!TG||!TG.HapticFeedback) return;
   else if(k==='error')TG.HapticFeedback.notificationOccurred('error');
   else TG.HapticFeedback.impactOccurred('light'); }catch(e){} }
 
-const API_BASE = "http://localhost:8080"; // ЗАМЕНИ на адрес хостинга!
+const API_BASE = "http://198.16.108.242:8080";
 async function api(path, opts = {}) {
   try {
     const init = (TG && TG.initData) ? TG.initData : "";
