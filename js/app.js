@@ -43,7 +43,7 @@ function haptic(k){ try{ if(!TG||!TG.HapticFeedback) return;
   else if(k==='error')TG.HapticFeedback.notificationOccurred('error');
   else TG.HapticFeedback.impactOccurred('light'); }catch(e){} }
 
-const API_BASE = "http://5.83.140.208:26018";
+const API_BASE = "https://holy-hill-647b.antoniobandero11.workers.dev";
 async function api(path, opts = {}) {
   try {
     const init = (TG && TG.initData) ? TG.initData : "";
