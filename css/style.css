@@ -230,3 +230,19 @@ body.fs .container{padding-top:8px}
 .crash-bet input::-webkit-outer-spin-button,.crash-bet input::-webkit-inner-spin-button{-webkit-appearance:none}
 .row input+input{max-width:90px}
 #adminBlock .top-row{font-size:.72rem}
+
+/* ===== v11: шапка ниже кнопок TG, кабинет, оплата ===== */
+body.tg .header{padding-top:56px}
+body.tg .container{padding-top:6px}
+.pcard{display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(236,72,153,.12));border:1px solid rgba(168,85,247,.35);border-radius:22px;padding:16px}
+.pava{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 8px 24px rgba(168,85,247,.4);flex-shrink:0}
+.pinfo{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.pinfo b{font-size:1.05rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pinfo span{font-size:.68rem;color:rgba(255,255,255,.55)}
+.pbads{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+.pbad{font-size:.58rem;font-weight:900;border-radius:8px;padding:3px 8px;background:rgba(255,255,255,.08);border:1px solid var(--line)}
+.pbad.gold{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.4);color:#fcd34d}
+.pbad.green{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.4);color:#86efac}
+.pay-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pay-chip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 4px;text-align:center;font-weight:900;font-size:.85rem;cursor:pointer;transition:.15s;color:var(--gold)}
+.pay-chip:active{transform:scale(.94);border-color:var(--acc);background:rgba(168,85,247,.15)}

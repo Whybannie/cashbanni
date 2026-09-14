@@ -1,15 +1,17 @@
-const BUILD = 10;
+const BUILD = 11;
 const $ = id => document.getElementById(id);
 const fmt = n => n.toLocaleString('ru-RU');
 const rnd = (a,b) => a + Math.random()*(b-a);
 const pick = a => a[Math.floor(Math.random()*a.length)];
 const gift = id => GIFTS.find(g=>g.id===id);
 const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const SUB_REWARD = 10;
+const PAY_PRESETS = [1,5,10,25,50,100,250,500];
 
 const DEF = () => ({
   balance:ECO.START_BALANCE, xp:0, inv:[],
   stats:{opened:0,spent:0,won:0,best:0,upgrades:0,upWins:0,battles:0,bWins:0,sells:0,buys:0,crashWins:0},
-  qp:{}, qc:[], ac:[], promo:[], refs:0, freeLast:0, subDone:false, tgId:null, migrated:false,
+  qp:{}, qc:[], ac:[], promo:[], refs:0, freeLast:0, subDone:false, tgId:null, migrated:false, createdAt:null,
   sound:true, fair:false, seed:uid()+uid(), serverMode:false, isAdmin:false
 });
 let S = load();
@@ -26,13 +28,12 @@ function load(){
 }
 
 const TG = (window.Telegram && window.Telegram.WebApp) || null;
-let FS_MODE = false;
 if (TG) {
   try {
     TG.ready(); TG.expand();
     setTimeout(()=>{try{TG.expand()}catch(e){}},300);
-    if (TG.requestFullscreen) { try{ const p=TG.requestFullscreen(); if(p&&p.then){p.then(()=>{FS_MODE=true;document.body.classList.add('fs');}).catch(()=>{});} }catch(e){} }
-    setTimeout(()=>{ if(FS_MODE) document.body.classList.add('fs'); },800);
+    if (TG.initData) document.body.classList.add('tg');
+    if (TG.requestFullscreen) { try{ const p=TG.requestFullscreen(); if(p&&p.catch)p.catch(()=>{}); }catch(e){} }
     if (TG.setHeaderColor) TG.setHeaderColor('#06061a');
     if (TG.setBackgroundColor) TG.setBackgroundColor('#06061a');
     const u = TG.initDataUnsafe && TG.initDataUnsafe.user;
@@ -58,10 +59,13 @@ function apiSave(){ if(!S.serverMode)return; clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{ api("/api/save",{method:"POST",body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})}); },800); }
 async function apiPay(stars){
   const r=await api("/api/pay",{method:"POST",body:JSON.stringify({stars})});
-  if(r.ok) toast("💳 Счёт на ⭐"+stars+" отправлен в Telegram","good"); else toast("Не удалось создать счёт","bad");
+  if(r.ok){ toast("💳 Открываю страницу оплаты Telegram…","good"); modalClose('payModal'); }
+  else toast("Не удалось создать счёт","bad");
 }
 function save(){ localStorage.setItem('cashbanni_v2', JSON.stringify(S)); apiSave(); }
 function validInv(){ return S.inv.filter(i=>i&&i.gid&&gift(i.gid)); }
+function refreshInv(){ if($('sec-profile').classList.contains('active'))renderInventory();
+  if($('sec-upgrade').classList.contains('active'))renderUpgrade(); }
 
 let upFrom=null, upTo=null, curCase=null, spinning=false, upBusy=false;
 const IMG = {};
@@ -80,8 +84,11 @@ async function loadTgs(url){
 }
 async function buildGiftImages(){
   if(!window.lottie) return;
-  let ok=0;
-  for(const g of GIFTS){ if(!g.tgs) continue;
+  try{ const c=JSON.parse(localStorage.getItem('cb_imgs')||'{}'); Object.assign(IMG,c);
+    if(Object.keys(c).length){ renderAll(); } }catch(e){}
+  const missing=GIFTS.filter(g=>g.tgs&&!IMG[g.id]);
+  if(!missing.length) return;
+  await Promise.allSettled(missing.map(async g=>{
     try{
       const data=await loadTgs(g.tgs);
       const div=document.createElement('div'); div.style.cssText='width:96px;height:96px;position:fixed;left:-9999px;top:0';
@@ -89,11 +96,12 @@ async function buildGiftImages(){
       const anim=lottie.loadAnimation({animationData:data,renderer:'canvas',loop:false,autoplay:false,container:div});
       await new Promise(r=>anim.addEventListener('DOMLoaded',r,{once:true}));
       anim.goToAndStop(Math.floor((anim.totalFrames||30)/2),true);
-      const c=div.querySelector('canvas'); if(c){ IMG[g.id]=c.toDataURL('image/png'); ok++; }
+      const c2=div.querySelector('canvas'); if(c2) IMG[g.id]=c2.toDataURL('image/png');
       anim.destroy(); div.remove();
     }catch(e){}
-  }
-  if(ok) renderAll();
+  }));
+  try{ localStorage.setItem('cb_imgs', JSON.stringify(IMG)); }catch(e){}
+  renderAll();
 }
 
 let AC;
@@ -219,9 +227,9 @@ async function spin(n){ if(spinning) return;
     $('multiResults').insertAdjacentHTML('beforeend',itemCard(g,true));
     if(g.rarity==='epic'||g.rarity==='legendary'){sfx.legend();confetti(150);toast('💎 ЭПИКА: '+g.name+'!','good');} else sfx.win();
     qEvent('open',1); save(); renderHeader(); }
-  spinning=false; checkAch(); save(); renderCases(); renderTasks(); }
+  spinning=false; checkAch(); save(); renderCases(); renderTasks(); refreshInv(); }
 
-// ---------- CRASH LIVE: раунды идут 24/7, самолёт летает всегда ----------
+// ---------- CRASH LIVE ----------
 const crash={ phase:'bet', betEnds:Date.now()+6000, t0:0, m:1, cp:1, myBet:0, cashed:false, hist:[], lastInt:1, sparks:[], tNow:0 };
 function genCrash(){ const r=Math.random(); if(r<0.03)return 1.00; return Math.min(150,Math.floor(0.97/(1-r)*100)/100); }
 function crashResize(){ const c=$('crashCanvas'); if(!c)return;
@@ -357,9 +365,9 @@ function sellAll(){ const items=validInv(); if(!items.length)return;
   save(); renderHeader(); renderInventory(); renderUpgrade(); }
 function toUpgrade(u){ upFrom=S.inv.find(i=>i.uid===u)||null; upTo=null; activateTab('upgrade'); }
 
-// ---------- АПГРЕЙД ----------
+// ---------- АПГРЕЙД (честные шансы: 50→100 = 50%) ----------
 function upChanceVal(){ if(!(upFrom&&upTo))return 0;
-  return Math.min(80,Math.max(2,Math.floor(gift(upFrom.gid).price/upTo.price*100*ECO.UPGRADE_EDGE))); }
+  return Math.min(90, Math.max(2, Math.round(gift(upFrom.gid).price/upTo.price*100))); }
 function selFrom(u){ upFrom=S.inv.find(i=>i.uid===u)||null; upTo=null; sfx.click(); renderUpgrade(); }
 function selTo(id){ upTo=gift(id)||null; sfx.click(); renderUpgrade(); }
 function renderUpgrade(){ const items=validInv();
@@ -401,8 +409,8 @@ function renderTasks(){ const fr=freeReady();
   renderQuests(); renderAchs(); }
 async function doSub(){ openChannel();
   setTimeout(async()=>{ const r=await api('/api/check_sub');
-    if(r&&r.sub&&!S.subDone){ S.subDone=true; S.balance+=25; sfx.win(); confetti(60);
-      toast('📢 Подписка подтверждена: +⭐25','good'); save(); renderHeader(); renderTasks(); renderProfile(); }
+    if(r&&r.sub&&!S.subDone){ S.subDone=true; S.balance+=SUB_REWARD; sfx.win(); confetti(60);
+      toast('📢 Подписка подтверждена: +⭐'+SUB_REWARD,'good'); save(); renderHeader(); renderTasks(); renderProfile(); }
     else if(r&&r.sub){ S.subDone=true; toast('Подписка есть ✅','good'); renderProfile(); }
     else toast('Ты не подписан на канал','bad'); },2500); }
 function renderQuests(){ $('questsList').innerHTML=QUESTS.map(q=>{
@@ -411,7 +419,7 @@ function renderQuests(){ $('questsList').innerHTML=QUESTS.map(q=>{
     '<div class="q-bar"><div class="q-fill" style="width:'+(p/q.target*100)+'%"></div></div>'+
     '<button class="q-claim" '+(done&&!cl?'':'disabled')+' onclick="claimQuest(\''+q.id+'\')">'+(cl?'✅ Получено':'Забрать ⭐'+q.reward)+'</button></div>';}).join(''); }
 function renderAchs(){ $('achList').innerHTML=ACHS.map(a=>{const d=a.cond(S);return
-  '<div class="ach '+(d?'done':'locked')+'"><span class="emoji">'+a.emoji+'</span><div><b>'+a.name+'</b><div class="muted small">'+(d?'Выполнено ✅':'Не выполнено')+'</div></div></div>';}).join(''); }
+    '<div class="ach '+(d?'done':'locked')+'"><span class="emoji">'+a.emoji+'</span><div><b>'+a.name+'</b><div class="muted small">'+(d?'Выполнено ✅':'Не выполнено')+'</div></div></div>';}).join(''); }
 function claimQuest(id){ const q=QUESTS.find(x=>x.id===id);
   if(S.qc.includes(id)||(S.qp[q.type]||0)<q.target)return;
   S.qc.push(id); S.balance+=q.reward; sfx.win(); toast('📜 Квест: +⭐'+q.reward,'good');
@@ -434,7 +442,16 @@ function renderMarket(){ const disc=dailyDiscount();
 function buyGift(id,p){ if(S.balance<p)return toast('Недостаточно Stars','bad');
   S.balance-=p; S.stats.spent+=p; S.inv.push({uid:uid(),gid:id}); S.stats.buys++;
   qEvent('buy'); sfx.win(); toast('Куплено: '+gift(id).name+' за ⭐'+p,'good');
-  save(); renderHeader(); renderMarket(); renderInventory(); renderUpgrade(); checkAch(); }
+  save(); renderHeader(); renderMarket(); refreshInv(); checkAch(); }
+
+// ---------- ПОПОЛНЕНИЕ ----------
+function openPay(){ sfx.click();
+  $('payGrid').innerHTML=PAY_PRESETS.map(v=>'<div class="pay-chip" onclick="doPay('+v+')">⭐'+v+'</div>').join('');
+  modalOpen('payModal'); }
+function doPay(stars){ apiPay(stars); }
+function doPayCustom(){ const v=parseInt($('payCustom').value);
+  if(!v||v<1||v>10000) return toast('Сумма от 1 до 10000','bad');
+  apiPay(v); }
 
 // ---------- БАТТЛЫ ----------
 function renderBattles(){ if(!S.serverMode){$('battlesList').innerHTML='<div class="muted">Баттлы доступны в Telegram-версии.</div>';return;}
@@ -471,7 +488,7 @@ function runBattle(hostName,bet,youWin){ $('battlePot').textContent=fmt(bet*2);
 function closeBattle(){ modalClose('battleModal'); renderBattles(); }
 setInterval(()=>{ if($('sec-battles').classList.contains('active'))renderBattles(); },6000);
 
-// ---------- ТОП-50 / РАНГ / КАБИНЕТ / АДМИН ----------
+// ---------- КАБИНЕТ / ТОП / АДМИН ----------
 function renderRank(){ const rc=$('rankCard');
   if(!S.serverMode){ rc.innerHTML='<div class="ic-box gold"><svg class="ic"><use href="#i-trophy"/></svg></div><div><b>Твоё место: #1</b><span>Лидерборд живых — в Telegram</span></div>'; return; }
   api('/api/rank').then(r=>{ if(r.error)return;
@@ -482,8 +499,17 @@ function renderTop(){ if(!S.serverMode){ $('topList').innerHTML='<div class="top
     if(!rows.length){$('topList').innerHTML='<div class="muted">Пока пусто — стань первым!</div>';return;}
     $('topList').innerHTML=rows.map((x,i)=>'<div class="top-row '+(x.me?'me':'')+'"><div class="pos">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1)+'</div><b>'+(x.me?'😎 ':'🧑 ')+x.name+'</b><div class="won">⭐'+fmt(x.won)+'</div></div>').join(''); }); }
 function renderProfile(){ const st=S.stats,li=levelInfo();
+  $('pName').textContent=S.tgName||'Игрок';
+  $('pAva').textContent=(S.tgName||'😎').charAt(0).toUpperCase();
   $('myId').textContent=S.tgId||'—';
-  $('subState').textContent=S.subDone?'Активна ✅':'Не подтверждена';
+  $('pReg').textContent=S.createdAt?new Date(S.createdAt).toLocaleDateString('ru-RU'):'—';
+  let bad='';
+  if(S.isAdmin)bad+='<span class="pbad gold">🛡 АДМИН</span>';
+  if(S.subDone)bad+='<span class="pbad green">📢 Подписчик</span>';
+  if(S.refs>0)bad+='<span class="pbad">🤝 '+S.refs+' рефов</span>';
+  if(st.opened>=100)bad+='<span class="pbad gold">📦 100+ кейсов</span>';
+  $('pBadges').innerHTML=bad||'<span class="pbad">🌱 Новичок</span>';
+  $('subState').textContent=S.subDone?'Активна ✅':'Награда ⭐'+SUB_REWARD;
   $('statsGrid').innerHTML=[['Уровень',li.lvl+' ур.'],['Кейсов',st.opened],['Потрачено','⭐'+fmt(st.spent)],['Выиграно','⭐'+fmt(st.won)],
     ['Лучший дроп','⭐'+fmt(st.best)],['Апгрейдов',st.upWins+'/'+st.upgrades],['Баттлов',st.bWins+'/'+st.battles],['Crash побед',st.crashWins||0],
     ['Режим',S.serverMode?'🟢 онлайн':'⚪ локально'],['Сборка','build '+BUILD]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('');
@@ -513,8 +539,7 @@ function copyRef(){ const code=S.tgId||S.seed.slice(0,8);
   toast('🤝 Ссылка скопирована! Друг зайдёт — получишь ⭐'+REF_REWARD,'good'); }
 function toggleSound(){ S.sound=$('soundToggle').checked; save(); }
 function toggleFair(){ S.fair=$('fairToggle').checked; save(); renderProfile(); }
-function resetAll(){ if(confirm('Сбросить ТОЛЬКО локальный кеш? Данные на сервере сохранятся!')){ localStorage.removeItem('cashbanni_v2'); location.reload(); } }
-function addStars(){ if(S.serverMode&&TG){apiPay(100);} else {S.balance+=100;sfx.click();toast('⭐ +100 (демо)');save();renderHeader();} }
+function addStars(){ if(S.serverMode&&TG){ openPay(); } else { S.balance+=100; sfx.click(); toast('⭐ +100 (демо)'); save(); renderHeader(); } }
 
 (function(){ const cols=['#a855f7','#ec4899','#3b82f6','#f59e0b'];
   for(let i=0;i<6;i++){ const d=document.createElement('div'); d.className='bubble';
@@ -527,12 +552,12 @@ function addStars(){ if(S.serverMode&&TG){apiPay(100);} else {S.balance+=100;sfx
   if(S.inv.length!==validInv().length){ S.inv=validInv(); localStorage.setItem('cashbanni_v2',JSON.stringify(S)); }
   const me=await api('/api/me');
   if(me&&me.tg_id){
-    S.tgId=me.tg_id; S.refs=me.ref_count||0; S.isAdmin=!!me.admin;
+    S.tgId=me.tg_id; S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
     const serverEmpty=(!me.stats||!me.stats.opened)&&me.balance===ECO.START_BALANCE&&!me.inv.length;
     const localHas=S.stats.opened>0||S.inv.length>0||S.balance!==ECO.START_BALANCE;
     if(serverEmpty&&localHas&&!S.migrated){
       await api('/api/save',{method:'POST',body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})});
-      S.migrated=true; toast('📦 Твой локальный прогресс перенесён на сервер!','good');
+      S.migrated=true; toast('📦 Локальный прогресс перенесён на сервер!','good');
     } else {
       S.balance=me.balance; S.inv=me.inv; S.stats=me.stats; S.xp=me.xp; S.migrated=true;
     }
