@@ -43,7 +43,7 @@ function haptic(k){ try{ if(!TG||!TG.HapticFeedback) return;
   else if(k==='error')TG.HapticFeedback.notificationOccurred('error');
   else TG.HapticFeedback.impactOccurred('light'); }catch(e){} }
 
-const API_BASE = "https://holy-hill-647b.antoniobandero11.workers.dev";
+const API_BASE = "https://cashbanni-api-proxy2.vercel.app";
 async function api(path, opts = {}) {
   try {
     const init = (TG && TG.initData) ? TG.initData : "";
