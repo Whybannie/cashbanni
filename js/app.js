@@ -517,7 +517,12 @@ function renderProfile(){ const st=S.stats,li=levelInfo();
   $('fairInfo').innerHTML=S.fair?'Seed: '+S.seed+'<br>Hash: '+hash(S.seed):'';
   if(S.isAdmin){ $('adminBlock').style.display='block'; renderAdmin(); } }
 function renderAdmin(){ api('/api/admin/stats').then(r=>{ if(r.error)return;
-  $('adminStats').innerHTML=[['Игроков',r.total],['Балансов всего','⭐'+fmt(r.sumBalance)],['Баттлов',r.battles],['Платежей',r.payments]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join(''); });
+  $('adminStats').innerHTML=[
+    ['Игроков',r.total],['Новых 24ч',r.new24],['Новых 7д',r.new7],['Актив 24ч',r.active24],
+    ['Балансы','⭐'+fmt(r.sumBalance)],['Средний','⭐'+fmt(r.avgBalance)],['Потрачено','⭐'+fmt(r.sumSpent)],['Выиграно','⭐'+fmt(r.sumWon)],
+    ['Кейсов',r.sumOpened],['Апгрейдов',r.sumUpW+'/'+r.sumUpA],['Crash побед',r.sumCrashW],['Баттлов',r.battles],
+    ['Покупок',r.sumBuys],['Продаж',r.sumSells],['Рефералов',r.sumRefs],['Платежи',r.payments+' / ⭐'+fmt(r.payStars)]
+  ].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join(''); });
   api('/api/admin/users').then(r=>{ if(r.error)return;
   $('adminUsers').innerHTML=(r.rows||[]).map(x=>'<div class="top-row"><div class="pos">#'+x.tg_id+'</div><b>'+x.name+'</b><div class="won">⭐'+fmt(x.balance)+'</div></div>').join(''); }); }
 function admGrant(){ const id=parseInt($('admId').value), sum=parseInt($('admSum').value);
