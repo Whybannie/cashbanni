@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Cash Banni</title>
-<link rel="stylesheet" href="css/style.css?v=9">
+<link rel="stylesheet" href="css/style.css?v=10">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous"></script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -25,6 +25,7 @@
 <symbol id="i-mega" viewBox="0 0 24 24"><path d="M3 11l18-6v14L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></symbol>
 <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17.5" cy="9" r="3"/><path d="M17.5 14.5c2.8 0 4.5 1.8 4.5 4.5"/></symbol>
 <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4z"/><path d="m9 12 2 2 4-4"/></symbol>
 </svg>
 
 <canvas id="confetti"></canvas>
@@ -43,7 +44,7 @@
   <section class="section active" id="sec-home">
     <div class="hero-card" onclick="activateTab('crash')">
       <div class="ic-box gold"><svg class="ic"><use href="#i-rocket"/></svg></div>
-      <div class="hero-info"><b>CRASH</b><span>Поймай множитель и забери Stars</span></div>
+      <div class="hero-info"><b>CRASH · LIVE</b><span id="heroCrashState">Раунд идёт — успей запрыгнуть</span></div>
       <div class="hero-go">›</div>
     </div>
     <div class="sec-head"><h2>🎁 Кейсы</h2><span class="muted" id="casesStat"></span></div>
@@ -53,7 +54,7 @@
   <section class="section" id="sec-crash">
     <div class="crash-head">
       <button class="back-btn" onclick="activateTab('home')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
-      <h2>Crash</h2>
+      <h2>Crash · Live</h2>
     </div>
     <div class="crash-box" id="crashBox">
       <canvas id="crashCanvas"></canvas>
@@ -66,7 +67,7 @@
         <input id="crashBetInput" type="number" value="20" min="5">
         <button class="mini-btn sell" onclick="crashBet(10)">+10</button>
       </div>
-      <button class="btn btn-primary" id="crashBtn" onclick="crashAction()">Начать полёт</button>
+      <button class="btn btn-primary" id="crashBtn" onclick="crashAction()">Сделать ставку</button>
     </div>
     <div class="crash-history" id="crashHistory"></div>
   </section>
@@ -85,7 +86,7 @@
     </div>
     <div class="task-card">
       <div class="ic-box blue"><svg class="ic"><use href="#i-users"/></svg></div>
-      <div class="task-info"><b>Пригласи друга</b><span>⭐5 когда друг зайдёт в бота · <b id="refCount">0</b></span></div>
+      <div class="task-info"><b>Пригласи друга</b><span>⭐5 когда друг зайдёт · <b id="refCount">0</b></span></div>
       <button class="btn btn-secondary task-btn" onclick="copyRef()">Ссылка</button>
     </div>
     <h2 class="mt">Квесты</h2>
@@ -114,7 +115,7 @@
     <h2>Режимы</h2>
     <div class="task-card" onclick="activateTab('crash')">
       <div class="ic-box gold"><svg class="ic"><use href="#i-rocket"/></svg></div>
-      <div class="task-info"><b>Crash</b><span>Множитель растёт — успей забрать</span></div>
+      <div class="task-info"><b>Crash Live</b><span>Раунды идут 24/7</span></div>
       <div class="hero-go">›</div>
     </div>
     <div class="task-card" onclick="activateTab('battles')">
@@ -148,13 +149,23 @@
   </section>
 
   <section class="section" id="sec-profile">
-    <h2>Профиль</h2>
-    <div class="stats-grid" id="statsGrid"></div>
+    <h2>Личный кабинет</h2>
     <div class="rank-card" id="rankCard"></div>
-    <h2 class="mt">Лидеры</h2>
+    <div class="stats-grid mt" id="statsGrid"></div>
+    <div class="task-card mt">
+      <div class="ic-box purple"><svg class="ic"><use href="#i-user"/></svg></div>
+      <div class="task-info"><b>ID аккаунта: #<span id="myId">—</span></b><span>Нужен для начислений (стримерам, ивентам)</span></div>
+      <button class="btn btn-secondary task-btn" onclick="copyId()">Копировать</button>
+    </div>
+    <div class="task-card">
+      <div class="ic-box green"><svg class="ic"><use href="#i-mega"/></svg></div>
+      <div class="task-info"><b>Подписка на канал</b><span id="subState">Проверяется…</span></div>
+      <button class="btn btn-secondary task-btn" id="subBtn2" onclick="doSub()">Проверить</button>
+    </div>
+    <h2 class="mt">Топ-50 лидеров</h2>
     <div id="topList"></div>
     <h2 class="mt">Мои предметы</h2>
-    <div class="muted mb" id="invValue"></div>
+    <div class="sec-head mb"><span class="muted" id="invValue"></span><button class="btn btn-sell" onclick="sellAll()">Продать всё</button></div>
     <div class="inventory-grid" id="inventoryGrid"></div>
     <h3 class="mt">Промокод</h3>
     <div class="row"><input id="promoInput" placeholder="ВВЕДИ КОД"><button class="btn btn-primary" onclick="applyPromo()">OK</button></div>
@@ -162,7 +173,19 @@
     <label class="switch-row"><input type="checkbox" id="soundToggle" onchange="toggleSound()"> Звуки и вибрация</label>
     <label class="switch-row"><input type="checkbox" id="fairToggle" onchange="toggleFair()"> Provably Fair</label>
     <div class="muted small" id="fairInfo"></div>
-    <button class="btn btn-danger mt" onclick="resetAll()">Сбросить прогресс</button>
+
+    <div id="adminBlock" style="display:none">
+      <h2 class="mt">🛡 Админ-панель</h2>
+      <div class="stats-grid" id="adminStats"></div>
+      <h3 class="mt">Начислить Stars по ID</h3>
+      <div class="row"><input id="admId" placeholder="ID"><input id="admSum" placeholder="Сумма"><button class="btn btn-primary" onclick="admGrant()">OK</button></div>
+      <h3 class="mt">Рассылка всем игрокам</h3>
+      <div class="row"><input id="admMsg" placeholder="Текст"><button class="btn btn-primary" onclick="admBroadcast()">📨</button></div>
+      <h3 class="mt">Игроки</h3>
+      <div id="adminUsers"></div>
+    </div>
+
+    <button class="btn btn-danger mt" onclick="resetAll()">Сбросить локальный кеш</button>
   </section>
 </main>
 
@@ -171,7 +194,7 @@
   <button data-tab="tasks"><svg class="ic"><use href="#i-tasks"/></svg><span class="nl">Задания</span></button>
   <button data-tab="upgrade"><svg class="ic"><use href="#i-bolt"/></svg><span class="nl">Апгрейд</span></button>
   <button data-tab="modes"><svg class="ic"><use href="#i-modes"/></svg><span class="nl">Режимы</span></button>
-  <button data-tab="profile"><svg class="ic"><use href="#i-user"/></svg><span class="nl">Профиль</span></button>
+  <button data-tab="profile"><svg class="ic"><use href="#i-user"/></svg><span class="nl">Кабинет</span></button>
 </nav>
 
 <div class="modal-overlay" id="caseModal">
@@ -208,7 +231,7 @@
 </div>
 
 <div class="toasts" id="toasts"></div>
-<script src="js/data.js?v=9"></script>
-<script src="js/app.js?v=9"></script>
+<script src="js/data.js?v=10"></script>
+<script src="js/app.js?v=10"></script>
 </body>
 </html>

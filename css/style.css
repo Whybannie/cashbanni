@@ -223,3 +223,10 @@ h3{font-size:.82rem;margin-bottom:8px;color:rgba(255,255,255,.75)}
 @media (min-width:900px){.cases-grid{grid-template-columns:repeat(5,1fr)}.wheel-wrap{width:320px}.crash-box{height:360px}}
 @media (max-width:360px){.logo{font-size:20px}.balance{padding:8px 11px;font-size:.88rem}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== v10: фуллскрин-шапка, админ, краш-live ===== */
+body.fs .header{padding-top:56px}
+body.fs .container{padding-top:8px}
+.crash-bet input::-webkit-outer-spin-button,.crash-bet input::-webkit-inner-spin-button{-webkit-appearance:none}
+.row input+input{max-width:90px}
+#adminBlock .top-row{font-size:.72rem}

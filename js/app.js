@@ -1,4 +1,4 @@
-const BUILD = 9;
+const BUILD = 10;
 const $ = id => document.getElementById(id);
 const fmt = n => n.toLocaleString('ru-RU');
 const rnd = (a,b) => a + Math.random()*(b-a);
@@ -8,9 +8,9 @@ const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 
 const DEF = () => ({
   balance:ECO.START_BALANCE, xp:0, inv:[],
-  stats:{opened:0,spent:0,won:0,best:0,upgrades:0,upWins:0,battles:0,bWins:0,sells:0,buys:0},
-  qp:{}, qc:[], ac:[], promo:[], refs:0, freeLast:0, subDone:false, tgId:null,
-  sound:true, fair:false, seed:uid()+uid(), serverMode:false
+  stats:{opened:0,spent:0,won:0,best:0,upgrades:0,upWins:0,battles:0,bWins:0,sells:0,buys:0,crashWins:0},
+  qp:{}, qc:[], ac:[], promo:[], refs:0, freeLast:0, subDone:false, tgId:null, migrated:false,
+  sound:true, fair:false, seed:uid()+uid(), serverMode:false, isAdmin:false
 });
 let S = load();
 function load(){
@@ -26,19 +26,20 @@ function load(){
 }
 
 const TG = (window.Telegram && window.Telegram.WebApp) || null;
+let FS_MODE = false;
 if (TG) {
   try {
     TG.ready(); TG.expand();
     setTimeout(()=>{try{TG.expand()}catch(e){}},300);
-    setTimeout(()=>{try{TG.expand()}catch(e){}},1200);
-    if (TG.requestFullscreen) { try{ const p=TG.requestFullscreen(); if(p&&p.catch)p.catch(()=>{}); }catch(e){} }
+    if (TG.requestFullscreen) { try{ const p=TG.requestFullscreen(); if(p&&p.then){p.then(()=>{FS_MODE=true;document.body.classList.add('fs');}).catch(()=>{});} }catch(e){} }
+    setTimeout(()=>{ if(FS_MODE) document.body.classList.add('fs'); },800);
     if (TG.setHeaderColor) TG.setHeaderColor('#06061a');
     if (TG.setBackgroundColor) TG.setBackgroundColor('#06061a');
     const u = TG.initDataUnsafe && TG.initDataUnsafe.user;
     if (u) S.tgName = u.first_name || null;
   } catch (e) {}
 }
-function haptic(k){ try{ if(!TG||!TG.HapticFeedback) return;
+function haptic(k){ try{ if(!TG||!TG.HapticFeedback)return;
   if(k==='success')TG.HapticFeedback.notificationOccurred('success');
   else if(k==='error')TG.HapticFeedback.notificationOccurred('error');
   else TG.HapticFeedback.impactOccurred('light'); }catch(e){} }
@@ -53,7 +54,7 @@ async function api(path, opts = {}) {
   } catch (e) { return { error: e.message }; }
 }
 let saveTimer=null;
-function apiSave(){ if(!S.serverMode) return; clearTimeout(saveTimer);
+function apiSave(){ if(!S.serverMode)return; clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{ api("/api/save",{method:"POST",body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})}); },800); }
 async function apiPay(stars){
   const r=await api("/api/pay",{method:"POST",body:JSON.stringify({stars})});
@@ -64,7 +65,6 @@ function validInv(){ return S.inv.filter(i=>i&&i.gid&&gift(i.gid)); }
 
 let upFrom=null, upTo=null, curCase=null, spinning=false, upBusy=false;
 const IMG = {};
-
 function modalOpen(id){ $(id).classList.add('active'); document.body.classList.add('modal-open'); }
 function modalClose(id){ $(id).classList.remove('active');
   if(!document.querySelector('.modal-overlay.active')) document.body.classList.remove('modal-open'); }
@@ -97,7 +97,7 @@ async function buildGiftImages(){
 }
 
 let AC;
-function beep(f,d,t,v){ d=d||0.08;t=t||'square';v=v||0.12; if(!S.sound) return;
+function beep(f,d,t,v){ d=d||0.08;t=t||'square';v=v||0.12; if(!S.sound)return;
   try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)();
     const o=AC.createOscillator(),g=AC.createGain(); o.type=t;o.frequency.value=f;g.gain.value=v;
     o.connect(g);g.connect(AC.destination);o.start();
@@ -155,7 +155,6 @@ function spinWheel(el,segs,winIndex,cb){ let start=0;
   let n=0; const ti=setInterval(()=>{sfx.tick(); if(++n>26)clearInterval(ti);},150);
   setTimeout(cb,4100); }
 
-// ---------- ПОДПИСКА ----------
 async function checkSub(){ const r=await api('/api/check_sub'); return !!(r&&r.sub); }
 function openChannel(){ try{ TG&&TG.openTelegramLink?TG.openTelegramLink(CHANNEL):window.open(CHANNEL); }catch(e){ window.open(CHANNEL); } }
 
@@ -167,7 +166,7 @@ function freeReady(){ return Date.now()-(S.freeLast||0)>=FREE_CASE_COOLDOWN; }
 function renderCases(){ $('casesStat').textContent='Открыто: '+S.stats.opened;
   $('casesGrid').innerHTML=CASES.map(c=>
     '<div class="case-card" style="--glow:'+RAR[c.rarity].glow+'" onclick="openCaseModal(\''+c.id+'\')">'+
-    (c.free?'<div class="free-badge">'+(freeReady()?'24Ч ДОСТУПНО':'1/24Ч')+'</div>':'')+
+    (c.free?'<div class="free-badge">'+(freeReady()?'ДОСТУПНО':'1/24Ч')+'</div>':'')+
     '<div class="rt" style="background:'+RAR[c.rarity].color+';color:'+RAR[c.rarity].color+'"></div>'+
     caseArt(c)+'<div class="name">'+c.name+'</div>'+
     '<div class="price">'+(c.price===0?'БЕСПЛАТНО':'⭐ '+fmt(c.price))+'</div></div>').join(''); }
@@ -203,7 +202,7 @@ function spinOnce(g,dur){ return new Promise(res=>{
 async function spin(n){ if(spinning) return;
   if(curCase.free){ if(!freeReady()) return toast('⏳ Раз в 24 часа','bad');
     const sub=await checkSub();
-    if(!sub){ toast('📢 Бесплатный кейс только для подписчиков канала','bad'); openChannel(); return; } }
+    if(!sub){ toast('📢 Только для подписчиков канала','bad'); openChannel(); return; } }
   if(curCase.free) n=1;
   const cost=curCase.price*n;
   if(S.balance<cost) return toast('Недостаточно Stars ⭐','bad');
@@ -222,55 +221,74 @@ async function spin(n){ if(spinning) return;
     qEvent('open',1); save(); renderHeader(); }
   spinning=false; checkAch(); save(); renderCases(); renderTasks(); }
 
-// ---------- КРАШ v2 (медленнее, красивее) ----------
-const crash={state:'idle',bet:20,m:1,cp:1,t0:0,tNow:0,raf:0,hist:[],lastInt:1,sparks:[]};
+// ---------- CRASH LIVE: раунды идут 24/7, самолёт летает всегда ----------
+const crash={ phase:'bet', betEnds:Date.now()+6000, t0:0, m:1, cp:1, myBet:0, cashed:false, hist:[], lastInt:1, sparks:[], tNow:0 };
+function genCrash(){ const r=Math.random(); if(r<0.03)return 1.00; return Math.min(150,Math.floor(0.97/(1-r)*100)/100); }
 function crashResize(){ const c=$('crashCanvas'); if(!c)return;
   const r=c.parentElement.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
-  c.width=r.width*dpr; c.height=r.height*dpr; crashDraw(); }
+  c.width=r.width*dpr; c.height=r.height*dpr; }
 addEventListener('resize',()=>{ if($('sec-crash').classList.contains('active'))crashResize(); });
-function genCrash(){ const r=Math.random(); if(r<0.03)return 1.00; return Math.min(150,Math.floor(0.97/(1-r)*100)/100); }
 function crashBet(d){ const i=$('crashBetInput'); i.value=Math.max(5,(parseInt(i.value)||20)+d); }
-function crashAction(){ if(crash.state==='flying')return crashCashout();
-  const bet=Math.max(5,parseInt($('crashBetInput').value)||20);
-  if(S.balance<bet)return toast('Недостаточно Stars ⭐','bad');
-  S.balance-=bet; S.stats.spent+=bet;
-  crash.bet=bet; crash.cp=genCrash(); crash.m=1; crash.lastInt=1; crash.sparks=[];
-  crash.state='flying'; crash.t0=performance.now();
-  save(); renderHeader();
-  $('crashBtn').textContent='Забрать ⭐'+bet; $('crashBtn').className='btn btn-sell';
-  $('crashStatus').textContent='Летим… жми, чтобы забрать!';
-  $('crashMult').className='crash-mult'; sfx.click(); crashLoop(); }
-function crashLoop(){ const t=performance.now()-crash.t0; crash.tNow=t;
-  crash.m=Math.exp(t/9000); // МЕДЛЕННЕЕ: x2 ~6.2с, x5 ~14.5с, x10 ~20.7с
-  if(crash.m>=crash.cp){ crash.m=crash.cp; crashDraw(true); return crashEnd(); }
-  if(Math.floor(crash.m)>crash.lastInt){ crash.lastInt=Math.floor(crash.m); sfx.tick(); }
+function crashAction(){
+  if(crash.phase==='bet'){
+    if(crash.myBet>0){ S.balance+=crash.myBet; crash.myBet=0; sfx.click();
+      toast('Ставка отменена','good'); save(); renderHeader(); return; }
+    const bet=Math.max(5,parseInt($('crashBetInput').value)||20);
+    if(S.balance<bet) return toast('Недостаточно Stars ⭐','bad');
+    S.balance-=bet; crash.myBet=bet; crash.cashed=false;
+    sfx.click(); toast('✅ Ставка ⭐'+bet+' принята! Жди взлёт','good');
+    save(); renderHeader(); return;
+  }
+  if(crash.phase==='fly'&&crash.myBet>0&&!crash.cashed){
+    const win=Math.floor(crash.myBet*crash.m);
+    S.balance+=win; S.stats.won+=win; S.stats.crashWins=(S.stats.crashWins||0)+1;
+    crash.cashed=true;
+    $('crashMult').className='crash-mult green';
+    $('crashStatus').innerHTML='✅ Забрал на '+crash.m.toFixed(2)+'× → +⭐'+fmt(win);
+    sfx.win(); if(crash.m>=5)confetti(90);
+    save(); renderHeader(); checkAch(); return;
+  }
+  toast('⏳ Ставки принимаются только перед взлётом','bad');
+}
+function crashLoop(){
+  const now=Date.now();
+  if(crash.phase==='bet'){
+    const left=(crash.betEnds-now)/1000;
+    $('crashMult').textContent='1.00×'; $('crashMult').className='crash-mult';
+    $('crashStatus').innerHTML='🎰 Ставки: '+Math.max(0,left).toFixed(1)+' с';
+    const hero=$('heroCrashState'); if(hero) hero.textContent='Приём ставок: '+Math.max(0,left).toFixed(0)+' с';
+    if(left<=0){ crash.phase='fly'; crash.t0=now; crash.cp=genCrash(); crash.m=1; crash.lastInt=1; crash.sparks=[];
+      if(crash.myBet>0) toast('🚀 Взлёт! Твоя ставка ⭐'+crash.myBet+' в игре','good'); }
+  } else if(crash.phase==='fly'){
+    const t=now-crash.t0; crash.tNow=t;
+    crash.m=Math.exp(t/9000);
+    if(crash.m>=crash.cp){ crash.m=crash.cp; crash.phase='crash'; crash.betEnds=now+2500;
+      $('crashMult').textContent=crash.cp.toFixed(2)+'×'; $('crashMult').className='crash-mult red';
+      const c=$('crashCanvas'),dpr=window.devicePixelRatio||1;
+      for(let i=0;i<26;i++)crash.sparks.push({x:c.width*0.85,y:c.height*0.25,vx:rnd(-4,4)*dpr,vy:rnd(-4,4)*dpr,l:1});
+      $('crashStatus').innerHTML='💥 Краш на '+crash.cp.toFixed(2)+'×';
+      if(crash.myBet>0&&!crash.cashed){ sfx.lose(); toast('💥 Краш! −⭐'+crash.myBet,'bad'); }
+      $('crashBox').classList.add('shake'); setTimeout(()=>$('crashBox').classList.remove('shake'),500);
+      crash.hist.unshift(crash.cp); crash.hist=crash.hist.slice(12); crashHist(); crash.myBet=0; crash.cashed=false;
+    } else {
+      if(Math.floor(crash.m)>crash.lastInt){ crash.lastInt=Math.floor(crash.m); sfx.tick(); }
+      $('crashMult').textContent=crash.m.toFixed(2)+'×';
+      $('crashMult').className='crash-mult'+(crash.m>=10?' gold':'');
+      $('crashStatus').innerHTML=crash.myBet>0?(crash.cashed?'✅ Забрано':'🚀 Летим! Забрать: ⭐'+Math.floor(crash.myBet*crash.m)):'🚀 В полёте';
+      const hero=$('heroCrashState'); if(hero) hero.textContent='LIVE: '+crash.m.toFixed(2)+'×';
+    }
+  } else {
+    if(now>=crash.betEnds){ crash.phase='bet'; crash.betEnds=now+6000; }
+  }
+  const btn=$('crashBtn');
+  if(crash.phase==='bet') btn.textContent=crash.myBet>0?('Отменить ⭐'+crash.myBet):'Сделать ставку';
+  else if(crash.phase==='fly') btn.textContent=crash.myBet>0?(crash.cashed?'Забрано ✅':'Забрать ⭐'+Math.floor(crash.myBet*crash.m)):'Ждём следующий раунд…';
+  else btn.textContent='💥 Краш…';
   crashDraw();
-  const el=$('crashMult'); el.textContent=crash.m.toFixed(2)+'×';
-  el.className='crash-mult'+(crash.m>=10?' gold':'');
-  $('crashBtn').textContent='Забрать ⭐'+Math.floor(crash.bet*crash.m);
-  crash.raf=requestAnimationFrame(crashLoop); }
-function crashCashout(){ if(crash.state!=='flying')return;
-  const win=Math.floor(crash.bet*crash.m);
-  S.balance+=win; S.stats.won+=win; crash.state='idle'; cancelAnimationFrame(crash.raf);
-  $('crashMult').className='crash-mult green';
-  $('crashStatus').innerHTML='✅ Забрал на '+crash.m.toFixed(2)+'× → +⭐'+fmt(win);
-  sfx.win(); if(crash.m>=5)confetti(90);
-  crash.hist.unshift(crash.m); crashHist(); crashReset();
-  save(); renderHeader(); checkAch(); crashDraw(); }
-function crashEnd(){ crash.state='idle'; cancelAnimationFrame(crash.raf);
-  $('crashMult').textContent=crash.cp.toFixed(2)+'×'; $('crashMult').className='crash-mult red';
-  $('crashStatus').innerHTML='💥 Краш на '+crash.cp.toFixed(2)+'×';
-  const dpr=window.devicePixelRatio||1, c=$('crashCanvas');
-  for(let i=0;i<26;i++)crash.sparks.push({x:c.width*0.9,y:c.height*0.2,vx:rnd(-4,4)*dpr,vy:rnd(-4,4)*dpr,l:1});
-  sfx.lose(); $('crashBox').classList.add('shake'); setTimeout(()=>$('crashBox').classList.remove('shake'),500);
-  crash.hist.unshift(crash.cp); crashHist(); crashReset(); save(); sparkLoop(); }
-function sparkLoop(){ if(!crash.sparks.length)return;
-  crashDraw(true); requestAnimationFrame(sparkLoop); }
-function crashReset(){ $('crashBtn').textContent='Начать полёт'; $('crashBtn').className='btn btn-primary'; }
-function crashHist(){ $('crashHistory').innerHTML=crash.hist.slice(0,12).map(v=>
-  '<span class="ch-h '+(v>=10?'hi':v>=2?'mid':'lo')+'">'+v.toFixed(2)+'×</span>').join(''); }
+  requestAnimationFrame(crashLoop);
+}
 function crashY(m,mMax,H){ return H*0.94-(H*0.8)*((m-1)/(mMax-1||1)); }
-function crashDraw(crashed){ const c=$('crashCanvas'); if(!c||!c.width)return;
+function crashDraw(){ const c=$('crashCanvas'); if(!c||!c.width)return;
   const x=c.getContext('2d'),W=c.width,H=c.height,dpr=window.devicePixelRatio||1;
   x.clearRect(0,0,W,H);
   const mMax=Math.max(crash.m*1.15,2);
@@ -280,12 +298,20 @@ function crashDraw(crashed){ const c=$('crashCanvas'); if(!c||!c.width)return;
     x.strokeStyle='rgba(255,255,255,.05)'; x.lineWidth=1*dpr;
     x.beginPath();x.moveTo(0,y);x.lineTo(W,y);x.stroke();
     x.fillStyle='rgba(255,255,255,.28)'; x.fillText(v+'×',W-8*dpr,y-4*dpr); });
-  const tNow=crash.tNow||0, N=70, pts=[];
+  if(crash.phase==='bet'){
+    const bob=Math.sin(Date.now()/300)*4*dpr;
+    x.font=(30*dpr)+'px serif'; x.textAlign='center';
+    x.fillText('🚀',W*0.12,H*0.8+bob);
+    for(let i=1;i<=3;i++){ x.fillStyle='rgba(251,191,36,'+(0.3/i)+')';
+      x.beginPath();x.arc(W*0.12-14*dpr*i,H*0.8+bob,(4-i)*dpr,0,7);x.fill(); }
+    return;
+  }
+  const tNow=crash.phase==='fly'?crash.tNow:(4500*Math.log(crash.m)||0), N=70, pts=[];
   for(let i=0;i<=N;i++){ const tt=tNow*i/N, m=Math.exp(tt/9000);
     pts.push([W*0.05+(W*0.88)*(i/N), crashY(Math.min(m,mMax),mMax,H)]); }
-  x.save(); x.shadowColor=crashed?'#ef4444':'#a855f7'; x.shadowBlur=16*dpr;
+  x.save(); x.shadowColor=crash.phase==='crash'?'#ef4444':'#a855f7'; x.shadowBlur=16*dpr;
   const grad=x.createLinearGradient(0,H,W,0);
-  grad.addColorStop(0,'#a855f7'); grad.addColorStop(1,crashed?'#ef4444':'#ec4899');
+  grad.addColorStop(0,'#a855f7'); grad.addColorStop(1,crash.phase==='crash'?'#ef4444':'#ec4899');
   x.strokeStyle=grad; x.lineWidth=3.5*dpr; x.lineJoin='round';
   x.beginPath(); pts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke(); x.restore();
   x.lineTo(pts[N][0],H); x.lineTo(pts[0][0],H); x.closePath();
@@ -294,17 +320,19 @@ function crashDraw(crashed){ const c=$('crashCanvas'); if(!c||!c.width)return;
   x.fillStyle=fg; x.fill();
   const tip=pts[N], prev=pts[N-1]||tip;
   const ang=Math.atan2(tip[1]-prev[1],tip[0]-prev[0]);
-  if(!crashed&&crash.state==='flying'){
+  if(crash.phase==='fly'){
     for(let i=1;i<=3;i++){ x.fillStyle='rgba(251,191,36,'+(0.35/i)+')';
       x.beginPath(); x.arc(tip[0]-Math.cos(ang)*10*dpr*i,tip[1]-Math.sin(ang)*10*dpr*i,(5-i)*dpr,0,7); x.fill(); }
     x.save(); x.translate(tip[0],tip[1]); x.rotate(ang);
     x.font=(26*dpr)+'px serif'; x.textAlign='center'; x.textBaseline='middle';
     x.fillText('🚀',6*dpr,0); x.restore();
-  } else if(crashed){ x.font=(30*dpr)+'px serif'; x.textAlign='center'; x.fillText('💥',tip[0],tip[1]); }
+  } else { x.font=(30*dpr)+'px serif'; x.textAlign='center'; x.fillText('💥',tip[0],tip[1]); }
   crash.sparks=crash.sparks.filter(s=>s.l>0);
   crash.sparks.forEach(s=>{ s.x+=s.vx;s.y+=s.vy;s.vy+=0.15*dpr;s.l-=0.03;
     x.fillStyle='rgba(239,68,68,'+Math.max(s.l,0)+')';
     x.beginPath();x.arc(s.x,s.y,2.5*dpr,0,7);x.fill(); }); }
+function crashHist(){ $('crashHistory').innerHTML=crash.hist.map(v=>
+  '<span class="ch-h '+(v>=10?'hi':v>=2?'mid':'lo')+'">'+v.toFixed(2)+'×</span>').join(''); }
 
 // ---------- ИНВЕНТАРЬ ----------
 function itemCard(g,noActs){ return '<div class="inv-item">'+
@@ -314,16 +342,15 @@ function itemCard(g,noActs){ return '<div class="inv-item">'+
   '<button class="mini-btn up" onclick="toUpgrade(\''+g.uid+'\')">⚡</button></div>')+'</div>'; }
 function renderInventory(){ const items=validInv();
   const val=items.reduce((a,i)=>a+gift(i.gid).price,0);
-  $('invValue').textContent='Предметов: '+items.length+' · Стоимость: ⭐'+fmt(val);
+  $('invValue').textContent='Предметов: '+items.length+' · ⭐'+fmt(val);
   $('inventoryGrid').innerHTML=items.length?items.map(i=>itemCard(Object.assign({},gift(i.gid),{uid:i.uid}))).join(''):'<div class="muted">Пусто. Открой кейс или купи в маркете! 📦</div>'; }
 function sellItem(u){ const idx=S.inv.findIndex(i=>i.uid===u); if(idx<0)return;
   const g=gift(S.inv[idx].gid); if(!g)return;
-  const price=Math.floor(g.price*ECO.SELL_BACK);
-  S.inv.splice(idx,1); S.balance+=price; S.stats.sells++;
-  qEvent('sell'); sfx.win(); toast('Продано: '+g.name+' +⭐'+fmt(price),'good');
+  S.inv.splice(idx,1); S.balance+=g.price; S.stats.sells++;
+  qEvent('sell'); sfx.win(); toast('Продано: '+g.name+' +⭐'+fmt(g.price),'good');
   save(); renderHeader(); renderInventory(); renderUpgrade(); checkAch(); }
 function sellAll(){ const items=validInv(); if(!items.length)return;
-  let t=0; items.forEach(i=>t+=Math.floor(gift(i.gid).price*ECO.SELL_BACK));
+  let t=0; items.forEach(i=>t+=gift(i.gid).price);
   if(!confirm('Продать всё за ⭐'+fmt(t)+'?'))return;
   S.stats.sells+=items.length; S.inv=[]; S.balance+=t;
   qEvent('sell'); sfx.win(); toast('Продано всё: +⭐'+fmt(t),'good');
@@ -367,7 +394,7 @@ function doUpgrade(){ if(!upFrom||!upTo||upBusy)return;
 
 // ---------- ЗАДАНИЯ ----------
 function renderTasks(){ const fr=freeReady();
-  $('freeCaseState').textContent=fr?'Доступен сейчас · 1 спин · нужна подписка':'Следующий через '+Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5)+' ч.';
+  $('freeCaseState').textContent=fr?'Доступен сейчас · 1 спин · подписка':'Следующий через '+Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5)+' ч.';
   const sb=$('subBtn');
   if(S.subDone){sb.textContent='✅ Получено';sb.disabled=true;} else sb.textContent='Подписаться';
   $('refCount').textContent=S.refs;
@@ -375,8 +402,9 @@ function renderTasks(){ const fr=freeReady();
 async function doSub(){ openChannel();
   setTimeout(async()=>{ const r=await api('/api/check_sub');
     if(r&&r.sub&&!S.subDone){ S.subDone=true; S.balance+=25; sfx.win(); confetti(60);
-      toast('📢 Подписка подтверждена: +⭐25','good'); save(); renderHeader(); renderTasks(); }
-    else if(r&&r.sub)toast('Уже получено','bad'); else toast('Ты не подписан на канал','bad'); },2500); }
+      toast('📢 Подписка подтверждена: +⭐25','good'); save(); renderHeader(); renderTasks(); renderProfile(); }
+    else if(r&&r.sub){ S.subDone=true; toast('Подписка есть ✅','good'); renderProfile(); }
+    else toast('Ты не подписан на канал','bad'); },2500); }
 function renderQuests(){ $('questsList').innerHTML=QUESTS.map(q=>{
   const p=Math.min(S.qp[q.type]||0,q.target),done=p>=q.target,cl=S.qc.includes(q.id);
   return '<div class="quests-row"><div class="q-head"><span>'+q.name+'</span><span class="muted">'+p+'/'+q.target+'</span></div>'+
@@ -395,7 +423,7 @@ function checkAch(){ ACHS.forEach(a=>{ if(!S.ac.includes(a.id)&&a.cond(S)){S.ac.
 function dailyDiscount(){ return GIFTS[3+new Date().getDate()%(GIFTS.length-3)].id; }
 function renderMarket(){ const disc=dailyDiscount();
   const note=$('marketNote');
-  if(note)note.innerHTML='Покупка и продажа — по <b>реальной цене TG</b> · Скидка дня −20%: <b style="color:var(--ok)">'+gift(disc).name+'</b>';
+  if(note)note.innerHTML='Цены = реальные цены TG · Скидка дня −20%: <b style="color:var(--ok)">'+gift(disc).name+'</b>';
   $('marketGrid').innerHTML=GIFTS.filter(g=>g.price>=15).map(g=>{
     const p=disc===g.id?Math.floor(g.price*ECO.DISCOUNT):g.price;
     const owned=validInv().filter(i=>i.gid===g.id).length;
@@ -409,23 +437,23 @@ function buyGift(id,p){ if(S.balance<p)return toast('Недостаточно St
   save(); renderHeader(); renderMarket(); renderInventory(); renderUpgrade(); checkAch(); }
 
 // ---------- БАТТЛЫ ----------
-function renderBattles(){ if(!S.serverMode){$('battlesList').innerHTML='<div class="muted">Баттлы доступны в Telegram-версии игры.</div>';return;}
+function renderBattles(){ if(!S.serverMode){$('battlesList').innerHTML='<div class="muted">Баттлы доступны в Telegram-версии.</div>';return;}
   api('/api/battles').then(r=>{ if(r.error){$('battlesList').innerHTML='<div class="muted">Сервер недоступен.</div>';return;}
     const list=r.battles||[];
-    if(!list.length){$('battlesList').innerHTML='<div class="muted">Нет активных баттлов. Создай свой — живой игрок присоединится!</div>';return;}
+    if(!list.length){$('battlesList').innerHTML='<div class="muted">Нет активных баттлов. Создай свой!</div>';return;}
     $('battlesList').innerHTML=list.map(b=>{
       if(b.mine&&b.status==='wait')return '<div class="battle-row"><div class="info"><b>Твой баттл</b><span class="muted">ждём соперника…</span></div><div class="bet">⭐'+b.bet+'</div></div>';
       if(b.mine&&b.status==='done')return '<div class="battle-row"><div class="info"><b>Твой баттл</b><span class="muted">соперник найден</span></div><div class="bet">⭐'+b.bet+'</div><button class="btn btn-primary" onclick="showMyResult(\''+b.id+'\')">Результат</button></div>';
       if(b.mine)return '';
       return '<div class="battle-row"><div class="info"><b>'+(b.host_name||'Игрок')+'</b><span class="muted">живой игрок · 50/50</span></div><div class="bet">⭐'+b.bet+'</div><button class="btn btn-primary" onclick="joinBattle(\''+b.id+'\')">Войти</button></div>';}).join(''); }); }
 function showMyResult(id){ api('/api/battles/result?id='+id).then(r=>{ if(!r.error)runBattle(r.host_name,r.bet,r.you_win); }); }
-function createBattle(){ if(!S.serverMode)return toast('Баттлы только в Telegram-версии','bad');
+function createBattle(){ if(!S.serverMode)return toast('Только в Telegram-версии','bad');
   const bet=parseInt(prompt('Твоя ставка (Stars):','50')); if(!bet||bet<10)return;
   if(S.balance<bet)return toast('Недостаточно Stars','bad');
   api('/api/battles/create',{method:'POST',body:JSON.stringify({bet})}).then(r=>{
     if(r.error)return toast(r.error,'bad');
     S.balance-=bet; save(); renderHeader();
-    toast('⚔️ Баттл создан! Ждём живого соперника…','good'); renderBattles(); }); }
+    toast('⚔️ Баттл создан! Ждём соперника…','good'); renderBattles(); }); }
 function joinBattle(id){ api('/api/battles/join',{method:'POST',body:JSON.stringify({id})}).then(r=>{
   if(r.error)return toast(r.error,'bad');
   S.balance-=r.bet; save(); renderHeader(); runBattle(r.host_name,r.bet,r.you_win); }); }
@@ -443,22 +471,37 @@ function runBattle(hostName,bet,youWin){ $('battlePot').textContent=fmt(bet*2);
 function closeBattle(){ modalClose('battleModal'); renderBattles(); }
 setInterval(()=>{ if($('sec-battles').classList.contains('active'))renderBattles(); },6000);
 
-// ---------- ТОП / РАНГ / ПРОФИЛЬ ----------
+// ---------- ТОП-50 / РАНГ / КАБИНЕТ / АДМИН ----------
 function renderRank(){ const rc=$('rankCard');
-  if(!S.serverMode){ rc.innerHTML='<div class="ic-box gold"><svg class="ic"><use href="#i-trophy"/></svg></div><div><b>Твоё место: #1</b><span>Лидерборд живых игроков — в Telegram-версии</span></div>'; return; }
+  if(!S.serverMode){ rc.innerHTML='<div class="ic-box gold"><svg class="ic"><use href="#i-trophy"/></svg></div><div><b>Твоё место: #1</b><span>Лидерборд живых — в Telegram</span></div>'; return; }
   api('/api/rank').then(r=>{ if(r.error)return;
     rc.innerHTML='<div class="ic-box gold"><svg class="ic"><use href="#i-trophy"/></svg></div>'+
       '<div><b>Твоё место: #'+r.rank+' из '+r.total+'</b><span>Выиграно: ⭐'+fmt(r.won)+'</span></div>'; }); }
 function renderTop(){ if(!S.serverMode){ $('topList').innerHTML='<div class="top-row me"><div class="pos">🥇</div><b>😎 '+(S.tgName||'ТЫ')+'</b><div class="won">⭐'+fmt(S.stats.won)+'</div></div>'; return; }
-  api('/api/top').then(r=>{ const rows=r.rows||[];
+  api('/api/top?limit=50').then(r=>{ const rows=r.rows||[];
     if(!rows.length){$('topList').innerHTML='<div class="muted">Пока пусто — стань первым!</div>';return;}
     $('topList').innerHTML=rows.map((x,i)=>'<div class="top-row '+(x.me?'me':'')+'"><div class="pos">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1)+'</div><b>'+(x.me?'😎 ':'🧑 ')+x.name+'</b><div class="won">⭐'+fmt(x.won)+'</div></div>').join(''); }); }
 function renderProfile(){ const st=S.stats,li=levelInfo();
-  $('statsGrid').innerHTML=[['Уровень',li.lvl+' ур.'],['Открыто кейсов',st.opened],['Потрачено','⭐'+fmt(st.spent)],['Выиграно','⭐'+fmt(st.won)],
-    ['Лучший дроп','⭐'+fmt(st.best)],['Апгрейдов',st.upWins+'/'+st.upgrades],['Баттлов',st.bWins+'/'+st.battles],
+  $('myId').textContent=S.tgId||'—';
+  $('subState').textContent=S.subDone?'Активна ✅':'Не подтверждена';
+  $('statsGrid').innerHTML=[['Уровень',li.lvl+' ур.'],['Кейсов',st.opened],['Потрачено','⭐'+fmt(st.spent)],['Выиграно','⭐'+fmt(st.won)],
+    ['Лучший дроп','⭐'+fmt(st.best)],['Апгрейдов',st.upWins+'/'+st.upgrades],['Баттлов',st.bWins+'/'+st.battles],['Crash побед',st.crashWins||0],
     ['Режим',S.serverMode?'🟢 онлайн':'⚪ локально'],['Сборка','build '+BUILD]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('');
   $('soundToggle').checked=S.sound; $('fairToggle').checked=S.fair;
-  $('fairInfo').innerHTML=S.fair?'Seed: '+S.seed+'<br>Hash: '+hash(S.seed):''; }
+  $('fairInfo').innerHTML=S.fair?'Seed: '+S.seed+'<br>Hash: '+hash(S.seed):'';
+  if(S.isAdmin){ $('adminBlock').style.display='block'; renderAdmin(); } }
+function renderAdmin(){ api('/api/admin/stats').then(r=>{ if(r.error)return;
+  $('adminStats').innerHTML=[['Игроков',r.total],['Балансов всего','⭐'+fmt(r.sumBalance)],['Баттлов',r.battles],['Платежей',r.payments]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join(''); });
+  api('/api/admin/users').then(r=>{ if(r.error)return;
+  $('adminUsers').innerHTML=(r.rows||[]).map(x=>'<div class="top-row"><div class="pos">#'+x.tg_id+'</div><b>'+x.name+'</b><div class="won">⭐'+fmt(x.balance)+'</div></div>').join(''); }); }
+function admGrant(){ const id=parseInt($('admId').value), sum=parseInt($('admSum').value);
+  if(!id||!sum)return toast('Заполни ID и сумму','bad');
+  api('/api/admin/grant',{method:'POST',body:JSON.stringify({id,sum})}).then(r=>{
+    toast(r.ok?('✅ Начислено ⭐'+sum+' игроку #'+id):('❌ '+r.error), r.ok?'good':'bad'); renderAdmin(); }); }
+function admBroadcast(){ const text=$('admMsg').value.trim(); if(!text)return;
+  api('/api/admin/broadcast',{method:'POST',body:JSON.stringify({text})}).then(r=>{
+    toast(r.ok?('📨 Отправлено '+r.sent+' игрокам'):('❌ '+r.error), r.ok?'good':'bad'); $('admMsg').value=''; }); }
+function copyId(){ navigator.clipboard.writeText(String(S.tgId||'')); toast('🆔 ID скопирован','good'); }
 function hash(s){ let h=5381; for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0; return h.toString(16); }
 function applyPromo(){ const c=$('promoInput').value.trim().toUpperCase();
   if(!PROMOS[c])return toast('Неверный код','bad');
@@ -467,10 +510,10 @@ function applyPromo(){ const c=$('promoInput').value.trim().toUpperCase();
   $('promoInput').value=''; save(); renderHeader(); }
 function copyRef(){ const code=S.tgId||S.seed.slice(0,8);
   navigator.clipboard.writeText('https://t.me/CashBanni_bot?start=ref_'+code);
-  toast('🤝 Ссылка скопирована! Друг зайдёт в бота — получишь ⭐'+REF_REWARD,'good'); }
+  toast('🤝 Ссылка скопирована! Друг зайдёт — получишь ⭐'+REF_REWARD,'good'); }
 function toggleSound(){ S.sound=$('soundToggle').checked; save(); }
 function toggleFair(){ S.fair=$('fairToggle').checked; save(); renderProfile(); }
-function resetAll(){ if(confirm('Сбросить весь прогресс?')){ localStorage.removeItem('cashbanni_v2'); location.reload(); } }
+function resetAll(){ if(confirm('Сбросить ТОЛЬКО локальный кеш? Данные на сервере сохранятся!')){ localStorage.removeItem('cashbanni_v2'); location.reload(); } }
 function addStars(){ if(S.serverMode&&TG){apiPay(100);} else {S.balance+=100;sfx.click();toast('⭐ +100 (демо)');save();renderHeader();} }
 
 (function(){ const cols=['#a855f7','#ec4899','#3b82f6','#f59e0b'];
@@ -483,10 +526,20 @@ function addStars(){ if(S.serverMode&&TG){apiPay(100);} else {S.balance+=100;sfx
 (async function startup(){
   if(S.inv.length!==validInv().length){ S.inv=validInv(); localStorage.setItem('cashbanni_v2',JSON.stringify(S)); }
   const me=await api('/api/me');
-  if(me&&me.tg_id){ S.balance=me.balance; S.inv=me.inv; S.stats=me.stats; S.xp=me.xp;
-    S.tgId=me.tg_id; S.refs=me.ref_count||0; S.serverMode=true;
-    localStorage.setItem('cashbanni_v2',JSON.stringify(S)); }
-  renderHeader(); renderCases(); crashHist();
+  if(me&&me.tg_id){
+    S.tgId=me.tg_id; S.refs=me.ref_count||0; S.isAdmin=!!me.admin;
+    const serverEmpty=(!me.stats||!me.stats.opened)&&me.balance===ECO.START_BALANCE&&!me.inv.length;
+    const localHas=S.stats.opened>0||S.inv.length>0||S.balance!==ECO.START_BALANCE;
+    if(serverEmpty&&localHas&&!S.migrated){
+      await api('/api/save',{method:'POST',body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})});
+      S.migrated=true; toast('📦 Твой локальный прогресс перенесён на сервер!','good');
+    } else {
+      S.balance=me.balance; S.inv=me.inv; S.stats=me.stats; S.xp=me.xp; S.migrated=true;
+    }
+    S.serverMode=true;
+    localStorage.setItem('cashbanni_v2',JSON.stringify(S));
+  }
+  renderHeader(); renderCases(); crashHist(); crashResize(); crashLoop();
   save(); buildGiftImages();
   setTimeout(()=>toast(S.serverMode?'Cash Banni · build '+BUILD+' · 🟢':'Cash Banni · build '+BUILD+' · ⚪'),400);
 })();
