@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Cash Banni</title>
-<link rel="stylesheet" href="css/style.css?v=11">
+<link rel="stylesheet" href="css/style.css?v=12">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous"></script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -187,7 +187,10 @@
       <h3 class="mt">Начислить Stars по ID</h3>
       <div class="row"><input id="admId" placeholder="ID"><input id="admSum" placeholder="Сумма"><button class="btn btn-primary" onclick="admGrant()">OK</button></div>
       <h3 class="mt">Рассылка всем игрокам</h3>
-      <div class="row"><input id="admMsg" placeholder="Текст"><button class="btn btn-primary" onclick="admBroadcast()">📨</button></div>
+      <div class="row"><input id="admMsg" placeholder="Текст"><button class="btn btn-primary" onclick="admBroadcast()">Отправить</button></div>
+      <h3 class="mt">Промокоды</h3>
+      <div id="adminPromos"></div>
+      <div class="row"><input id="admPromoCode" placeholder="КОД"><input id="admPromoSum" placeholder="Сумма"><button class="btn btn-primary" onclick="admPromoCreate()">Создать</button></div>
       <h3 class="mt">Игроки</h3>
       <div id="adminUsers"></div>
     </div>
@@ -202,17 +205,13 @@
   <button data-tab="profile"><svg class="ic"><use href="#i-user"/></svg><span class="nl">Кабинет</span></button>
 </nav>
 
+<!-- КЕЙС: FULLSCREEN -->
 <div class="modal-overlay" id="caseModal">
-  <div class="modal wide">
-    <div class="sheet-grab"></div>
-    <div class="modal-head"><h3 id="cmTitle"></h3><button class="x" onclick="closeCaseModal()"><svg class="ic s"><use href="#i-x"/></svg></button></div>
-    <div class="roulette-container" id="rouletteBox">
-      <div class="roulette-pointer"></div>
-      <div class="roulette-strip" id="rouletteStrip"></div>
-    </div>
-    <div class="multi-results" id="multiResults"></div>
-    <div class="contents" id="cmContents"></div>
-    <div class="modal-actions">
+  <div class="modal case-full">
+    <div class="cf-head"><h3 id="cmTitle"></h3><button class="x" onclick="closeCaseModal()"><svg class="ic s"><use href="#i-x"/></svg></button></div>
+    <div class="cf-strips" id="cfStrips"><div class="muted" style="text-align:center;padding:24px">Выбери режим вращения внизу 👇</div></div>
+    <div class="cf-contents" id="cmContents"></div>
+    <div class="cf-actions">
       <button class="btn btn-secondary" id="btnX1" onclick="spin(1)">×1 ⭐<span id="p1"></span></button>
       <button class="btn btn-secondary" id="btnX3" onclick="spin(3)">×3 ⭐<span id="p3"></span></button>
       <button class="btn btn-primary" id="btnX5" onclick="spin(5)">×5 ⭐<span id="p5"></span></button>
@@ -226,7 +225,7 @@
     <div class="modal-head"><h3>💳 Пополнение</h3><button class="x" onclick="modalClose('payModal')"><svg class="ic s"><use href="#i-x"/></svg></button></div>
     <div class="pay-grid" id="payGrid"></div>
     <div class="row mt"><input id="payCustom" type="number" min="1" max="10000" placeholder="Своя сумма (1–10000)"><button class="btn btn-primary" onclick="doPayCustom()">Оплатить</button></div>
-    <p class="muted small mt">Откроется официальная страница оплаты Telegram Stars.</p>
+    <p class="muted small mt">Откроется официальная панель оплаты Telegram Stars.</p>
   </div>
 </div>
 
@@ -246,7 +245,7 @@
 </div>
 
 <div class="toasts" id="toasts"></div>
-<script src="js/data.js?v=11"></script>
-<script src="js/app.js?v=11"></script>
+<script src="js/data.js?v=12"></script>
+<script src="js/app.js?v=12"></script>
 </body>
 </html>

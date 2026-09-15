@@ -246,3 +246,21 @@ body.tg .container{padding-top:6px}
 .pay-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .pay-chip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 4px;text-align:center;font-weight:900;font-size:.85rem;cursor:pointer;transition:.15s;color:var(--gold)}
 .pay-chip:active{transform:scale(.94);border-color:var(--acc);background:rgba(168,85,247,.15)}
+
+/* ===== v12: safe-area iPhone, кейс-фуллскрин, стрипы ===== */
+body.tg .header{padding-top:calc(10px + var(--sat,0px))}
+.header{padding-top:calc(10px + var(--sat,0px))}
+.bottom-nav{bottom:calc(10px + var(--sab,0px) + env(safe-area-inset-bottom))}
+.toasts{bottom:calc(var(--nav-h) + 20px + var(--sab,0px) + env(safe-area-inset-bottom))}
+.modal.case-full{max-width:100%;width:100%;height:100dvh;max-height:100dvh;border-radius:0;display:flex;flex-direction:column;padding:calc(12px + var(--sat,0px)) 14px calc(14px + var(--sab,0px) + env(safe-area-inset-bottom))}
+.cf-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.cf-head h3{font-size:1rem;font-weight:900}
+.cf-strips{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;min-height:120px;scrollbar-width:none}
+.cf-strips::-webkit-scrollbar{display:none}
+.cf-strips .roulette-container{margin:0;flex-shrink:0}
+.roulette-container.won{border-color:rgba(34,197,94,.5);box-shadow:0 0 24px rgba(34,197,94,.2)}
+.strip-win{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(6,6,26,.72);backdrop-filter:blur(4px);font-weight:900;font-size:.9rem;z-index:12;animation:fadein .3s}
+.strip-win .gimg{width:34px;height:34px}
+.cf-contents{margin-top:10px}
+.cf-contents .contents{margin:0;max-height:120px;overflow-y:auto}
+.cf-actions{display:flex;gap:8px;margin-top:12px}
