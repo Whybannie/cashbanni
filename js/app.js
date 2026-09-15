@@ -1,4 +1,4 @@
-const BUILD = 12;
+const BUILD = 13;
 const $ = id => document.getElementById(id);
 const setT = (id,v) => { const e=$(id); if(e) e.textContent=v; };
 const setH = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
@@ -29,15 +29,18 @@ function load(){
   }catch(e){ return DEF(); }
 }
 
-// ---------- TELEGRAM + SAFE AREA (iPhone 17 Pro fix) ----------
+// ---------- TELEGRAM + SAFE AREA ----------
 const TG = (window.Telegram && window.Telegram.WebApp) || null;
 let FS_MODE = false;
 function applySafe(){
-  let top=0, bot=0;
-  try{ if(TG&&TG.safeAreaInset){ top=TG.safeAreaInset.top||0; bot=TG.safeAreaInset.bottom||0; } }catch(e){}
-  if(FS_MODE) top=Math.max(top,54);
-  document.documentElement.style.setProperty('--sat',top+'px');
-  document.documentElement.style.setProperty('--sab',bot+'px');
+  let top = 0;
+  try{ if(TG&&TG.safeAreaInset&&TG.safeAreaInset.top) top = TG.safeAreaInset.top||0; }catch(e){}
+  if (TG && TG.initData) top = Math.max(top, 44) + 12;   // кнопки TG поверх контента
+  if (FS_MODE) top = Math.max(top, 54) + 6;
+  document.documentElement.style.setProperty('--sat', top+'px');
+  let bot = 0;
+  try{ if(TG&&TG.safeAreaInset&&TG.safeAreaInset.bottom) bot = TG.safeAreaInset.bottom||0; }catch(e){}
+  document.documentElement.style.setProperty('--sab', bot+'px');
 }
 if (TG) {
   try {
@@ -54,6 +57,22 @@ if (TG) {
   } catch (e) {}
 }
 applySafe();
+
+// ---------- ВЕРСИОННОЕ РУКОПОЖАТИЕ (фикс "пустого кабинета") ----------
+(function versionHandshake(){
+  try{
+    const m = document.querySelector('meta[name="build"]');
+    const pageBuild = m ? m.content : '0';
+    if (pageBuild !== String(BUILD)) {
+      const key = 'cb_reload_' + BUILD;
+      if (!localStorage.getItem(key)) {
+        localStorage.setItem(key, '1');
+        location.replace(location.pathname + '?cb=' + BUILD + '&' + Date.now());
+      }
+    }
+  }catch(e){}
+})();
+
 function haptic(k){ try{ if(!TG||!TG.HapticFeedback)return;
   if(k==='success')TG.HapticFeedback.notificationOccurred('success');
   else if(k==='error')TG.HapticFeedback.notificationOccurred('error');
@@ -73,7 +92,8 @@ function apiSave(){ if(!S.serverMode)return; clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{ api("/api/save",{method:"POST",body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})}); },800); }
 async function refreshMe(){ const me=await api('/api/me');
   if(me&&me.tg_id){ S.balance=me.balance; S.inv=me.inv; S.stats=me.stats; S.xp=me.xp;
-    save(); renderHeader(); renderInventory(); } }
+    S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
+    save(); renderHeader(); renderInventory(); renderProfile(); } }
 async function apiPay(stars){
   const r=await api("/api/pay",{method:"POST",body:JSON.stringify({stars})});
   if(r.url && TG && TG.openInvoice){
@@ -87,13 +107,14 @@ async function apiPay(stars){
 }
 function save(){ localStorage.setItem('cashbanni_v2', JSON.stringify(S)); apiSave(); }
 function validInv(){ return S.inv.filter(i=>i&&i.gid&&gift(i.gid)); }
-function refreshInv(){ if($('sec-profile')&&$('sec-profile').classList.contains('active'))renderInventory();
-  if($('sec-upgrade')&&$('sec-upgrade').classList.contains('active'))renderUpgrade(); }
+function refreshInv(){ try{
+  if($('sec-profile')&&$('sec-profile').classList.contains('active'))renderInventory();
+  if($('sec-upgrade')&&$('sec-upgrade').classList.contains('active'))renderUpgrade(); }catch(e){} }
 
 let upFrom=null, upTo=null, curCase=null, spinning=false, upBusy=false;
 const IMG = {};
-function modalOpen(id){ $(id).classList.add('active'); document.body.classList.add('modal-open'); }
-function modalClose(id){ $(id).classList.remove('active');
+function modalOpen(id){ const e=$(id); if(e){e.classList.add('active'); document.body.classList.add('modal-open');} }
+function modalClose(id){ const e=$(id); if(e)e.classList.remove('active');
   if(!document.querySelector('.modal-overlay.active')) document.body.classList.remove('modal-open'); }
 
 async function loadTgs(url){
@@ -158,27 +179,33 @@ function levelInfo(){ let lvl=1,need=500; while(S.xp>=need){lvl++;need+=lvl*500;
 function renderHeader(){ setT('balanceValue',fmt(S.balance));
   const e=$('lvlFill'); if(e) e.style.width=(levelInfo().prog*100)+'%'; }
 
+// ---------- НАВИГАЦИЯ (с защитой от падений) ----------
 function activateTab(t){ sfx.click();
   document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   const sec=$('sec-'+t); if(sec) sec.classList.add('active');
-  renderSection(t); scrollTo({top:0,behavior:'smooth'});
+  try{ renderSection(t); }catch(e){ console.error('render',t,e); }
+  scrollTo({top:0,behavior:'smooth'});
   if(t==='crash') setTimeout(crashResize,60); }
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>activateTab(b.dataset.tab));
 function renderSection(t){
   if(t==='home') renderCases();
-  else if(t==='profile'){ renderProfile(); renderInventory(); renderTop(); renderRank(); }
+  else if(t==='profile'){ renderProfile(); renderInventory(); renderTop(); renderRank();
+    if(S.serverMode) api('/api/me').then(me=>{ if(me&&me.tg_id){
+      S.balance=me.balance; S.inv=me.inv; S.stats=me.stats; S.xp=me.xp;
+      S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
+      save(); renderHeader(); renderProfile(); renderInventory(); renderTop(); renderRank(); } }); }
   else if(t==='tasks') renderTasks();
   else if(t==='market') renderMarket();
   else if(t==='upgrade') renderUpgrade();
   else if(t==='battles') renderBattles(); }
-function renderAll(){ renderHeader(); const a=document.querySelector('.section.active');
-  if(a) renderSection(a.id.replace('sec-','')); }
+function renderAll(){ try{ renderHeader(); const a=document.querySelector('.section.active');
+  if(a) renderSection(a.id.replace('sec-','')); }catch(e){} }
 
-function setWheel(el,segs){ let acc=0;
+function setWheel(el,segs){ if(!el)return; let acc=0;
   const stops=segs.map(s=>{const f=acc;acc+=s.pct;return s.color+' '+f+'% '+acc+'%';});
   el.style.background='conic-gradient('+stops.join(',')+')'; }
-function spinWheel(el,segs,winIndex,cb){ let start=0;
+function spinWheel(el,segs,winIndex,cb){ if(!el)return cb&&cb(); let start=0;
   const zones=segs.map(s=>{const z=[start,start+s.pct];start+=s.pct;return z;});
   const a=zones[winIndex][0],b=zones[winIndex][1];
   const t=(a+(b-a)*rnd(0.15,0.85))*3.6, R=5*360+(360-t);
@@ -293,7 +320,7 @@ function crashLoop(){
   const now=Date.now();
   if(crash.phase==='bet'){
     const left=(crash.betEnds-now)/1000;
-    setT('crashMult','1.00×'); $('crashMult').className='crash-mult';
+    setT('crashMult','1.00×'); const cm=$('crashMult'); if(cm)cm.className='crash-mult';
     setH('crashStatus','🎰 Ставки: '+Math.max(0,left).toFixed(1)+' с');
     setT('heroCrashState','Приём ставок: '+Math.max(0,left).toFixed(0)+' с');
     if(left<=0){ crash.phase='fly'; crash.t0=now; crash.cp=genCrash(); crash.m=1; crash.lastInt=1; crash.sparks=[];
@@ -302,17 +329,17 @@ function crashLoop(){
     const t=now-crash.t0; crash.tNow=t;
     crash.m=Math.exp(t/9000);
     if(crash.m>=crash.cp){ crash.m=crash.cp; crash.phase='crash'; crash.betEnds=now+2500;
-      setT('crashMult',crash.cp.toFixed(2)+'×'); $('crashMult').className='crash-mult red';
+      setT('crashMult',crash.cp.toFixed(2)+'×'); const cm=$('crashMult'); if(cm)cm.className='crash-mult red';
       const c=$('crashCanvas'),dpr=window.devicePixelRatio||1;
       for(let i=0;i<26;i++)crash.sparks.push({x:c.width*0.85,y:c.height*0.25,vx:rnd(-4,4)*dpr,vy:rnd(-4,4)*dpr,l:1});
       setH('crashStatus','💥 Краш на '+crash.cp.toFixed(2)+'×');
       if(crash.myBet>0&&!crash.cashed){ sfx.lose(); toast('💥 Краш! −⭐'+crash.myBet,'bad'); }
-      $('crashBox').classList.add('shake'); setTimeout(()=>$('crashBox').classList.remove('shake'),500);
+      const cb=$('crashBox'); if(cb){cb.classList.add('shake'); setTimeout(()=>cb.classList.remove('shake'),500);}
       crash.hist.unshift(crash.cp); crash.hist=crash.hist.slice(12); crashHist(); crash.myBet=0; crash.cashed=false;
     } else {
       if(Math.floor(crash.m)>crash.lastInt){ crash.lastInt=Math.floor(crash.m); sfx.tick(); }
       setT('crashMult',crash.m.toFixed(2)+'×');
-      $('crashMult').className='crash-mult'+(crash.m>=10?' gold':'');
+      const cm=$('crashMult'); if(cm)cm.className='crash-mult'+(crash.m>=10?' gold':'');
       setH('crashStatus',crash.myBet>0?(crash.cashed?'✅ Забрано':'🚀 Летим! Забрать: ⭐'+Math.floor(crash.myBet*crash.m)):'🚀 В полёте');
       setT('heroCrashState','LIVE: '+crash.m.toFixed(2)+'×');
     }
@@ -415,13 +442,14 @@ function renderUpgrade(){ const items=validInv();
     '<button class="chip '+(upTo&&upTo.id===g.id?'sel':'')+'" onclick="selTo(\''+g.id+'\')">'+gImg(g)+'<div class="name">'+g.name+'</div><div class="price">⭐'+g.price+'</div></button>').join('')
     :'<div class="chip empty">Нет целей дороже</div>');
   const ch=upChanceVal(); setT('upChance',ch+'%');
-  if(upFrom&&upTo)setWheel($('upWheel'),[{pct:ch,color:'#22c55e'},{pct:100-ch,color:'#2a2a4a'}]);
-  else setWheel($('upWheel'),[{pct:100,color:'#2a2a4a'}]);
-  $('upWheel').style.transition='none'; $('upWheel').style.transform='rotate(0deg)';
-  $('upBtn').disabled=!(upFrom&&upTo)||upBusy; }
-$('upBtn').onclick=doUpgrade;
+  const w=$('upWheel');
+  if(upFrom&&upTo)setWheel(w,[{pct:ch,color:'#22c55e'},{pct:100-ch,color:'#2a2a4a'}]);
+  else setWheel(w,[{pct:100,color:'#2a2a4a'}]);
+  if(w){ w.style.transition='none'; w.style.transform='rotate(0deg)'; }
+  const ub=$('upBtn'); if(ub) ub.disabled=!(upFrom&&upTo)||upBusy; }
+const upBtnEl=$('upBtn'); if(upBtnEl) upBtnEl.onclick=doUpgrade;
 function doUpgrade(){ if(!upFrom||!upTo||upBusy)return;
-  upBusy=true; $('upBtn').disabled=true;
+  upBusy=true; const ub=$('upBtn'); if(ub)ub.disabled=true;
   const ch=upChanceVal(), win=Math.random()*100<ch;
   spinWheel($('upWheel'),[{pct:ch,color:'#22c55e'},{pct:100-ch,color:'#2a2a4a'}],win?0:1,()=>{
     S.stats.upgrades++;
@@ -519,7 +547,7 @@ function runBattle(hostName,bet,youWin){ setT('battlePot',fmt(bet*2));
     else { setT('battleLog','💥 Поражение...'); sfx.lose(); }
     save(); renderHeader(); checkAch(); }); }
 function closeBattle(){ modalClose('battleModal'); renderBattles(); }
-setInterval(()=>{ const b=$('sec-battles'); if(b&&b.classList.contains('active'))renderBattles(); },6000);
+setInterval(()=>{ try{ const b=$('sec-battles'); if(b&&b.classList.contains('active'))renderBattles(); }catch(e){} },6000);
 
 // ---------- КАБИНЕТ / ТОП / АДМИН ----------
 function renderRank(){ const rc=$('rankCard'); if(!rc)return;
@@ -562,27 +590,28 @@ function renderAdmin(){ api('/api/admin/stats').then(r=>{ if(r.error)return;
   api('/api/admin/users').then(r=>{ if(r.error)return;
   setH('adminUsers',(r.rows||[]).map(x=>'<div class="top-row"><div class="pos">#'+x.tg_id+'</div><b>'+x.name+'</b><div class="won">⭐'+fmt(x.balance)+'</div></div>').join('')); });
   api('/api/admin/promo/list').then(r=>{ if(r.error)return;
-  setH('adminPromos',(r.rows||[]).map(p=>'<div class="battle-row"><div class="info"><b>'+p.code+'</b><span class="muted">⭐'+p.amount+' · использован '+p.uses+(p.max_uses?'/'+p.max_uses:'')+'</span></div><button class="btn btn-danger" style="width:auto;min-width:90px;min-height:40px" onclick="admPromoDel(\''+p.code+'\')">Удалить</button></div>').join('')||'<div class="muted">Промокодов нет</div>'); }); }
+  setH('adminPromos',(r.rows||[]).map(p=>'<div class="battle-row"><div class="info"><b>'+p.code+'</b><span class="muted">⭐'+p.amount+' · активаций '+p.uses+(p.max_uses?'/'+p.max_uses:'')+'</span></div><button class="btn btn-danger" style="width:auto;min-width:90px;min-height:40px" onclick="admPromoDel(\''+p.code+'\')">Удалить</button></div>').join('')||'<div class="muted">Промокодов нет</div>'); }); }
 function admGrant(){ const id=parseInt($('admId').value), sum=parseInt($('admSum').value);
   if(!id||!sum)return toast('Заполни ID и сумму','bad');
   api('/api/admin/grant',{method:'POST',body:JSON.stringify({id,sum})}).then(r=>{
     toast(r.ok?('✅ Начислено ⭐'+sum+' игроку #'+id):('❌ '+r.error), r.ok?'good':'bad'); renderAdmin(); }); }
-function admBroadcast(){ const text=$('admMsg').value.trim(); if(!text)return;
+function admBroadcast(){ const t=$('admMsg'); const text=t?t.value.trim():''; if(!text)return;
   api('/api/admin/broadcast',{method:'POST',body:JSON.stringify({text})}).then(r=>{
-    toast(r.ok?('📨 Отправлено '+r.sent+' игрокам'):('❌ '+r.error), r.ok?'good':'bad'); $('admMsg').value=''; }); }
-function admPromoCreate(){ const code=($('admPromoCode').value||'').trim().toUpperCase(), sum=parseInt($('admPromoSum').value);
+    toast(r.ok?('📨 Отправлено '+r.sent+' игрокам'):('❌ '+r.error), r.ok?'good':'bad'); t.value=''; }); }
+function admPromoCreate(){ const c=$('admPromoCode'), s=$('admPromoSum');
+  const code=c?c.value.trim().toUpperCase():'', sum=s?parseInt(s.value):0;
   if(!code||!sum)return toast('Код и сумма обязательны','bad');
   api('/api/admin/promo/create',{method:'POST',body:JSON.stringify({code,sum})}).then(r=>{
     toast(r.ok?('✅ Промокод '+code+' создан'):('❌ '+r.error), r.ok?'good':'bad');
-    if(r.ok){ $('admPromoCode').value=''; $('admPromoSum').value=''; } renderAdmin(); }); }
+    if(r.ok&&c&&s){ c.value=''; s.value=''; } renderAdmin(); }); }
 function admPromoDel(code){ api('/api/admin/promo/delete',{method:'POST',body:JSON.stringify({code})}).then(r=>{
   toast(r.ok?'🗑 Промокод удалён':'❌ '+r.error, r.ok?'good':'bad'); renderAdmin(); }); }
 function copyId(){ navigator.clipboard.writeText(String(S.tgId||'')); toast('🆔 ID скопирован','good'); }
 function hash(s){ let h=5381; for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0; return h.toString(16); }
-async function applyPromo(){ const c=$('promoInput').value.trim().toUpperCase();
+async function applyPromo(){ const pi=$('promoInput'); const c=pi?pi.value.trim().toUpperCase():'';
   if(!c)return;
   const r=await api('/api/promo/apply',{method:'POST',body:JSON.stringify({code:c})});
-  if(r.ok){ S.balance+=r.amount; sfx.win(); confetti(60); toast('🎟 Промокод: +⭐'+r.amount,'good'); $('promoInput').value=''; save(); renderHeader(); }
+  if(r.ok){ S.balance+=r.amount; sfx.win(); confetti(60); toast('🎟 Промокод: +⭐'+r.amount,'good'); pi.value=''; save(); renderHeader(); }
   else toast('❌ '+(r.error||'Неверный код'),'bad'); }
 function copyRef(){ const code=S.tgId||S.seed.slice(0,8);
   navigator.clipboard.writeText('https://t.me/CashBanni_bot?start=ref_'+code);
@@ -599,22 +628,24 @@ function addStars(){ if(S.serverMode&&TG){ openPay(); } else { S.balance+=100; s
     $('bubbles').appendChild(d); } })();
 
 (async function startup(){
-  if(S.inv.length!==validInv().length){ S.inv=validInv(); localStorage.setItem('cashbanni_v2',JSON.stringify(S)); }
-  const me=await api('/api/me');
-  if(me&&me.tg_id){
-    S.tgId=me.tg_id; S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
-    const serverEmpty=(!me.stats||!me.stats.opened)&&me.balance===ECO.START_BALANCE&&!me.inv.length;
-    const localHas=S.stats.opened>0||S.inv.length>0||S.balance!==ECO.START_BALANCE;
-    if(serverEmpty&&localHas&&!S.migrated){
-      await api('/api/save',{method:'POST',body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})});
-      S.migrated=true; toast('📦 Локальный прогресс перенесён на сервер!','good');
-    } else {
-      S.balance=me.balance; S.inv=me.inv; S.stats=me.stats; S.xp=me.xp; S.migrated=true;
+  try{
+    if(S.inv.length!==validInv().length){ S.inv=validInv(); localStorage.setItem('cashbanni_v2',JSON.stringify(S)); }
+    const me=await api('/api/me');
+    if(me&&me.tg_id){
+      S.tgId=me.tg_id; S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
+      const serverEmpty=(!me.stats||!me.stats.opened)&&me.balance===ECO.START_BALANCE&&!me.inv.length;
+      const localHas=S.stats.opened>0||S.inv.length>0||S.balance!==ECO.START_BALANCE;
+      if(serverEmpty&&localHas&&!S.migrated){
+        await api('/api/save',{method:'POST',body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})});
+        S.migrated=true; toast('📦 Локальный прогресс перенесён на сервер!','good');
+      } else {
+        S.balance=me.balance; S.inv=me.inv; S.stats=me.stats; S.xp=me.xp; S.migrated=true;
+      }
+      S.serverMode=true;
+      localStorage.setItem('cashbanni_v2',JSON.stringify(S));
     }
-    S.serverMode=true;
-    localStorage.setItem('cashbanni_v2',JSON.stringify(S));
-  }
-  renderHeader(); renderCases(); crashHist(); crashResize(); crashLoop();
-  save(); buildGiftImages();
-  setTimeout(()=>toast(S.serverMode?'Cash Banni · build '+BUILD+' · 🟢':'Cash Banni · build '+BUILD+' · ⚪'),400);
+    renderHeader(); renderCases(); crashHist(); crashResize(); crashLoop();
+    save(); buildGiftImages();
+    setTimeout(()=>toast(S.serverMode?'Cash Banni · build '+BUILD+' · 🟢':'Cash Banni · build '+BUILD+' · ⚪'),400);
+  }catch(e){ console.error('startup',e); }
 })();

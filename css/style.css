@@ -264,3 +264,8 @@ body.tg .header{padding-top:calc(10px + var(--sat,0px))}
 .cf-contents{margin-top:10px}
 .cf-contents .contents{margin:0;max-height:120px;overflow-y:auto}
 .cf-actions{display:flex;gap:8px;margin-top:12px}
+
+/* ===== v13: гарантированный отступ шапки под кнопки TG ===== */
+.header{padding-top:calc(10px + var(--sat,0px))}
+body.tg .header{padding-top:calc(10px + var(--sat,56px))}
+body.tg .container{padding-top:4px}
