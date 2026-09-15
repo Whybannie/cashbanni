@@ -269,3 +269,25 @@ body.tg .header{padding-top:calc(10px + var(--sat,0px))}
 .header{padding-top:calc(10px + var(--sat,0px))}
 body.tg .header{padding-top:calc(10px + var(--sat,56px))}
 body.tg .container{padding-top:4px}
+
+/* ===== v14: шапка ниже, краш-панель, превью кейса ===== */
+body.tg .header{padding-top:calc(14px + var(--sat,64px))}
+.crash-panel{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:20px;padding:12px;margin-top:12px}
+.cp-row{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.cp-bet{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 8px}
+.cp-step{width:40px;height:40px;border-radius:12px;border:none;background:rgba(255,255,255,.08);color:#fff;font-size:1.3rem;font-weight:900;cursor:pointer;transition:.15s}
+.cp-step:active{transform:scale(.9);background:rgba(168,85,247,.3)}
+.cp-val{min-width:74px;text-align:center;font-weight:900;color:var(--gold);font-size:1.05rem}
+.cp-chips{flex:1;display:flex;gap:6px}
+.cp-chip{flex:1;border:1px solid var(--line);background:var(--card);color:rgba(255,255,255,.7);border-radius:12px;padding:11px 0;font-size:.72rem;font-weight:900;cursor:pointer;transition:.15s}
+.cp-chip:active{border-color:var(--acc);color:#fff;transform:scale(.94)}
+.crash-main-btn{min-height:58px;font-size:1.05rem;letter-spacing:.5px;border-radius:16px}
+.crash-main-btn.bet{background:linear-gradient(135deg,#22c55e,#a3e635);color:#052e16;box-shadow:0 8px 26px rgba(34,197,94,.35)}
+.crash-main-btn.cancel{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7)}
+.crash-main-btn.cash{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;animation:pulse 1s infinite}
+.crash-main-btn.wait{background:rgba(255,255,255,.06);color:rgba(255,255,255,.4)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+.cf-contents{margin:0 0 10px}
+.cf-contents .contents{margin:0;max-height:150px;overflow-y:auto}
+.roulette-container.preview{opacity:.85}
+.preview-label{position:absolute;top:6px;left:10px;font-size:.58rem;font-weight:900;color:rgba(255,255,255,.4);letter-spacing:1px;z-index:11}

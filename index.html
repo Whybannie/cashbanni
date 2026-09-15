@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Cash Banni</title>
-<meta name="build" content="13">
+<meta name="build" content="14">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=13">
+<link rel="stylesheet" href="css/style.css?v=14">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous"></script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -45,7 +45,6 @@
 
 <main class="container">
 
-  <!-- ГЛАВНАЯ -->
   <section class="section active" id="sec-home">
     <div class="hero-card" onclick="activateTab('crash')">
       <div class="ic-box gold"><svg class="ic"><use href="#i-rocket"/></svg></div>
@@ -56,7 +55,6 @@
     <div class="cases-grid" id="casesGrid"></div>
   </section>
 
-  <!-- КРАШ -->
   <section class="section" id="sec-crash">
     <div class="crash-head">
       <button class="back-btn" onclick="activateTab('home')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
@@ -67,18 +65,26 @@
       <div class="crash-mult" id="crashMult">1.00×</div>
       <div class="crash-status" id="crashStatus"></div>
     </div>
-    <div class="crash-controls">
-      <div class="crash-bet">
-        <button class="mini-btn sell" onclick="crashBet(-10)">−10</button>
-        <input id="crashBetInput" type="number" value="20" min="5">
-        <button class="mini-btn sell" onclick="crashBet(10)">+10</button>
+    <div class="crash-panel">
+      <div class="cp-row">
+        <div class="cp-bet">
+          <button class="cp-step" onclick="crashBet(-10)">−</button>
+          <div class="cp-val">⭐<span id="crashBetVal">20</span></div>
+          <button class="cp-step" onclick="crashBet(10)">+</button>
+        </div>
+        <div class="cp-chips">
+          <button class="cp-chip" onclick="crashSet(10)">10</button>
+          <button class="cp-chip" onclick="crashSet(25)">25</button>
+          <button class="cp-chip" onclick="crashSet(50)">50</button>
+          <button class="cp-chip" onclick="crashSet(100)">100</button>
+          <button class="cp-chip" onclick="crashSet(250)">250</button>
+        </div>
       </div>
-      <button class="btn btn-primary" id="crashBtn" onclick="crashAction()">Сделать ставку</button>
+      <button class="btn crash-main-btn bet" id="crashBtn" onclick="crashAction()">ПОСТАВИТЬ ⭐20</button>
     </div>
     <div class="crash-history" id="crashHistory"></div>
   </section>
 
-  <!-- ЗАДАНИЯ -->
   <section class="section" id="sec-tasks">
     <h2>Задания</h2>
     <div class="task-card" onclick="openCaseModal('free')">
@@ -102,7 +108,6 @@
     <div id="achList"></div>
   </section>
 
-  <!-- АПГРЕЙД -->
   <section class="section" id="sec-upgrade">
     <h2>Апгрейд</h2>
     <div class="up-layout">
@@ -119,7 +124,6 @@
     </div>
   </section>
 
-  <!-- РЕЖИМЫ -->
   <section class="section" id="sec-modes">
     <h2>Режимы</h2>
     <div class="task-card" onclick="activateTab('crash')">
@@ -139,7 +143,6 @@
     </div>
   </section>
 
-  <!-- БАТТЛЫ -->
   <section class="section" id="sec-battles">
     <div class="crash-head">
       <button class="back-btn" onclick="activateTab('modes')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
@@ -149,7 +152,6 @@
     <div id="battlesList"></div>
   </section>
 
-  <!-- МАРКЕТ -->
   <section class="section" id="sec-market">
     <div class="crash-head">
       <button class="back-btn" onclick="activateTab('modes')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
@@ -159,7 +161,6 @@
     <div class="market-grid" id="marketGrid"></div>
   </section>
 
-  <!-- ЛИЧНЫЙ КАБИНЕТ -->
   <section class="section" id="sec-profile">
     <div class="pcard">
       <div class="pava" id="pAva">😎</div>
@@ -209,7 +210,6 @@
   </section>
 </main>
 
-<!-- НИЖНЯЯ НАВИГАЦИЯ -->
 <nav class="bottom-nav">
   <button data-tab="home" class="active"><svg class="ic"><use href="#i-home"/></svg><span class="nl">Главная</span></button>
   <button data-tab="tasks"><svg class="ic"><use href="#i-tasks"/></svg><span class="nl">Задания</span></button>
@@ -218,12 +218,12 @@
   <button data-tab="profile"><svg class="ic"><use href="#i-user"/></svg><span class="nl">Кабинет</span></button>
 </nav>
 
-<!-- КЕЙС: FULLSCREEN -->
+<!-- КЕЙС: FULLSCREEN, содержимое видно ДО спина -->
 <div class="modal-overlay" id="caseModal">
   <div class="modal case-full">
     <div class="cf-head"><h3 id="cmTitle"></h3><button class="x" onclick="closeCaseModal()"><svg class="ic s"><use href="#i-x"/></svg></button></div>
-    <div class="cf-strips" id="cfStrips"><div class="muted" style="text-align:center;padding:24px">Выбери режим вращения внизу 👇</div></div>
     <div class="cf-contents" id="cmContents"></div>
+    <div class="cf-strips" id="cfStrips"></div>
     <div class="cf-actions">
       <button class="btn btn-secondary" id="btnX1" onclick="spin(1)">×1 ⭐<span id="p1"></span></button>
       <button class="btn btn-secondary" id="btnX3" onclick="spin(3)">×3 ⭐<span id="p3"></span></button>
@@ -232,7 +232,6 @@
   </div>
 </div>
 
-<!-- ПОПОЛНЕНИЕ -->
 <div class="modal-overlay" id="payModal">
   <div class="modal">
     <div class="sheet-grab"></div>
@@ -243,7 +242,6 @@
   </div>
 </div>
 
-<!-- БАТТЛ -->
 <div class="modal-overlay" id="battleModal">
   <div class="modal">
     <div class="sheet-grab"></div>
@@ -260,7 +258,7 @@
 </div>
 
 <div class="toasts" id="toasts"></div>
-<script src="js/data.js?v=13"></script>
-<script src="js/app.js?v=13"></script>
+<script src="js/data.js?v=14"></script>
+<script src="js/app.js?v=14"></script>
 </body>
 </html>
