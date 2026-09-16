@@ -2,7 +2,7 @@ const BUILD = 16;
 const $ = id => document.getElementById(id);
 const setT = (id,v) => { const e=$(id); if(e) e.textContent=v; };
 const setH = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
-const fmt = n => n.toLocaleString('ru-RU');
+const fmt = n => (Number(n)||0).toLocaleString('ru-RU');
 const rnd = (a,b) => a + Math.random()*(b-a);
 const pick = a => a[Math.floor(Math.random()*a.length)];
 const gift = id => GIFTS.find(g=>g.id===id);
@@ -100,7 +100,7 @@ let saveTimer=null;
 function apiSave(){ if(!S.serverMode)return; clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{ api("/api/save",{method:"POST",body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})}); },800); }
 async function refreshMe(){ const me=await apiR('/api/me');
-  if(me&&me.tg_id){ S.balance=me.balance; S.inv=me.inv; S.stats=me.stats; S.xp=me.xp;
+  if(me&&me.tg_id){ S.balance=Number(me.balance)||0; S.inv=me.inv; S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
     S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
     S.serverMode=true; save(); renderHeader();
     try{ renderSection(activeTab()); }catch(e){} } }
@@ -204,7 +204,7 @@ function renderSection(t){
   if(t==='home') renderCases();
   else if(t==='profile'){ renderProfile(); renderInventory(); renderTop(); renderRank();
     if(S.serverMode) apiR('/api/me').then(me=>{ if(me&&me.tg_id){
-      S.balance=me.balance; S.inv=me.inv; S.stats=me.stats; S.xp=me.xp;
+      S.balance=Number(me.balance)||0; S.inv=me.inv; S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
       S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
       save(); renderHeader(); renderProfile(); renderInventory(); renderTop(); renderRank(); } }); }
   else if(t==='tasks') renderTasks();
@@ -621,7 +621,7 @@ function ensureBanner(){ let b=$('connBanner');
 async function retryConnect(){ const b=$('connBanner');
   if(b) b.innerHTML='<span>⏳ Подключение…</span>';
   const me=await apiR('/api/me');
-  if(me&&me.tg_id){ S.tgId=me.tg_id; S.balance=me.balance; S.inv=me.inv; S.stats=me.stats; S.xp=me.xp;
+  if(me&&me.tg_id){ S.tgId=me.tg_id; S.balance=Number(me.balance)||0; S.inv=me.inv; S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
     S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
     S.serverMode=true; S.migrated=true; save(); renderHeader(); renderSection('profile');
     toast('🟢 Подключено к серверу','good'); }
@@ -718,7 +718,7 @@ function addStars(){ if(S.serverMode&&TG){ openPay(); } else { S.balance+=100; s
         await api('/api/save',{method:'POST',body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})});
         S.migrated=true; toast('📦 Локальный прогресс перенесён на сервер!','good');
       } else {
-        S.balance=me.balance; S.inv=me.inv; S.stats=me.stats; S.xp=me.xp; S.migrated=true;
+        S.balance=Number(me.balance)||0; S.inv=me.inv; S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0; S.migrated=true;
       }
       S.serverMode=true;
       localStorage.setItem('cashbanni_v2',JSON.stringify(S));
