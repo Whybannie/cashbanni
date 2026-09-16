@@ -1,4 +1,4 @@
-const BUILD = 16;
+const BUILD = 17;
 const $ = id => document.getElementById(id);
 const setT = (id,v) => { const e=$(id); if(e) e.textContent=v; };
 const setH = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
@@ -100,7 +100,8 @@ let saveTimer=null;
 function apiSave(){ if(!S.serverMode)return; clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{ api("/api/save",{method:"POST",body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})}); },800); }
 async function refreshMe(){ const me=await apiR('/api/me');
-  if(me&&me.tg_id){ S.balance=Number(me.balance)||0; S.inv=me.inv; S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
+  if(me&&me.tg_id){ S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
+    S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
     S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
     S.serverMode=true; save(); renderHeader();
     try{ renderSection(activeTab()); }catch(e){} } }
@@ -202,9 +203,10 @@ function activateTab(t){ sfx.click();
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>activateTab(b.dataset.tab));
 function renderSection(t){
   if(t==='home') renderCases();
-  else if(t==='profile'){ renderProfile(); renderInventory(); renderTop(); renderRank();
+  else if(t==='profile'){ S.stats=Object.assign(DEF().stats, S.stats||{}); renderProfile(); renderInventory(); renderTop(); renderRank();
     if(S.serverMode) apiR('/api/me').then(me=>{ if(me&&me.tg_id){
-      S.balance=Number(me.balance)||0; S.inv=me.inv; S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
+      S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
+      S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
       S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
       save(); renderHeader(); renderProfile(); renderInventory(); renderTop(); renderRank(); } }); }
   else if(t==='tasks') renderTasks();
@@ -271,7 +273,9 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
       '<div class="price">'+(curCase.price===0?'БЕСПЛАТНО':'⭐ '+fmt(curCase.price))+'</div>'+
       '<span class="muted">Состав и шансы выпада:</span></div></div>'+
     '<div class="contents">'+curCase.drops.map(d=>{const g=gift(d[0]);return
-      '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'44">'+gImg(g)+'<div>'+g.name+'</div><div class="ch">'+(d[1]*100).toFixed(0)+'% · ⭐'+g.price+'</div></div>';}).join('')+'</div>');
+      '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'55;box-shadow:0 0 16px '+RAR[g.rarity].color+'22 inset">'+
+      '<div class="ch">'+(d[1]*100).toFixed(0)+'%</div>'+gImg(g)+
+      '<div class="cname">'+g.name+'</div><div class="cprice">⭐'+g.price+'</div></div>';}).join('')+'</div>');
   const box=$('cfStrips'); box.innerHTML='';
   const prev=document.createElement('div'); prev.className='roulette-container preview';
   prev.innerHTML='<div class="preview-label">ПРЕВЬЮ</div><div class="roulette-pointer"></div><div class="roulette-strip"></div>';
@@ -579,15 +583,22 @@ function doPayCustom(){ const v=parseInt($('payCustom').value);
   apiPay(v); }
 
 // ---------- БАТТЛЫ ----------
+let battleWatch=null;
+function stopBattleWatch(){ if(battleWatch){clearInterval(battleWatch); battleWatch=null;} }
+function battleCard(b){
+  if(b.mine&&b.status==='wait')return '<div class="battle-card mine"><div class="bc-top"><span class="bc-wait">⏳ ОЖИДАНИЕ</span><div class="bet">⭐'+b.bet+'</div></div>'+
+    '<div class="bc-mid"><div class="bc-player"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div><div class="bc-player empty"><span class="emoji">❓</span><b>Ищем соперника…</b></div></div>'+
+    '<button class="btn btn-secondary" onclick="openBattleHost(\''+b.id+'\','+b.bet+')">Открыть баттл</button></div>';
+  if(b.mine&&b.status==='done')return '<div class="battle-card mine"><div class="bc-top"><span class="bc-done">✅ СЫГРАН</span><div class="bet">⭐'+b.bet+'</div></div><button class="btn btn-primary" onclick="showMyResult(\''+b.id+'\')">Результат</button></div>';
+  return '<div class="battle-card"><div class="bc-top"><span class="bc-live">🔴 АКТИВЕН</span><div class="bet">⭐'+b.bet+'</div></div>'+
+    '<div class="bc-mid"><div class="bc-player"><span class="emoji">🧑</span><b>'+(b.host_name||'Игрок')+'</b></div><div class="bc-player empty"><span class="emoji">🎯</span><b>Твой слот</b></div></div>'+
+    '<button class="btn btn-primary" onclick="joinBattle(\''+b.id+'\')">Войти за ⭐'+b.bet+'</button></div>';
+}
 function renderBattles(){ if(!S.serverMode){setH('battlesList','<div class="muted">Баттлы доступны в Telegram-версии.</div>');return;}
   apiR('/api/battles').then(r=>{ if(r.error){setH('battlesList','<div class="muted">Сервер недоступен.</div>');return;}
     const list=r.battles||[];
-    if(!list.length){setH('battlesList','<div class="muted">Нет активных баттлов. Создай свой!</div>');return;}
-    setH('battlesList',list.map(b=>{
-      if(b.mine&&b.status==='wait')return '<div class="battle-row"><div class="info"><b>Твой баттл</b><span class="muted">ждём соперника…</span></div><div class="bet">⭐'+b.bet+'</div></div>';
-      if(b.mine&&b.status==='done')return '<div class="battle-row"><div class="info"><b>Твой баттл</b><span class="muted">соперник найден</span></div><div class="bet">⭐'+b.bet+'</div><button class="btn btn-primary" onclick="showMyResult(\''+b.id+'\')">Результат</button></div>';
-      if(b.mine)return '';
-      return '<div class="battle-row"><div class="info"><b>'+(b.host_name||'Игрок')+'</b><span class="muted">живой игрок · 50/50</span></div><div class="bet">⭐'+b.bet+'</div><button class="btn btn-primary" onclick="joinBattle(\''+b.id+'\')">Войти</button></div>';}).join('')); }); }
+    if(!list.length){setH('battlesList','<div class="battle-empty"><span class="emoji">⚔️</span><b>Нет активных баттлов</b><span class="muted">Создай свой — соперник найдётся за секунды</span></div>');return;}
+    setH('battlesList',list.map(battleCard).join('')); }); }
 function showMyResult(id){ api('/api/battles/result?id='+id).then(r=>{ if(!r.error)runBattle(r.host_name,r.bet,r.you_win); }); }
 function createBattle(){ if(!S.serverMode)return toast('Только в Telegram-версии','bad');
   const bet=parseInt(prompt('Твоя ставка (Stars):','50')); if(!bet||bet<10)return;
@@ -595,22 +606,56 @@ function createBattle(){ if(!S.serverMode)return toast('Только в Telegram
   api('/api/battles/create',{method:'POST',body:JSON.stringify({bet})}).then(r=>{
     if(r.error)return toast(r.error,'bad');
     S.balance-=bet; save(); renderHeader();
-    toast('⚔️ Баттл создан! Ждём соперника…','good'); renderBattles(); }); }
+    openBattleHost(r.id,bet); renderBattles(); }); }
+function openBattleHost(bid,bet){
+  stopBattleWatch();
+  setT('battlePot',fmt(bet*2));
+  const w=$('bWheel'); setWheel(w,[{pct:50,color:'#a855f7'},{pct:50,color:'#ec4899'}]);
+  if(w){ w.classList.add('idle'); w.style.transition='none'; w.style.transform='none'; }
+  setH('battlePlayers','<div class="b-player"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div>'+
+    '<div class="b-player empty pulse"><span class="emoji">❓</span><b>Ищем соперника…</b></div>');
+  setT('battleLog','⏳ Баттл виден всем игрокам — ждём соперника');
+  modalOpen('battleModal');
+  battleWatch=setInterval(async()=>{
+    const r=await api('/api/battles/result?id='+bid);
+    if(r&&!r.error){ stopBattleWatch();
+      const ww=$('bWheel'); if(ww) ww.classList.remove('idle');
+      setH('battlePlayers','<div class="b-player me"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div>'+
+        '<div class="b-player"><span class="emoji">🧑</span><b>'+(r.guest_name||'Соперник')+'</b></div>');
+      setT('battleLog','🎯 Соперник найден! Крутим колесо…');
+      setTimeout(()=>spinBattleWheel(r.you_win,r.bet,true),700);
+    }
+  },3000);
+}
 function joinBattle(id){ api('/api/battles/join',{method:'POST',body:JSON.stringify({id})}).then(r=>{
     if(r.error)return toast(r.error,'bad');
-    S.balance-=r.bet; save(); renderHeader(); runBattle(r.host_name,r.bet,r.you_win); }); }
-function runBattle(hostName,bet,youWin){ setT('battlePot',fmt(bet*2));
-  setH('battlePlayers','<div class="b-player" id="bp1"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div>'+
-    '<div class="b-player" id="bp2"><span class="emoji">🧑</span><b>'+hostName+'</b></div>');
-  setT('battleLog','Крутим колесо...'); modalOpen('battleModal');
-  setWheel($('bWheel'),[{pct:50,color:'#a855f7'},{pct:50,color:'#ec4899'}]);
-  spinWheel($('bWheel'),[{pct:50,color:'#a855f7'},{pct:50,color:'#ec4899'}],youWin?0:1,()=>{
-    const w=$('bp'+(youWin?1:2)); if(w)w.classList.add('win'); S.stats.battles++;
+    S.balance-=r.bet; save(); renderHeader();
+    setH('battlePlayers','<div class="b-player"><span class="emoji">🧑</span><b>'+r.host_name+'</b></div>'+
+      '<div class="b-player me"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div>');
+    setT('battleLog','🎯 Крутим колесо…');
+    const w=$('bWheel'); setWheel(w,[{pct:50,color:'#ec4899'},{pct:50,color:'#a855f7'}]); if(w)w.classList.remove('idle');
+    modalOpen('battleModal');
+    setTimeout(()=>spinBattleWheel(r.you_win,r.bet,false),700); }); }
+function spinBattleWheel(youWin,bet,iAmHost){
+  setT('battlePot',fmt(bet*2));
+  const segs=iAmHost?[{pct:50,color:'#a855f7'},{pct:50,color:'#ec4899'}]:[{pct:50,color:'#ec4899'},{pct:50,color:'#a855f7'}];
+  const winIndex=iAmHost?(youWin?0:1):(youWin?1:0);
+  spinWheel($('bWheel'),segs,winIndex,()=>{
+    const my=document.querySelector('.b-player.me');
+    const op=document.querySelector('.b-player:not(.me)');
+    if(youWin&&my)my.classList.add('win'); if(!youWin&&op)op.classList.add('win');
+    S.stats.battles++;
     if(youWin){ S.balance+=bet*2; S.stats.bWins++; S.stats.won+=bet*2;
       setT('battleLog','🎉 ПОБЕДА! +⭐'+fmt(bet*2)); sfx.win(); confetti(100); qEvent('battle_win'); }
-    else { setT('battleLog','💥 Поражение...'); sfx.lose(); }
-    save(); renderHeader(); checkAch(); }); }
-function closeBattle(){ modalClose('battleModal'); renderBattles(); }
+    else { setT('battleLog','💥 Поражение… банк ушёл сопернику'); sfx.lose(); }
+    save(); renderHeader(); checkAch(); renderBattles(); });
+}
+function runBattle(hostName,bet,youWin){
+  setH('battlePlayers','<div class="b-player"><span class="emoji">🧑</span><b>'+hostName+'</b></div><div class="b-player me"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div>');
+  const w=$('bWheel'); setWheel(w,[{pct:50,color:'#ec4899'},{pct:50,color:'#a855f7'}]); if(w)w.classList.remove('idle');
+  setT('battleLog','🎯 Крутим колесо…'); modalOpen('battleModal');
+  setTimeout(()=>spinBattleWheel(youWin,bet,false),700); }
+function closeBattle(){ stopBattleWatch(); const w=$('bWheel'); if(w)w.classList.remove('idle'); modalClose('battleModal'); renderBattles(); }
 setInterval(()=>{ try{ const b=$('sec-battles'); if(b&&b.classList.contains('active'))renderBattles(); }catch(e){} },6000);
 
 // ---------- КАБИНЕТ / ТОП / АДМИН ----------
@@ -621,7 +666,8 @@ function ensureBanner(){ let b=$('connBanner');
 async function retryConnect(){ const b=$('connBanner');
   if(b) b.innerHTML='<span>⏳ Подключение…</span>';
   const me=await apiR('/api/me');
-  if(me&&me.tg_id){ S.tgId=me.tg_id; S.balance=Number(me.balance)||0; S.inv=me.inv; S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
+  if(me&&me.tg_id){ S.tgId=me.tg_id; S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
+    S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
     S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
     S.serverMode=true; S.migrated=true; save(); renderHeader(); renderSection('profile');
     toast('🟢 Подключено к серверу','good'); }
@@ -636,7 +682,8 @@ function renderTop(){ const tl=$('topList'); if(!tl)return;
   apiR('/api/top?limit=50').then(r=>{ const rows=r.rows||[];
     if(!rows.length){tl.innerHTML='<div class="muted">Пока пусто — стань первым!</div>';return;}
     tl.innerHTML=rows.map((x,i)=>'<div class="top-row '+(x.me?'me':'')+'"><div class="pos">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1)+'</div><b>'+(x.me?'😎 ':'🧑 ')+x.name+'</b><div class="won">⭐'+fmt(x.won)+'</div></div>').join(''); }); }
-function renderProfile(){ const st=S.stats,li=levelInfo();
+function renderProfile(){ S.stats=Object.assign(DEF().stats, S.stats||{});
+  const st=S.stats,li=levelInfo();
   const b=ensureBanner();
   if(b){ if(S.serverMode) b.style.display='none';
     else { b.style.display='flex'; b.innerHTML='<span>⚠️ Нет соединения с сервером — кабинет в локальном режиме</span><button class="btn btn-secondary" onclick="retryConnect()">Повторить</button>'; } }
@@ -718,14 +765,14 @@ function addStars(){ if(S.serverMode&&TG){ openPay(); } else { S.balance+=100; s
         await api('/api/save',{method:'POST',body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})});
         S.migrated=true; toast('📦 Локальный прогресс перенесён на сервер!','good');
       } else {
-        S.balance=Number(me.balance)||0; S.inv=me.inv; S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0; S.migrated=true;
+        S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
+        S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0; S.migrated=true;
       }
       S.serverMode=true;
       localStorage.setItem('cashbanni_v2',JSON.stringify(S));
     }
     renderHeader(); renderCases(); crashHist(); crashResize(); syncBetUI(); startCrashLoop();
     save(); buildGiftImages();
-    // ГЛАВНЫЙ ФИКС КАБИНЕТА: перерисовать текущую вкладку ПОСЛЕ ответа сервера
     try{ renderSection(activeTab()); }catch(e){}
     setTimeout(()=>toast(S.serverMode?'Cash Banni · build '+BUILD+' · 🟢':'Cash Banni · build '+BUILD+' · ⚪'),400);
   }catch(e){ console.error('startup',e); }
