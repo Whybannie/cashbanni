@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Cash Banni</title>
+<meta name="build" content="16">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="stylesheet" href="css/style.css?v=16">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></symbol>
+<symbol id="i-tasks" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1 1 2-2m-3 5 1 1 2-2m-3 5 1 1 2-2"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></symbol>
+<symbol id="i-modes" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+<symbol id="i-rocket" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2.1-.1-2.9a2.2 2.2 0 0 0-2.9-.1z"/><path d="M12 15l-3-3a22 22 0 0 1 2-4A12.9 12.9 0 0 1 22 2c0 2.7-.8 7.5-6 11a22 22 0 0 1-4 2z"/><path d="M9 12H4s.5-3 2-4c1.6-1 5 0 5 0M12 15v5s3-.5 4-2c1-1.6 0-5 0-5"/></symbol>
+<symbol id="i-swords" viewBox="0 0 24 24"><path d="M4 4l16 16M20 4 4 20"/><path d="m14 18 4 4M18 14l4 4M10 18l-4 4M6 14l-4 4"/></symbol>
+<symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/><path d="M3 4h2l2.6 12h10.8L21 8H7"/></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13"/><path d="M12 8c-2.5 0-4.5-1-4.5-3S10.5 3 12 8c1.5-5 4.5-3 4.5-3S14.5 8 12 8z"/></symbol>
+<symbol id="i-mega" viewBox="0 0 24 24"><path d="M3 11l18-6v14L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17.5" cy="9" r="3"/><path d="M17.5 14.5c2.8 0 4.5 1.8 4.5 4.5"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 3 6.6 7 .9-5.2 4.8 1.4 7L12 17.8 5.8 21.3l1.4-7L2 9.5l7-.9L12 2z"/></symbol>
+</svg>
+
+<canvas id="confetti"></canvas>
+<div class="bubbles" id="bubbles"></div>
+
+<header class="header">
+  <div class="logo">Cash <span>Banni</span></div>
+  <div class="hdr-right">
+    <div class="balance">⭐<span id="balanceValue">0</span><button class="add-btn" onclick="addStars()"><svg class="ic s"><use href="#i-plus"/></svg></button></div>
+  </div>
+  <div class="xp-line"><div id="lvlFill"></div></div>
+</header>
+
+<main class="container">
+
+  <!-- ГЛАВНАЯ -->
+  <section class="section active" id="sec-home">
+    <div class="hero-card" onclick="activateTab('crash')">
+      <div class="ic-box gold"><svg class="ic"><use href="#i-rocket"/></svg></div>
+      <div class="hero-info"><b>CRASH · LIVE</b><span id="heroCrashState">Раунд идёт — успей запрыгнуть</span></div>
+      <div class="hero-go">›</div>
+    </div>
+    <div class="sec-head"><h2>🎁 Кейсы</h2><span class="muted" id="casesStat"></span></div>
+    <div class="cases-grid" id="casesGrid"></div>
+  </section>
+
+  <!-- КРАШ -->
+  <section class="section" id="sec-crash">
+    <div class="crash-head">
+      <button class="back-btn" onclick="activateTab('home')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
+      <h2>Crash · Live</h2>
+    </div>
+    <div class="crash-box" id="crashBox">
+      <canvas id="crashCanvas"></canvas>
+      <div class="crash-mult" id="crashMult">1.00×</div>
+      <div class="crash-status" id="crashStatus"></div>
+    </div>
+    <div class="crash-panel">
+      <div class="cp-row">
+        <div class="cp-bet">
+          <button class="cp-step" onclick="crashBet(-10)">−</button>
+          <div class="cp-val">⭐<span id="crashBetVal">20</span></div>
+          <button class="cp-step" onclick="crashBet(10)">+</button>
+        </div>
+        <div class="cp-chips">
+          <button class="cp-chip" onclick="crashSet(10)">10</button>
+          <button class="cp-chip" onclick="crashSet(25)">25</button>
+          <button class="cp-chip" onclick="crashSet(50)">50</button>
+          <button class="cp-chip" onclick="crashSet(100)">100</button>
+          <button class="cp-chip" onclick="crashSet(250)">250</button>
+        </div>
+      </div>
+      <button class="btn crash-main-btn bet" id="crashBtn" onclick="crashAction()">ПОСТАВИТЬ ⭐20</button>
+    </div>
+    <div class="crash-history" id="crashHistory"></div>
+  </section>
+
+  <!-- ЗАДАНИЯ -->
+  <section class="section" id="sec-tasks">
+    <h2>Задания</h2>
+    <div class="task-card" onclick="openCaseModal('free')">
+      <div class="ic-box green"><svg class="ic"><use href="#i-gift"/></svg></div>
+      <div class="task-info"><b>Бесплатный кейс</b><span id="freeCaseState">1 раз в 24 часа · нужна подписка</span></div>
+      <div class="hero-go">›</div>
+    </div>
+    <div class="task-card">
+      <div class="ic-box purple"><svg class="ic"><use href="#i-mega"/></svg></div>
+      <div class="task-info"><b>Подписка на канал</b><span>Награда: ⭐10</span></div>
+      <button class="btn btn-secondary task-btn" id="subBtn" onclick="doSub()">Подписаться</button>
+    </div>
+    <div class="task-card">
+      <div class="ic-box blue"><svg class="ic"><use href="#i-users"/></svg></div>
+      <div class="task-info"><b>Пригласи друга</b><span>⭐5 когда друг зайдёт · <b id="refCount">0</b></span></div>
+      <button class="btn btn-secondary task-btn" onclick="copyRef()">Ссылка</button>
+    </div>
+    <h2 class="mt">Квесты</h2>
+    <div id="questsList"></div>
+    <h2 class="mt">Достижения</h2>
+    <div id="achList"></div>
+  </section>
+
+  <!-- АПГРЕЙД -->
+  <section class="section" id="sec-upgrade">
+    <h2>Апгрейд</h2>
+    <div class="up-layout">
+      <div class="wheel-wrap">
+        <div class="wheel-pointer"></div>
+        <div class="wheel" id="upWheel"></div>
+        <div class="wheel-center" id="upChance">0%</div>
+      </div>
+      <button class="btn btn-primary mt" id="upBtn">Улучшить</button>
+      <h3 class="mt">Твои предметы</h3>
+      <div class="h-scroll" id="upMine"></div>
+      <h3>Цель — зона шанса появится на колесе</h3>
+      <div class="h-scroll" id="upTarget"></div>
+    </div>
+  </section>
+
+  <!-- РЕЖИМЫ -->
+  <section class="section" id="sec-modes">
+    <h2>Режимы</h2>
+    <div class="task-card" onclick="activateTab('crash')">
+      <div class="ic-box gold"><svg class="ic"><use href="#i-rocket"/></svg></div>
+      <div class="task-info"><b>Crash Live</b><span>Раунды идут 24/7</span></div>
+      <div class="hero-go">›</div>
+    </div>
+    <div class="task-card" onclick="activateTab('battles')">
+      <div class="ic-box red"><svg class="ic"><use href="#i-swords"/></svg></div>
+      <div class="task-info"><b>Баттлы 1×1</b><span>Только живые игроки</span></div>
+      <div class="hero-go">›</div>
+    </div>
+    <div class="task-card" onclick="activateTab('market')">
+      <div class="ic-box blue"><svg class="ic"><use href="#i-cart"/></svg></div>
+      <div class="task-info"><b>Маркет</b><span>Покупка и продажа по цене TG</span></div>
+      <div class="hero-go">›</div>
+    </div>
+  </section>
+
+  <!-- БАТТЛЫ -->
+  <section class="section" id="sec-battles">
+    <div class="crash-head">
+      <button class="back-btn" onclick="activateTab('modes')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
+      <h2>Баттлы</h2>
+    </div>
+    <button class="btn btn-primary mb" onclick="createBattle()">+ Создать баттл</button>
+    <div id="battlesList"></div>
+  </section>
+
+  <!-- МАРКЕТ -->
+  <section class="section" id="sec-market">
+    <div class="crash-head">
+      <button class="back-btn" onclick="activateTab('modes')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
+      <h2>Маркет</h2>
+    </div>
+    <div class="market-note" id="marketNote"></div>
+    <div class="market-grid" id="marketGrid"></div>
+  </section>
+
+  <!-- ЛИЧНЫЙ КАБИНЕТ -->
+  <section class="section" id="sec-profile">
+    <div class="pcard">
+      <div class="pava" id="pAva">😎</div>
+      <div class="pinfo">
+        <b id="pName">Игрок</b>
+        <span>ID #<span id="myId">—</span> · с <span id="pReg">—</span></span>
+        <div class="pbads" id="pBadges"></div>
+      </div>
+      <button class="btn btn-secondary task-btn" onclick="copyId()">ID</button>
+    </div>
+    <div class="rank-card mt" id="rankCard"></div>
+    <div class="stats-grid mt" id="statsGrid"></div>
+    <div class="task-card mt" onclick="openPay()">
+      <div class="ic-box gold"><svg class="ic"><use href="#i-star"/></svg></div>
+      <div class="task-info"><b>Пополнить баланс</b><span>От ⭐1 · оплата через Telegram Stars</span></div>
+      <div class="hero-go">›</div>
+    </div>
+    <div class="task-card">
+      <div class="ic-box green"><svg class="ic"><use href="#i-mega"/></svg></div>
+      <div class="task-info"><b>Подписка на канал</b><span id="subState">Награда ⭐10</span></div>
+      <button class="btn btn-secondary task-btn" id="subBtn2" onclick="doSub()">Получить</button>
+    </div>
+    <h2 class="mt">Топ-50 лидеров</h2>
+    <div id="topList"></div>
+    <h2 class="mt">Мои предметы</h2>
+    <div class="sec-head mb"><span class="muted" id="invValue"></span><button class="btn btn-sell" onclick="sellAll()">Продать всё</button></div>
+    <div class="inventory-grid" id="inventoryGrid"></div>
+    <h3 class="mt">Промокод</h3>
+    <div class="row"><input id="promoInput" placeholder="ВВЕДИ КОД"><button class="btn btn-primary" onclick="applyPromo()">OK</button></div>
+    <h3 class="mt">Настройки</h3>
+    <label class="switch-row"><input type="checkbox" id="soundToggle" onchange="toggleSound()"> Звуки и вибрация</label>
+    <label class="switch-row"><input type="checkbox" id="fairToggle" onchange="toggleFair()"> Provably Fair</label>
+    <div class="muted small" id="fairInfo"></div>
+    <div id="adminBlock" style="display:none">
+      <h2 class="mt">🛡 Админ-панель</h2>
+      <div class="stats-grid" id="adminStats"></div>
+      <h3 class="mt">Начислить Stars по ID</h3>
+      <div class="row"><input id="admId" placeholder="ID"><input id="admSum" placeholder="Сумма"><button class="btn btn-primary" onclick="admGrant()">OK</button></div>
+      <h3 class="mt">Рассылка всем игрокам</h3>
+      <div class="row"><input id="admMsg" placeholder="Текст"><button class="btn btn-primary" onclick="admBroadcast()">Отправить</button></div>
+      <h3 class="mt">Промокоды</h3>
+      <div id="adminPromos"></div>
+      <div class="row"><input id="admPromoCode" placeholder="КОД"><input id="admPromoSum" placeholder="Сумма"><button class="btn btn-primary" onclick="admPromoCreate()">Создать</button></div>
+      <h3 class="mt">Игроки</h3>
+      <div id="adminUsers"></div>
+    </div>
+  </section>
+</main>
+
+<!-- НИЖНЯЯ НАВИГАЦИЯ -->
+<nav class="bottom-nav">
+  <button data-tab="home" class="active"><svg class="ic"><use href="#i-home"/></svg><span class="nl">Главная</span></button>
+  <button data-tab="tasks"><svg class="ic"><use href="#i-tasks"/></svg><span class="nl">Задания</span></button>
+  <button data-tab="upgrade"><svg class="ic"><use href="#i-bolt"/></svg><span class="nl">Апгрейд</span></button>
+  <button data-tab="modes"><svg class="ic"><use href="#i-modes"/></svg><span class="nl">Режимы</span></button>
+  <button data-tab="profile"><svg class="ic"><use href="#i-user"/></svg><span class="nl">Кабинет</span></button>
+</nav>
+
+<!-- КЕЙС: FULLSCREEN, состав и цена видны ДО спина -->
+<div class="modal-overlay" id="caseModal">
+  <div class="modal case-full">
+    <div class="cf-head"><h3 id="cmTitle"></h3><button class="x" onclick="closeCaseModal()"><svg class="ic s"><use href="#i-x"/></svg></button></div>
+    <div class="cf-contents" id="cmContents"></div>
+    <div class="cf-strips" id="cfStrips"></div>
+    <div class="cf-actions">
+      <button class="btn btn-secondary" id="btnX1" onclick="spin(1)">×1 ⭐<span id="p1"></span></button>
+      <button class="btn btn-secondary" id="btnX3" onclick="spin(3)">×3 ⭐<span id="p3"></span></button>
+      <button class="btn btn-primary" id="btnX5" onclick="spin(5)">×5 ⭐<span id="p5"></span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ПОПОЛНЕНИЕ -->
+<div class="modal-overlay" id="payModal">
+  <div class="modal">
+    <div class="sheet-grab"></div>
+    <div class="modal-head"><h3>💳 Пополнение</h3><button class="x" onclick="modalClose('payModal')"><svg class="ic s"><use href="#i-x"/></svg></button></div>
+    <div class="pay-grid" id="payGrid"></div>
+    <div class="row mt"><input id="payCustom" type="number" min="1" max="10000" placeholder="Своя сумма (1–10000)"><button class="btn btn-primary" onclick="doPayCustom()">Оплатить</button></div>
+    <p class="muted small mt">Откроется официальная панель оплаты Telegram Stars.</p>
+  </div>
+</div>
+
+<!-- БАТТЛ -->
+<div class="modal-overlay" id="battleModal">
+  <div class="modal">
+    <div class="sheet-grab"></div>
+    <div class="modal-head"><h3>Баттл</h3><button class="x" onclick="closeBattle()"><svg class="ic s"><use href="#i-x"/></svg></button></div>
+    <div class="battle-pot">Банк: ⭐<span id="battlePot">0</span></div>
+    <div class="wheel-wrap small">
+      <div class="wheel-pointer"></div>
+      <div class="wheel" id="bWheel"></div>
+      <div class="wheel-center">50/50</div>
+    </div>
+    <div class="battle-players" id="battlePlayers"></div>
+    <div class="battle-log" id="battleLog"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+<script src="js/data.js?v=16"></script>
+<script src="js/app.js?v=16"></script>
+</body>
+</html>
