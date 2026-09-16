@@ -291,3 +291,22 @@ body.tg .header{padding-top:calc(14px + var(--sat,64px))}
 .cf-contents .contents{margin:0;max-height:150px;overflow-y:auto}
 .roulette-container.preview{opacity:.85}
 .preview-label{position:absolute;top:6px;left:10px;font-size:.58rem;font-weight:900;color:rgba(255,255,255,.4);letter-spacing:1px;z-index:11}
+
+/* ===== v15: анти-зум, крупная рулетка, пустой портфель ===== */
+*{touch-action:manipulation}
+button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.roulette-container{height:152px}
+.roulette-item{width:104px;min-width:104px}
+.roulette-item .gimg{width:56px;height:56px}
+.roulette-item .emoji{font-size:2.4rem}
+.roulette-item .name{font-size:.62rem}
+.cf-strips{gap:12px}
+.cf-contents .contents{max-height:172px;grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}
+.contents .c-item{padding:10px 4px;font-size:.64rem}
+.contents .gimg{width:40px;height:40px}
+.contents .emoji{font-size:1.7rem}
+.inv-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--card);border:1px dashed var(--line);border-radius:20px;padding:26px;text-align:center}
+.inv-empty .ie-ico{font-size:2.4rem}
+.inv-empty b{font-size:.95rem}
+.inv-empty span{font-size:.7rem;color:rgba(255,255,255,.5);margin-bottom:8px}
+.inv-empty .btn{width:auto;min-width:170px}

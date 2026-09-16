@@ -2,13 +2,13 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
-<meta name="build" content="14">
+<meta name="build" content="15">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=14">
+<link rel="stylesheet" href="css/style.css?v=15">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous"></script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -45,6 +45,7 @@
 
 <main class="container">
 
+  <!-- ГЛАВНАЯ -->
   <section class="section active" id="sec-home">
     <div class="hero-card" onclick="activateTab('crash')">
       <div class="ic-box gold"><svg class="ic"><use href="#i-rocket"/></svg></div>
@@ -55,6 +56,7 @@
     <div class="cases-grid" id="casesGrid"></div>
   </section>
 
+  <!-- КРАШ -->
   <section class="section" id="sec-crash">
     <div class="crash-head">
       <button class="back-btn" onclick="activateTab('home')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
@@ -85,6 +87,7 @@
     <div class="crash-history" id="crashHistory"></div>
   </section>
 
+  <!-- ЗАДАНИЯ -->
   <section class="section" id="sec-tasks">
     <h2>Задания</h2>
     <div class="task-card" onclick="openCaseModal('free')">
@@ -108,6 +111,7 @@
     <div id="achList"></div>
   </section>
 
+  <!-- АПГРЕЙД -->
   <section class="section" id="sec-upgrade">
     <h2>Апгрейд</h2>
     <div class="up-layout">
@@ -124,6 +128,7 @@
     </div>
   </section>
 
+  <!-- РЕЖИМЫ -->
   <section class="section" id="sec-modes">
     <h2>Режимы</h2>
     <div class="task-card" onclick="activateTab('crash')">
@@ -143,6 +148,7 @@
     </div>
   </section>
 
+  <!-- БАТТЛЫ -->
   <section class="section" id="sec-battles">
     <div class="crash-head">
       <button class="back-btn" onclick="activateTab('modes')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
@@ -152,6 +158,7 @@
     <div id="battlesList"></div>
   </section>
 
+  <!-- МАРКЕТ -->
   <section class="section" id="sec-market">
     <div class="crash-head">
       <button class="back-btn" onclick="activateTab('modes')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
@@ -161,6 +168,7 @@
     <div class="market-grid" id="marketGrid"></div>
   </section>
 
+  <!-- ЛИЧНЫЙ КАБИНЕТ -->
   <section class="section" id="sec-profile">
     <div class="pcard">
       <div class="pava" id="pAva">😎</div>
@@ -210,6 +218,7 @@
   </section>
 </main>
 
+<!-- НИЖНЯЯ НАВИГАЦИЯ -->
 <nav class="bottom-nav">
   <button data-tab="home" class="active"><svg class="ic"><use href="#i-home"/></svg><span class="nl">Главная</span></button>
   <button data-tab="tasks"><svg class="ic"><use href="#i-tasks"/></svg><span class="nl">Задания</span></button>
@@ -218,7 +227,7 @@
   <button data-tab="profile"><svg class="ic"><use href="#i-user"/></svg><span class="nl">Кабинет</span></button>
 </nav>
 
-<!-- КЕЙС: FULLSCREEN, содержимое видно ДО спина -->
+<!-- КЕЙС: FULLSCREEN, состав виден ДО спина -->
 <div class="modal-overlay" id="caseModal">
   <div class="modal case-full">
     <div class="cf-head"><h3 id="cmTitle"></h3><button class="x" onclick="closeCaseModal()"><svg class="ic s"><use href="#i-x"/></svg></button></div>
@@ -232,6 +241,7 @@
   </div>
 </div>
 
+<!-- ПОПОЛНЕНИЕ -->
 <div class="modal-overlay" id="payModal">
   <div class="modal">
     <div class="sheet-grab"></div>
@@ -242,6 +252,7 @@
   </div>
 </div>
 
+<!-- БАТТЛ -->
 <div class="modal-overlay" id="battleModal">
   <div class="modal">
     <div class="sheet-grab"></div>
@@ -258,7 +269,7 @@
 </div>
 
 <div class="toasts" id="toasts"></div>
-<script src="js/data.js?v=14"></script>
-<script src="js/app.js?v=14"></script>
+<script src="js/data.js?v=15"></script>
+<script src="js/app.js?v=15"></script>
 </body>
 </html>
