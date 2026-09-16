@@ -1,4 +1,4 @@
-const BUILD = 15;
+const BUILD = 16;
 const $ = id => document.getElementById(id);
 const setT = (id,v) => { const e=$(id); if(e) e.textContent=v; };
 const setH = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
@@ -31,7 +31,6 @@ function load(){
   }catch(e){ return DEF(); }
 }
 
-// ---------- TELEGRAM + SAFE AREA ----------
 const TG = (window.Telegram && window.Telegram.WebApp) || null;
 let FS_MODE = false;
 function applySafe(){
@@ -88,7 +87,6 @@ async function api(path, opts = {}) {
     return await res.json();
   } catch (e) { return { error: e.message }; }
 }
-// запрос с авто-повтором (фикс нестабильного кабинета)
 async function apiR(path, opts, tries) {
   tries = tries===undefined ? 2 : tries;
   let r = await api(path, opts);
@@ -104,7 +102,8 @@ function apiSave(){ if(!S.serverMode)return; clearTimeout(saveTimer);
 async function refreshMe(){ const me=await apiR('/api/me');
   if(me&&me.tg_id){ S.balance=me.balance; S.inv=me.inv; S.stats=me.stats; S.xp=me.xp;
     S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
-    save(); renderHeader(); renderInventory(); renderProfile(); } }
+    S.serverMode=true; save(); renderHeader();
+    try{ renderSection(activeTab()); }catch(e){} } }
 async function apiPay(stars){
   const r=await api("/api/pay",{method:"POST",body:JSON.stringify({stars})});
   if(r.url && TG && TG.openInvoice){
@@ -214,7 +213,6 @@ function renderSection(t){
   else if(t==='battles') renderBattles(); }
 function renderAll(){ try{ renderHeader(); const t=activeTab(); if(t) renderSection(t); }catch(e){} }
 
-// возврат из сворачивания: перерисовать всё, оживить краш
 document.addEventListener('visibilitychange',()=>{
   if(!document.hidden){
     applySafe(); renderHeader();
@@ -262,19 +260,27 @@ function buildStrip(strip,g){
 function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   if(curCase.free&&!freeReady()){ const h=Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5);
     return toast('⏳ Бесплатный кейс раз в 24 часа. Ещё '+h+' ч.','bad'); }
-  setT('cmTitle',curCase.name+' · '+(curCase.price===0?'0⭐':'⭐'+curCase.price));
+  setT('cmTitle',curCase.name);
   setT('p1',fmt(curCase.price)); setT('p3',fmt(curCase.price*3)); setT('p5',fmt(curCase.price*5));
   const b3=$('btnX3'),b5=$('btnX5');
   if(b3)b3.style.display=curCase.free?'none':''; if(b5)b5.style.display=curCase.free?'none':'';
-  setH('cmContents','<div class="contents">'+curCase.drops.map(d=>{const g=gift(d[0]);return
-    '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'44">'+gImg(g)+'<div>'+g.name+'</div><div class="ch">'+(d[1]*100).toFixed(0)+'% · ⭐'+g.price+'</div></div>';}).join('')+'</div>');
+  const m=document.querySelector('#caseModal .modal'); if(m) m.classList.remove('compact');
+  setH('cmContents',
+    '<div class="cf-hero">'+caseArt(curCase)+
+      '<div class="cf-hero-info"><b>'+curCase.name+'</b>'+
+      '<div class="price">'+(curCase.price===0?'БЕСПЛАТНО':'⭐ '+fmt(curCase.price))+'</div>'+
+      '<span class="muted">Состав и шансы выпада:</span></div></div>'+
+    '<div class="contents">'+curCase.drops.map(d=>{const g=gift(d[0]);return
+      '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'44">'+gImg(g)+'<div>'+g.name+'</div><div class="ch">'+(d[1]*100).toFixed(0)+'% · ⭐'+g.price+'</div></div>';}).join('')+'</div>');
   const box=$('cfStrips'); box.innerHTML='';
   const prev=document.createElement('div'); prev.className='roulette-container preview';
   prev.innerHTML='<div class="preview-label">ПРЕВЬЮ</div><div class="roulette-pointer"></div><div class="roulette-strip"></div>';
   box.appendChild(prev);
   buildStrip(prev.querySelector('.roulette-strip'), gift(pick(curCase.drops)[0]));
   modalOpen('caseModal'); }
-function closeCaseModal(){ if(!spinning) modalClose('caseModal'); }
+function closeCaseModal(){ if(spinning) return;
+  const m=document.querySelector('#caseModal .modal'); if(m) m.classList.remove('compact');
+  modalClose('caseModal'); }
 function animateStrip(strip,dur){ return new Promise(res=>{
   const cw=strip.parentElement.offsetWidth;
   const off=42*STRIP_W-cw/2+STRIP_W/2+rnd(-30,30);
@@ -284,6 +290,16 @@ function animateStrip(strip,dur){ return new Promise(res=>{
   strip.style.transition='transform '+dur+'ms cubic-bezier(.12,.8,.2,1)';
   requestAnimationFrame(()=>{ strip.classList.add('spinning'); strip.style.transform='translateX(-'+off+'px)'; });
   setTimeout(()=>{ clearInterval(ti); res(); },dur+60); }); }
+function sellWon(u){ const idx=S.inv.findIndex(i=>i.uid===u); if(idx<0)return;
+  const g=gift(S.inv[idx].gid); if(!g)return;
+  S.inv.splice(idx,1); S.balance+=g.price; S.stats.sells++;
+  qEvent('sell'); sfx.win(); toast('Продано: '+g.name+' +⭐'+fmt(g.price),'good');
+  save(); renderHeader(); refreshInv(); checkAch();
+  const o=document.querySelector('[data-ow="'+u+'"]');
+  if(o){ o.innerHTML='✅ Продано +⭐'+g.price; setTimeout(()=>o.classList.add('fade'),1000); } }
+function keepWon(u){ sfx.click(); refreshInv();
+  const o=document.querySelector('[data-ow="'+u+'"]');
+  if(o){ o.innerHTML='📦 В инвентаре'; setTimeout(()=>o.classList.add('fade'),1000); } }
 async function spin(n){ if(spinning) return;
   if(curCase.free){ if(!freeReady()) return toast('⏳ Раз в 24 часа','bad');
     const sub=await checkSub();
@@ -294,18 +310,28 @@ async function spin(n){ if(spinning) return;
   spinning=true; S.balance-=cost; S.stats.spent+=cost;
   if(curCase.free) S.freeLast=Date.now();
   save(); renderHeader();
+  const box=$('cfStrips');
+  const avail=box.clientHeight||320;
+  box.innerHTML='';
+  const modal=document.querySelector('#caseModal .modal');
+  if(n>1&&modal) modal.classList.add('compact');
   const wins=[]; for(let i=0;i<n;i++) wins.push(rollDrop(curCase));
-  const box=$('cfStrips'); box.innerHTML='';
   const rows=wins.map(g=>{ const c=document.createElement('div'); c.className='roulette-container';
     c.innerHTML='<div class="roulette-pointer"></div><div class="roulette-strip"></div>';
-    box.appendChild(c); return {c,strip:c.querySelector('.roulette-strip'),g}; });
+    box.appendChild(c); return {c,strip:c.querySelector('.roulette-strip'),g,uid:uid()}; });
+  const rowH=Math.max(84, Math.floor(avail/n)-10);
+  rows.forEach(r=>{ r.c.style.height=rowH+'px'; if(rowH<120) r.c.classList.add('sm'); });
   rows.forEach(r=>buildStrip(r.strip,r.g));
   const dur=(n===1)?4200:3600;
   await Promise.all(rows.map(r=>animateStrip(r.strip,dur)));
   rows.forEach(r=>{ r.c.classList.add('won');
-    r.c.insertAdjacentHTML('beforeend','<div class="strip-win">'+gImg(r.g)+' +'+r.g.name+' · ⭐'+r.g.price+'</div>'); });
-  for(const g of wins){
-    S.inv.push({uid:uid(),gid:g.id}); S.stats.opened++; S.stats.won+=g.price; S.xp+=Math.floor(Math.max(curCase.price,1)/5);
+    r.c.insertAdjacentHTML('beforeend',
+      '<div class="strip-win" data-ow="'+r.uid+'">'+gImg(r.g)+
+      '<div class="sw-info"><b>+'+r.g.name+'</b><span>⭐'+r.g.price+'</span></div>'+
+      '<div class="sw-acts"><button class="sw-btn sell" onclick="sellWon(\''+r.uid+'\')">Продать</button>'+
+      '<button class="sw-btn keep" onclick="keepWon(\''+r.uid+'\')">В инвентарь</button></div></div>'); });
+  for(const r of rows){ const g=r.g;
+    S.inv.push({uid:r.uid,gid:g.id}); S.stats.opened++; S.stats.won+=g.price; S.xp+=Math.floor(Math.max(curCase.price,1)/5);
     if(g.price>S.stats.best)S.stats.best=g.price;
     if(g.rarity==='epic'||g.rarity==='legendary'){sfx.legend();confetti(150);toast('💎 ЭПИКА: '+g.name+'!','good');}
     qEvent('open',1);
@@ -313,7 +339,7 @@ async function spin(n){ if(spinning) return;
   if(wins.every(g=>g.rarity!=='epic'&&g.rarity!=='legendary')) sfx.win();
   spinning=false; checkAch(); save(); renderHeader(); renderCases(); renderTasks(); refreshInv(); }
 
-// ---------- CRASH LIVE (с watchdog) ----------
+// ---------- CRASH LIVE ----------
 const crash={ phase:'bet', betEnds:Date.now()+6000, t0:0, m:1, cp:1, myBet:0, cashed:false, hist:[], lastInt:1, sparks:[], tNow:0, betVal:20, lastFrame:Date.now() };
 let crashLoopOn=false;
 function startCrashLoop(){ if(crashLoopOn)return; crashLoopOn=true; crash.lastFrame=Date.now(); crashLoop(); }
@@ -588,6 +614,18 @@ function closeBattle(){ modalClose('battleModal'); renderBattles(); }
 setInterval(()=>{ try{ const b=$('sec-battles'); if(b&&b.classList.contains('active'))renderBattles(); }catch(e){} },6000);
 
 // ---------- КАБИНЕТ / ТОП / АДМИН ----------
+function ensureBanner(){ let b=$('connBanner');
+  if(!b){ b=document.createElement('div'); b.id='connBanner'; b.className='conn-banner';
+    const sec=$('sec-profile'); if(sec) sec.insertBefore(b, sec.firstChild); }
+  return b; }
+async function retryConnect(){ const b=$('connBanner');
+  if(b) b.innerHTML='<span>⏳ Подключение…</span>';
+  const me=await apiR('/api/me');
+  if(me&&me.tg_id){ S.tgId=me.tg_id; S.balance=me.balance; S.inv=me.inv; S.stats=me.stats; S.xp=me.xp;
+    S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
+    S.serverMode=true; S.migrated=true; save(); renderHeader(); renderSection('profile');
+    toast('🟢 Подключено к серверу','good'); }
+  else { if(b) b.innerHTML='<span>⚠️ Нет соединения с сервером</span><button class="btn btn-secondary" onclick="retryConnect()">Повторить</button>'; } }
 function renderRank(){ const rc=$('rankCard'); if(!rc)return;
   if(!S.serverMode){ rc.innerHTML='<div class="ic-box gold"><svg class="ic"><use href="#i-trophy"/></svg></div><div><b>Твоё место: #1</b><span>Лидерборд живых — в Telegram</span></div>'; return; }
   apiR('/api/rank').then(r=>{ if(r.error)return;
@@ -599,6 +637,9 @@ function renderTop(){ const tl=$('topList'); if(!tl)return;
     if(!rows.length){tl.innerHTML='<div class="muted">Пока пусто — стань первым!</div>';return;}
     tl.innerHTML=rows.map((x,i)=>'<div class="top-row '+(x.me?'me':'')+'"><div class="pos">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1)+'</div><b>'+(x.me?'😎 ':'🧑 ')+x.name+'</b><div class="won">⭐'+fmt(x.won)+'</div></div>').join(''); }); }
 function renderProfile(){ const st=S.stats,li=levelInfo();
+  const b=ensureBanner();
+  if(b){ if(S.serverMode) b.style.display='none';
+    else { b.style.display='flex'; b.innerHTML='<span>⚠️ Нет соединения с сервером — кабинет в локальном режиме</span><button class="btn btn-secondary" onclick="retryConnect()">Повторить</button>'; } }
   setT('pName',S.tgName||'Игрок');
   setT('pAva',(S.tgName||'😎').charAt(0).toUpperCase());
   setT('myId',S.tgId||'—');
@@ -684,6 +725,8 @@ function addStars(){ if(S.serverMode&&TG){ openPay(); } else { S.balance+=100; s
     }
     renderHeader(); renderCases(); crashHist(); crashResize(); syncBetUI(); startCrashLoop();
     save(); buildGiftImages();
+    // ГЛАВНЫЙ ФИКС КАБИНЕТА: перерисовать текущую вкладку ПОСЛЕ ответа сервера
+    try{ renderSection(activeTab()); }catch(e){}
     setTimeout(()=>toast(S.serverMode?'Cash Banni · build '+BUILD+' · 🟢':'Cash Banni · build '+BUILD+' · ⚪'),400);
   }catch(e){ console.error('startup',e); }
 })();
