@@ -1,4 +1,4 @@
-const BUILD = 20;
+const BUILD = 21;
 const $ = id => document.getElementById(id);
 const setT = (id,v) => { const e=$(id); if(e) e.textContent=v; };
 const setH = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
@@ -10,9 +10,9 @@ const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const SUB_REWARD = 10;
 const PAY_PRESETS = [1,5,10,25,50,100,250,500];
 const STRIP_W = 104;
-const CASE_RTP = 0.80;   // кейсы: возврат игроку не выше 80%
+const CASE_RTP = 0.80;   // кейсы: возврат не выше 80%
 const CRASH_EDGE = 0.96; // краш: возврат 96%
-const MINES_RTP = 0.96;  // мины: возврат 96%
+const MINES_RTP = 0.94;  // мины: возврат 94% (дом 6%)
 
 const DEF = () => ({
   balance:ECO.START_BALANCE, xp:0, inv:[],
@@ -243,7 +243,7 @@ function spinWheel(el,segs,winIndex,cb){ if(!el)return cb&&cb(); let start=0;
 async function checkSub(){ const r=await api('/api/check_sub'); return !!(r&&r.sub); }
 function openChannel(){ try{ TG&&TG.openTelegramLink?TG.openTelegramLink(CHANNEL):window.open(CHANNEL); }catch(e){ window.open(CHANNEL); } }
 
-// ---------- КЕЙСЫ (с предохранителем RTP 80%) ----------
+// ---------- КЕЙСЫ (предохранитель RTP 80%) ----------
 function caseArt(c){ const col=CASE_COLORS[c.rarity];
   return '<div class="case-art" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+
     '<div class="bow"></div><div class="lid"></div><div class="body"></div><div class="rv"></div><div class="rh"></div><div class="em">'+c.em+'</div></div>'; }
@@ -485,9 +485,10 @@ function crashDraw(){ const c=$('crashCanvas'); if(!c||!c.width)return;
 function crashHist(){ setH('crashHistory',crash.hist.map(v=>
   '<span class="ch-h '+(v>=10?'hi':v>=2?'mid':'lo')+'">'+v.toFixed(2)+'×</span>').join('')); }
 
-// ---------- MINES (RTP 96%) ----------
+// ---------- MINES (RTP 94% + мин. риск) ----------
 const mines={active:false,bet:20,m:3,field:[],rev:[],picks:0,mult:1};
 function minesFair(picks,m){ let f=1; for(let i=0;i<picks;i++) f*=(25-i)/(25-m-i); return f*MINES_RTP; }
+function minesMinPicks(){ return mines.m===3?2:(mines.m===5?3:4); }
 function minesBet(d){ if(mines.active)return; mines.bet=Math.max(5,mines.bet+d); syncMines(); sfx.click(); }
 function minesSet(v){ if(mines.active)return; mines.bet=v; syncMines(); sfx.click(); }
 function minesSetM(m){ if(mines.active)return; mines.m=m;
@@ -496,8 +497,11 @@ function minesSetM(m){ if(mines.active)return; mines.m=m;
 function syncMines(){ setT('minesBetVal',mines.bet);
   const btn=$('minesBtn'); if(!btn)return;
   if(!mines.active){ btn.textContent='СТАРТ ⭐'+mines.bet; btn.className='btn crash-main-btn bet'; }
-  else { const win=Math.floor(mines.bet*mines.mult);
-    btn.textContent=mines.picks>0?('ЗАБРАТЬ ⭐'+win):'Открой клетку…'; btn.className='btn crash-main-btn cash'; }
+  else {
+    const need=minesMinPicks();
+    if(mines.picks<need){ btn.textContent='ОТКРОЙ ЕЩЁ '+(need-mines.picks); btn.className='btn crash-main-btn wait'; }
+    else { const win=Math.floor(mines.bet*mines.mult); btn.textContent='ЗАБРАТЬ ⭐'+win; btn.className='btn crash-main-btn cash'; }
+  }
   setT('minesMult','x'+mines.mult.toFixed(2));
   setT('minesProfit','Профит: ⭐'+(mines.active?Math.floor(mines.bet*mines.mult)-mines.bet:0)); }
 function renderMines(){ const g=$('minesGrid'); if(!g)return;
@@ -506,7 +510,7 @@ function renderMines(){ const g=$('minesGrid'); if(!g)return;
   document.querySelectorAll('#minesCount .mc').forEach(b=>{ b.onclick=()=>minesSetM(+b.dataset.m);
     b.classList.toggle('sel',+b.dataset.m===mines.m); });
   syncMines(); }
-function minesAction(){ if(!mines.active) minesStart(); else minesCash(); }
+function minesAction(){ if(!mines.active) minesStart(); else { if(mines.picks>=minesMinPicks()) minesCash(); } }
 function minesStart(){ if(mines.active)return;
   if(S.balance<mines.bet)return toast('Недостаточно Stars ⭐','bad');
   S.balance-=mines.bet; save(); renderHeader();
@@ -533,7 +537,7 @@ function minePick(i){ if(!mines.active||mines.rev[i])return;
 function revealMines(){ document.querySelectorAll('.mine-tile').forEach(t=>{ const i=+t.dataset.i;
   if(mines.field[i]&&!t.classList.contains('boom')){t.classList.add('mine-show');t.textContent='💣';}
   else if(!mines.field[i]&&!t.classList.contains('gem')){t.classList.add('safe-show');t.textContent='💎';} }); }
-function minesCash(){ if(!mines.active||mines.picks===0)return;
+function minesCash(){ if(!mines.active||mines.picks<minesMinPicks())return;
   const win=Math.floor(mines.bet*mines.mult);
   S.balance+=win; S.stats.won+=win; S.stats.mines=(S.stats.mines||0)+1; S.stats.minesW=(S.stats.minesW||0)+1;
   mines.active=false; revealMines();
@@ -672,14 +676,14 @@ function doPayCustom(){ const v=parseInt($('payCustom').value);
   if(!v||v<1||v>10000) return toast('Сумма от 1 до 10000','bad');
   apiPay(v); }
 
-// ---------- БАТТЛЫ ----------
+// ---------- БАТТЛЫ (без двойных начислений) ----------
 let battleWatch=null;
 function stopBattleWatch(){ if(battleWatch){clearInterval(battleWatch); battleWatch=null;} }
 function battleCard(b){
   if(b.mine&&b.status==='wait')return '<div class="battle-card mine"><div class="bc-top"><span class="bc-wait">⏳ ОЖИДАНИЕ</span><div class="bet">⭐'+b.bet+'</div></div>'+
     '<div class="bc-mid"><div class="bc-player"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div><div class="bc-player empty"><span class="emoji">❓</span><b>Ищем соперника…</b></div></div>'+
     '<button class="btn btn-secondary" onclick="openBattleHost(\''+b.id+'\','+b.bet+')">Открыть баттл</button></div>';
-  if(b.mine&&b.status==='done')return '<div class="battle-card mine"><div class="bc-top"><span class="bc-done">✅ СЫГРАН</span><div class="bet">⭐'+b.bet+'</div></div><button class="btn btn-primary" onclick="showMyResult(\''+b.id+'\')">Результат</button></div>';
+  if(b.mine&&b.status==='done')return '<div class="battle-card mine"><div class="bc-top"><span class="bc-done">✅ СЫГРАН</span><div class="bet">⭐'+b.bet+'</div></div><button class="btn btn-primary" onclick="showMyResult(\''+b.id+'\')">🎬 Результат</button></div>';
   return '<div class="battle-card"><div class="bc-top"><span class="bc-live">🔴 АКТИВЕН</span><div class="bet">⭐'+b.bet+'</div></div>'+
     '<div class="bc-mid"><div class="bc-player"><span class="emoji">🧑</span><b>'+(b.host_name||'Игрок')+'</b></div><div class="bc-player empty"><span class="emoji">🎯</span><b>Твой слот</b></div></div>'+
     '<button class="btn btn-primary" onclick="joinBattle(\''+b.id+'\')">Войти за ⭐'+b.bet+'</button></div>';
@@ -689,7 +693,7 @@ function renderBattles(){ if(!S.serverMode){setH('battlesList','<div class="mute
     const list=r.battles||[];
     if(!list.length){setH('battlesList','<div class="battle-empty"><span class="emoji">⚔️</span><b>Нет активных баттлов</b><span class="muted">Создай свой — соперник найдётся за секунды</span></div>');return;}
     setH('battlesList',list.map(battleCard).join('')); }); }
-function showMyResult(id){ api('/api/battles/result?id='+id).then(r=>{ if(!r.error)runBattle(r.host_name,r.bet,r.you_win); }); }
+function showMyResult(id){ api('/api/battles/result?id='+id).then(r=>{ if(!r.error)runBattle(r.host_name,r.bet,r.you_win,true); }); }
 function createBattle(){ if(!S.serverMode)return toast('Только в Telegram-версии','bad');
   const bet=parseInt(prompt('Твоя ставка (Stars):','50')); if(!bet||bet<10)return;
   if(S.balance<bet)return toast('Недостаточно Stars','bad');
@@ -713,7 +717,7 @@ function openBattleHost(bid,bet){
       setH('battlePlayers','<div class="b-player me"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div>'+
         '<div class="b-player"><span class="emoji">🧑</span><b>'+(r.guest_name||'Соперник')+'</b></div>');
       setT('battleLog','🎯 Соперник найден! Крутим колесо…');
-      setTimeout(()=>spinBattleWheel(r.you_win,r.bet,true),700);
+      setTimeout(()=>spinBattleWheel(r.you_win,r.bet,true,false),700);
     }
   },3000);
 }
@@ -725,26 +729,34 @@ function joinBattle(id){ api('/api/battles/join',{method:'POST',body:JSON.string
     setT('battleLog','🎯 Крутим колесо…');
     const w=$('bWheel'); setWheel(w,[{pct:50,color:'#ec4899'},{pct:50,color:'#a855f7'}]); if(w)w.classList.remove('idle');
     modalOpen('battleModal');
-    setTimeout(()=>spinBattleWheel(r.you_win,r.bet,false),700); }); }
-function spinBattleWheel(youWin,bet,iAmHost){
+    setTimeout(()=>spinBattleWheel(r.you_win,r.bet,false,false),700); }); }
+function spinBattleWheel(youWin,bet,iAmHost,replay){
   setT('battlePot',fmt(bet*2));
   const segs=iAmHost?[{pct:50,color:'#a855f7'},{pct:50,color:'#ec4899'}]:[{pct:50,color:'#ec4899'},{pct:50,color:'#a855f7'}];
   const winIndex=iAmHost?(youWin?0:1):(youWin?1:0);
+  if(replay) setT('battleLog','🎬 Повтор результата…');
   spinWheel($('bWheel'),segs,winIndex,()=>{
     const my=document.querySelector('.b-player.me');
     const op=document.querySelector('.b-player:not(.me)');
     if(youWin&&my)my.classList.add('win'); if(!youWin&&op)op.classList.add('win');
+    if(replay){
+      setT('battleLog',youWin?'🎉 Ты победил в этом баттле (повтор, без начислений)':'💥 Ты проиграл этот баттл (повтор)');
+      if(youWin){sfx.win();confetti(60);} else sfx.lose();
+      return; // ⛔ НИКАКИХ начислений в повторе
+    }
     S.stats.battles++;
     if(youWin){ S.balance+=bet*2; S.stats.bWins++; S.stats.won+=bet*2;
       setT('battleLog','🎉 ПОБЕДА! +⭐'+fmt(bet*2)); sfx.win(); confetti(100); qEvent('battle_win'); }
     else { setT('battleLog','💥 Поражение… банк ушёл сопернику'); sfx.lose(); }
-    save(); renderHeader(); checkAch(); renderBattles(); });
+    save(); renderHeader(); checkAch(); renderBattles();
+    setTimeout(refreshMe,1200); // сверяем баланс с сервером
+  });
 }
-function runBattle(hostName,bet,youWin){
+function runBattle(hostName,bet,youWin,replay){
   setH('battlePlayers','<div class="b-player"><span class="emoji">🧑</span><b>'+hostName+'</b></div><div class="b-player me"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div>');
   const w=$('bWheel'); setWheel(w,[{pct:50,color:'#ec4899'},{pct:50,color:'#a855f7'}]); if(w)w.classList.remove('idle');
   setT('battleLog','🎯 Крутим колесо…'); modalOpen('battleModal');
-  setTimeout(()=>spinBattleWheel(youWin,bet,false),700); }
+  setTimeout(()=>spinBattleWheel(youWin,bet,false,!!replay),700); }
 function closeBattle(){ stopBattleWatch(); const w=$('bWheel'); if(w)w.classList.remove('idle'); modalClose('battleModal'); renderBattles(); }
 setInterval(()=>{ try{ const b=$('sec-battles'); if(b&&b.classList.contains('active'))renderBattles(); }catch(e){} },6000);
 
@@ -791,7 +803,7 @@ function renderProfile(){ S.stats=Object.assign(DEF().stats, S.stats||{});
   setH('statsGrid',[['Уровень',li.lvl+' ур.'],['Кейсов',st.opened],['Потрачено','⭐'+fmt(st.spent)],['Выиграно','⭐'+fmt(st.won)],
     ['Лучший дроп','⭐'+fmt(st.best)],['Апгрейдов',st.upWins+'/'+st.upgrades],['Баттлов',st.bWins+'/'+st.battles],
     ['Crash побед',st.crashWins||0],['Mines',((st.minesW||0)+'/'+(st.mines||0))],
-    ['Режим',S.serverMode?'🟢 онлайн':'⚪ локально'],['Сборка','build '+BUILD]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join(''));
+    ['Режим',S.serverMode?'🟢 онлайн':' локально'],['Сборка','build '+BUILD]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join(''));
   const st1=$('soundToggle'); if(st1)st1.checked=S.sound;
   const st2=$('fairToggle'); if(st2)st2.checked=S.fair;
   setH('fairInfo',S.fair?'Seed: '+S.seed+'<br>Hash: '+hash(S.seed):'');
