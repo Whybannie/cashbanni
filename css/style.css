@@ -365,3 +365,21 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 .mini-btn.gift:active{transform:scale(.94)}
 .inv-item .acts{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .inv-item .acts .mini-btn{flex:1;min-width:72px;font-size:.62rem}
+
+/* ===== v20: MINES ===== */
+.mines-panel{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:20px;padding:12px;margin-bottom:12px}
+.mines-count{display:flex;gap:6px;margin:10px 0}
+.mc{flex:1;border:1px solid var(--line);background:var(--card);color:rgba(255,255,255,.7);border-radius:12px;padding:10px 0;font-size:.72rem;font-weight:900;cursor:pointer}
+.mc.sel{border-color:var(--acc);color:#fff;background:rgba(168,85,247,.18)}
+.mines-info{display:flex;justify-content:space-between;font-size:.85rem;font-weight:900;margin-bottom:10px}
+#minesMult{color:var(--gold)}
+#minesProfit{color:rgba(255,255,255,.55)}
+.mines-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.mine-tile{aspect-ratio:1;border-radius:14px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));font-size:1.5rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
+.mine-tile:active{transform:scale(.92)}
+.mine-tile.gem{background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.5);animation:pop .25s}
+.mine-tile.boom{background:rgba(239,68,68,.22);border-color:rgba(239,68,68,.6);animation:shake2 .4s}
+.mine-tile.mine-show{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35)}
+.mine-tile.safe-show{opacity:.5}
+@keyframes pop{0%{transform:scale(.6)}100%{transform:scale(1)}}
+@keyframes shake2{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}

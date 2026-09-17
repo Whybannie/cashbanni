@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
-<meta name="build" content="16">
+<meta name="build" content="20">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=16">
+<link rel="stylesheet" href="css/style.css?v=20">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" crossorigin="anonymous"></script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -87,6 +87,37 @@
     <div class="crash-history" id="crashHistory"></div>
   </section>
 
+  <!-- МИНЫ -->
+  <section class="section" id="sec-mines">
+    <div class="crash-head">
+      <button class="back-btn" onclick="activateTab('modes')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
+      <h2>Mines</h2>
+    </div>
+    <div class="mines-panel">
+      <div class="cp-row">
+        <div class="cp-bet">
+          <button class="cp-step" onclick="minesBet(-10)">−</button>
+          <div class="cp-val">⭐<span id="minesBetVal">20</span></div>
+          <button class="cp-step" onclick="minesBet(10)">+</button>
+        </div>
+        <div class="cp-chips">
+          <button class="cp-chip" onclick="minesSet(10)">10</button>
+          <button class="cp-chip" onclick="minesSet(25)">25</button>
+          <button class="cp-chip" onclick="minesSet(50)">50</button>
+          <button class="cp-chip" onclick="minesSet(100)">100</button>
+        </div>
+      </div>
+      <div class="mines-count" id="minesCount">
+        <button data-m="3" class="mc sel">3 мины</button>
+        <button data-m="5" class="mc">5 мин</button>
+        <button data-m="10" class="mc">10 мин</button>
+      </div>
+      <div class="mines-info"><span id="minesMult">x1.00</span><span id="minesProfit">Профит: ⭐0</span></div>
+      <button class="btn crash-main-btn bet" id="minesBtn" onclick="minesAction()">СТАРТ ⭐20</button>
+    </div>
+    <div class="mines-grid" id="minesGrid"></div>
+  </section>
+
   <!-- ЗАДАНИЯ -->
   <section class="section" id="sec-tasks">
     <h2>Задания</h2>
@@ -134,6 +165,11 @@
     <div class="task-card" onclick="activateTab('crash')">
       <div class="ic-box gold"><svg class="ic"><use href="#i-rocket"/></svg></div>
       <div class="task-info"><b>Crash Live</b><span>Раунды идут 24/7</span></div>
+      <div class="hero-go">›</div>
+    </div>
+    <div class="task-card" onclick="activateTab('mines')">
+      <div class="ic-box green"><svg class="ic"><use href="#i-bolt"/></svg></div>
+      <div class="task-info"><b>Mines</b><span>Поле 5×5 · множитель до x100+</span></div>
       <div class="hero-go">›</div>
     </div>
     <div class="task-card" onclick="activateTab('battles')">
@@ -227,7 +263,7 @@
   <button data-tab="profile"><svg class="ic"><use href="#i-user"/></svg><span class="nl">Кабинет</span></button>
 </nav>
 
-<!-- КЕЙС: FULLSCREEN, состав и цена видны ДО спина -->
+<!-- КЕЙС: FULLSCREEN, состав виден ДО спина -->
 <div class="modal-overlay" id="caseModal">
   <div class="modal case-full">
     <div class="cf-head"><h3 id="cmTitle"></h3><button class="x" onclick="closeCaseModal()"><svg class="ic s"><use href="#i-x"/></svg></button></div>
@@ -269,7 +305,7 @@
 </div>
 
 <div class="toasts" id="toasts"></div>
-<script src="js/data.js?v=16"></script>
-<script src="js/app.js?v=16"></script>
+<script src="js/data.js?v=20"></script>
+<script src="js/app.js?v=20"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-const BUILD = 18;
+const BUILD = 20;
 const $ = id => document.getElementById(id);
 const setT = (id,v) => { const e=$(id); if(e) e.textContent=v; };
 const setH = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
@@ -10,10 +10,13 @@ const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const SUB_REWARD = 10;
 const PAY_PRESETS = [1,5,10,25,50,100,250,500];
 const STRIP_W = 104;
+const CASE_RTP = 0.80;   // кейсы: возврат игроку не выше 80%
+const CRASH_EDGE = 0.96; // краш: возврат 96%
+const MINES_RTP = 0.96;  // мины: возврат 96%
 
 const DEF = () => ({
   balance:ECO.START_BALANCE, xp:0, inv:[],
-  stats:{opened:0,spent:0,won:0,best:0,upgrades:0,upWins:0,battles:0,bWins:0,sells:0,buys:0,crashWins:0},
+  stats:{opened:0,spent:0,won:0,best:0,upgrades:0,upWins:0,battles:0,bWins:0,sells:0,buys:0,crashWins:0,mines:0,minesW:0},
   qp:{}, qc:[], ac:[], promo:[], refs:0, freeLast:0, subDone:false, tgId:null, migrated:false, createdAt:null,
   sound:true, fair:false, seed:uid()+uid(), serverMode:false, isAdmin:false
 });
@@ -212,7 +215,8 @@ function renderSection(t){
   else if(t==='tasks') renderTasks();
   else if(t==='market') renderMarket();
   else if(t==='upgrade') renderUpgrade();
-  else if(t==='battles') renderBattles(); }
+  else if(t==='battles') renderBattles();
+  else if(t==='mines') renderMines(); }
 function renderAll(){ try{ renderHeader(); const t=activeTab(); if(t) renderSection(t); }catch(e){} }
 
 document.addEventListener('visibilitychange',()=>{
@@ -239,11 +243,24 @@ function spinWheel(el,segs,winIndex,cb){ if(!el)return cb&&cb(); let start=0;
 async function checkSub(){ const r=await api('/api/check_sub'); return !!(r&&r.sub); }
 function openChannel(){ try{ TG&&TG.openTelegramLink?TG.openTelegramLink(CHANNEL):window.open(CHANNEL); }catch(e){ window.open(CHANNEL); } }
 
-// ---------- КЕЙСЫ ----------
+// ---------- КЕЙСЫ (с предохранителем RTP 80%) ----------
 function caseArt(c){ const col=CASE_COLORS[c.rarity];
   return '<div class="case-art" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+
     '<div class="bow"></div><div class="lid"></div><div class="body"></div><div class="rv"></div><div class="rh"></div><div class="em">'+c.em+'</div></div>'; }
 function freeReady(){ return Date.now()-(S.freeLast||0)>=FREE_CASE_COOLDOWN; }
+function caseEV(c){ return c.drops.reduce((a,d)=>{const g=gift(d[0]);return a+(g?g.price*d[1]:0);},0); }
+function rollDrop(c){
+  if(c.price>0){
+    const ev=caseEV(c);
+    const prices=c.drops.map(d=>{const g=gift(d[0]);return g?g.price:0;});
+    const minP=Math.min.apply(null,prices);
+    if(ev>CASE_RTP*c.price && ev>minP){
+      const cut=(ev-CASE_RTP*c.price)/(ev-minP);
+      if(Math.random()<cut){ return gift(c.drops[prices.indexOf(minP)][0]); }
+    }
+  }
+  let r=Math.random(),acc=0; for(const d of c.drops){acc+=d[1]; if(r<=acc)return gift(d[0]);} return gift(c.drops[0][0]);
+}
 function renderCases(){ setT('casesStat','Открыто: '+S.stats.opened);
   setH('casesGrid',CASES.map(c=>
     '<div class="case-card" style="--glow:'+RAR[c.rarity].glow+'" onclick="openCaseModal(\''+c.id+'\')">'+
@@ -251,7 +268,6 @@ function renderCases(){ setT('casesStat','Открыто: '+S.stats.opened);
     '<div class="rt" style="background:'+RAR[c.rarity].color+';color:'+RAR[c.rarity].color+'"></div>'+
     caseArt(c)+'<div class="name">'+c.name+'</div>'+
     '<div class="price">'+(c.price===0?'БЕСПЛАТНО':'⭐ '+fmt(c.price))+'</div></div>').join('')); }
-function rollDrop(c){ let r=Math.random(),acc=0; for(const d of c.drops){acc+=d[1]; if(r<=acc)return gift(d[0]);} return gift(c.drops[0][0]); }
 function buildStrip(strip,g){
   strip.innerHTML='';
   const winIdx=42;
@@ -343,12 +359,12 @@ async function spin(n){ if(spinning) return;
   if(wins.every(g=>g.rarity!=='epic'&&g.rarity!=='legendary')) sfx.win();
   spinning=false; checkAch(); save(); renderHeader(); renderCases(); renderTasks(); refreshInv(); }
 
-// ---------- CRASH LIVE ----------
+// ---------- CRASH LIVE (RTP 96%) ----------
 const crash={ phase:'bet', betEnds:Date.now()+6000, t0:0, m:1, cp:1, myBet:0, cashed:false, hist:[], lastInt:1, sparks:[], tNow:0, betVal:20, lastFrame:Date.now() };
 let crashLoopOn=false;
 function startCrashLoop(){ if(crashLoopOn)return; crashLoopOn=true; crash.lastFrame=Date.now(); crashLoop(); }
 setInterval(()=>{ if(crashLoopOn && Date.now()-crash.lastFrame>4000){ crashLoopOn=false; startCrashLoop(); } },3000);
-function genCrash(){ const r=Math.random(); if(r<0.03)return 1.00; return Math.min(150,Math.floor(0.97/(1-r)*100)/100); }
+function genCrash(){ const r=Math.random(); if(r<0.03)return 1.00; return Math.min(150,Math.floor(CRASH_EDGE/(1-r)*100)/100); }
 function crashResize(){ const c=$('crashCanvas'); if(!c)return;
   const r=c.parentElement.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
   c.width=r.width*dpr; c.height=r.height*dpr; }
@@ -469,7 +485,63 @@ function crashDraw(){ const c=$('crashCanvas'); if(!c||!c.width)return;
 function crashHist(){ setH('crashHistory',crash.hist.map(v=>
   '<span class="ch-h '+(v>=10?'hi':v>=2?'mid':'lo')+'">'+v.toFixed(2)+'×</span>').join('')); }
 
-// ---------- ИНВЕНТАРЬ (С ВЫВОДОМ 🎁) ----------
+// ---------- MINES (RTP 96%) ----------
+const mines={active:false,bet:20,m:3,field:[],rev:[],picks:0,mult:1};
+function minesFair(picks,m){ let f=1; for(let i=0;i<picks;i++) f*=(25-i)/(25-m-i); return f*MINES_RTP; }
+function minesBet(d){ if(mines.active)return; mines.bet=Math.max(5,mines.bet+d); syncMines(); sfx.click(); }
+function minesSet(v){ if(mines.active)return; mines.bet=v; syncMines(); sfx.click(); }
+function minesSetM(m){ if(mines.active)return; mines.m=m;
+  document.querySelectorAll('#minesCount .mc').forEach(b=>b.classList.toggle('sel',+b.dataset.m===m));
+  syncMines(); sfx.click(); }
+function syncMines(){ setT('minesBetVal',mines.bet);
+  const btn=$('minesBtn'); if(!btn)return;
+  if(!mines.active){ btn.textContent='СТАРТ ⭐'+mines.bet; btn.className='btn crash-main-btn bet'; }
+  else { const win=Math.floor(mines.bet*mines.mult);
+    btn.textContent=mines.picks>0?('ЗАБРАТЬ ⭐'+win):'Открой клетку…'; btn.className='btn crash-main-btn cash'; }
+  setT('minesMult','x'+mines.mult.toFixed(2));
+  setT('minesProfit','Профит: ⭐'+(mines.active?Math.floor(mines.bet*mines.mult)-mines.bet:0)); }
+function renderMines(){ const g=$('minesGrid'); if(!g)return;
+  if(!g.children.length){ for(let i=0;i<25;i++){ const b=document.createElement('button');
+      b.className='mine-tile'; b.dataset.i=i; b.onclick=()=>minePick(i); g.appendChild(b); } }
+  document.querySelectorAll('#minesCount .mc').forEach(b=>{ b.onclick=()=>minesSetM(+b.dataset.m);
+    b.classList.toggle('sel',+b.dataset.m===mines.m); });
+  syncMines(); }
+function minesAction(){ if(!mines.active) minesStart(); else minesCash(); }
+function minesStart(){ if(mines.active)return;
+  if(S.balance<mines.bet)return toast('Недостаточно Stars ⭐','bad');
+  S.balance-=mines.bet; save(); renderHeader();
+  mines.active=true; mines.picks=0; mines.mult=1; mines.rev=new Array(25).fill(false);
+  mines.field=new Array(25).fill(0);
+  let placed=0; while(placed<mines.m){ const r=Math.floor(Math.random()*25); if(!mines.field[r]){mines.field[r]=1;placed++;} }
+  document.querySelectorAll('.mine-tile').forEach(t=>{t.className='mine-tile';t.textContent='';});
+  sfx.click(); syncMines(); }
+function minePick(i){ if(!mines.active||mines.rev[i])return;
+  mines.rev[i]=true;
+  const t=document.querySelector('.mine-tile[data-i="'+i+'"]');
+  if(mines.field[i]){
+    t.classList.add('boom'); t.textContent='💣';
+    revealMines(); mines.active=false;
+    S.stats.mines=(S.stats.mines||0)+1;
+    sfx.lose(); haptic('error'); toast('💥 Мина! −⭐'+mines.bet,'bad');
+    save(); syncMines(); return;
+  }
+  t.classList.add('gem'); t.textContent='💎';
+  mines.picks++; mines.mult=minesFair(mines.picks,mines.m);
+  sfx.tick(); haptic('light');
+  if(mines.picks>=25-mines.m){ minesCash(); return; }
+  syncMines(); }
+function revealMines(){ document.querySelectorAll('.mine-tile').forEach(t=>{ const i=+t.dataset.i;
+  if(mines.field[i]&&!t.classList.contains('boom')){t.classList.add('mine-show');t.textContent='💣';}
+  else if(!mines.field[i]&&!t.classList.contains('gem')){t.classList.add('safe-show');t.textContent='💎';} }); }
+function minesCash(){ if(!mines.active||mines.picks===0)return;
+  const win=Math.floor(mines.bet*mines.mult);
+  S.balance+=win; S.stats.won+=win; S.stats.mines=(S.stats.mines||0)+1; S.stats.minesW=(S.stats.minesW||0)+1;
+  mines.active=false; revealMines();
+  sfx.win(); if(mines.mult>=5)confetti(90);
+  toast('✅ Забрал +⭐'+win+' (x'+mines.mult.toFixed(2)+')','good');
+  save(); renderHeader(); syncMines(); checkAch(); }
+
+// ---------- ИНВЕНТАРЬ ----------
 function itemCard(g,noActs){ return '<div class="inv-item">'+
   '<div class="rt" style="background:'+RAR[g.rarity].color+'"></div>'+
   gImg(g)+'<div class="name">'+g.name+'</div><div class="price">⭐ '+fmt(g.price)+'</div>'+
@@ -491,13 +563,13 @@ function sellItem(u){ const idx=S.inv.findIndex(i=>i.uid===u); if(idx<0)return;
 async function withdrawItem(u){
   const it=S.inv.find(i=>i.uid===u); if(!it)return;
   const g=gift(it.gid); if(!g)return;
-  if(!confirm('🎁 Вывести «'+g.name+'» себе в Telegram?\n\nБот пришлёт подарок с подписью канала.'))return;
+  if(!confirm('🎁 Вывести «'+g.name+'» себе в Telegram?\nКомиссия 10% спишется с баланса. Лимит: 3 в день.'))return;
   toast('⏳ Отправляю подарок…','');
-    const r=await api('/api/withdraw',{method:'POST',body:JSON.stringify({uid:u, price:g.price, emoji:g.emoji||''})});
+  const r=await api('/api/withdraw',{method:'POST',body:JSON.stringify({uid:u, price:g.price, emoji:g.emoji||''})});
   if(r.ok){
     const idx=S.inv.findIndex(i=>i.uid===u); if(idx>=0)S.inv.splice(idx,1);
     sfx.win(); confetti(80);
-    toast('🎁 Подарок отправлен! Проверь личные сообщения бота','good');
+    toast('🎁 Подарок отправлен! Комиссия ⭐'+(r.fee||0)+'. Осталось выводов сегодня: '+(r.left_today!==undefined?r.left_today:'—'),'good');
     save(); renderHeader(); renderInventory(); refreshInv();
   } else {
     toast('❌ '+(r.error||'Не удалось вывести подарок'),'bad');
@@ -717,7 +789,8 @@ function renderProfile(){ S.stats=Object.assign(DEF().stats, S.stats||{});
   setH('pBadges',bad||'<span class="pbad">🌱 Новичок</span>');
   setT('subState',S.subDone?'Активна ✅':'Награда ⭐'+SUB_REWARD);
   setH('statsGrid',[['Уровень',li.lvl+' ур.'],['Кейсов',st.opened],['Потрачено','⭐'+fmt(st.spent)],['Выиграно','⭐'+fmt(st.won)],
-    ['Лучший дроп','⭐'+fmt(st.best)],['Апгрейдов',st.upWins+'/'+st.upgrades],['Баттлов',st.bWins+'/'+st.battles],['Crash побед',st.crashWins||0],
+    ['Лучший дроп','⭐'+fmt(st.best)],['Апгрейдов',st.upWins+'/'+st.upgrades],['Баттлов',st.bWins+'/'+st.battles],
+    ['Crash побед',st.crashWins||0],['Mines',((st.minesW||0)+'/'+(st.mines||0))],
     ['Режим',S.serverMode?'🟢 онлайн':'⚪ локально'],['Сборка','build '+BUILD]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join(''));
   const st1=$('soundToggle'); if(st1)st1.checked=S.sound;
   const st2=$('fairToggle'); if(st2)st2.checked=S.fair;
