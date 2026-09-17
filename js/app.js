@@ -1,4 +1,4 @@
-const BUILD = 17;
+const BUILD = 18;
 const $ = id => document.getElementById(id);
 const setT = (id,v) => { const e=$(id); if(e) e.textContent=v; };
 const setH = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
@@ -469,12 +469,15 @@ function crashDraw(){ const c=$('crashCanvas'); if(!c||!c.width)return;
 function crashHist(){ setH('crashHistory',crash.hist.map(v=>
   '<span class="ch-h '+(v>=10?'hi':v>=2?'mid':'lo')+'">'+v.toFixed(2)+'×</span>').join('')); }
 
-// ---------- ИНВЕНТАРЬ ----------
+// ---------- ИНВЕНТАРЬ (С ВЫВОДОМ 🎁) ----------
 function itemCard(g,noActs){ return '<div class="inv-item">'+
   '<div class="rt" style="background:'+RAR[g.rarity].color+'"></div>'+
   gImg(g)+'<div class="name">'+g.name+'</div><div class="price">⭐ '+fmt(g.price)+'</div>'+
-  (noActs?'':'<div class="acts"><button class="mini-btn sell" onclick="sellItem(\''+g.uid+'\')">Продать ⭐'+g.price+'</button>'+
-  '<button class="mini-btn up" onclick="toUpgrade(\''+g.uid+'\')">⚡</button></div>')+'</div>'; }
+  (noActs?'':'<div class="acts">'+
+    '<button class="mini-btn gift" onclick="withdrawItem(\''+g.uid+'\')">🎁 Вывести</button>'+
+    '<button class="mini-btn sell" onclick="sellItem(\''+g.uid+'\')">Продать ⭐'+g.price+'</button>'+
+    '<button class="mini-btn up" onclick="toUpgrade(\''+g.uid+'\')">⚡</button>'+
+    '</div>')+'</div>'; }
 function renderInventory(){ const items=validInv();
   const val=items.reduce((a,i)=>a+gift(i.gid).price,0);
   setT('invValue','Предметов: '+items.length+' · ⭐'+fmt(val));
@@ -485,6 +488,21 @@ function sellItem(u){ const idx=S.inv.findIndex(i=>i.uid===u); if(idx<0)return;
   S.inv.splice(idx,1); S.balance+=g.price; S.stats.sells++;
   qEvent('sell'); sfx.win(); toast('Продано: '+g.name+' +⭐'+fmt(g.price),'good');
   save(); renderHeader(); renderInventory(); renderUpgrade(); checkAch(); }
+async function withdrawItem(u){
+  const it=S.inv.find(i=>i.uid===u); if(!it)return;
+  const g=gift(it.gid); if(!g)return;
+  if(!confirm('🎁 Вывести «'+g.name+'» себе в Telegram?\n\nБот пришлёт подарок с подписью канала.'))return;
+  toast('⏳ Отправляю подарок…','');
+  const r=await api('/api/withdraw',{method:'POST',body:JSON.stringify({uid:u})});
+  if(r.ok){
+    const idx=S.inv.findIndex(i=>i.uid===u); if(idx>=0)S.inv.splice(idx,1);
+    sfx.win(); confetti(80);
+    toast('🎁 Подарок отправлен! Проверь личные сообщения бота','good');
+    save(); renderHeader(); renderInventory(); refreshInv();
+  } else {
+    toast('❌ '+(r.error||'Не удалось вывести подарок'),'bad');
+  }
+}
 function sellAll(){ const items=validInv(); if(!items.length)return;
   let t=0; items.forEach(i=>t+=gift(i.gid).price);
   if(!confirm('Продать всё за ⭐'+fmt(t)+'?'))return;
@@ -759,8 +777,8 @@ function addStars(){ if(S.serverMode&&TG){ openPay(); } else { S.balance+=100; s
     const me=await apiR('/api/me');
     if(me&&me.tg_id){
       S.tgId=me.tg_id; S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
-      const serverEmpty=(!me.stats||!me.stats.opened)&&me.balance===ECO.START_BALANCE&&!me.inv.length;
-      const localHas=S.stats.opened>0||S.inv.length>0||S.balance!==ECO.START_BALANCE;
+      const serverEmpty=(!me.stats||!me.stats.opened)&&me.balance===0&&!me.inv.length;
+      const localHas=S.stats.opened>0||S.inv.length>0||S.balance!==0;
       if(serverEmpty&&localHas&&!S.migrated){
         await api('/api/save',{method:'POST',body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})});
         S.migrated=true; toast('📦 Локальный прогресс перенесён на сервер!','good');

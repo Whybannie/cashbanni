@@ -360,3 +360,8 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 .c-item .ch{position:absolute;top:6px;right:6px;font-size:.55rem;font-weight:900;background:rgba(0,0,0,.4);border-radius:50px;padding:2px 7px;color:#fff}
 .c-item .cname{font-size:.64rem;font-weight:800;text-align:center}
 .c-item .cprice{font-size:.62rem;color:var(--gold);font-weight:900}
+.mini-btn.gift{background:rgba(96,165,250,.18);color:#93c5fd}
+.mini-btn.gift{background:rgba(96,165,250,.18);color:#93c5fd;font-weight:900}
+.mini-btn.gift:active{transform:scale(.94)}
+.inv-item .acts{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.inv-item .acts .mini-btn{flex:1;min-width:72px;font-size:.62rem}
