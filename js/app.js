@@ -493,7 +493,7 @@ async function withdrawItem(u){
   const g=gift(it.gid); if(!g)return;
   if(!confirm('🎁 Вывести «'+g.name+'» себе в Telegram?\n\nБот пришлёт подарок с подписью канала.'))return;
   toast('⏳ Отправляю подарок…','');
-  const r=await api('/api/withdraw',{method:'POST',body:JSON.stringify({uid:u})});
+    const r=await api('/api/withdraw',{method:'POST',body:JSON.stringify({uid:u, price:g.price, emoji:g.emoji||''})});
   if(r.ok){
     const idx=S.inv.findIndex(i=>i.uid===u); if(idx>=0)S.inv.splice(idx,1);
     sfx.win(); confetti(80);
