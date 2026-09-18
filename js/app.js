@@ -315,7 +315,7 @@ async function spin(n){ if(spinning) return;
   const rowH=Math.max(84, Math.floor(avail/n)-10);
   rows.forEach(r=>{ r.c.style.height=rowH+'px'; if(rowH<120) r.c.classList.add('sm'); });
   rows.forEach(r=>buildStrip(r.strip,r.g));
-  const dur=(n===1)?4200:3600;
+  const dur=(n===1)?6000:5000;
   await Promise.all(rows.map(r=>animateStrip(r.strip,dur)));
   rows.forEach(r=>{ r.c.classList.add('won');
     r.c.insertAdjacentHTML('beforeend',
