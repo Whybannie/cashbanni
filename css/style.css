@@ -383,3 +383,9 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 .mine-tile.safe-show{opacity:.5}
 @keyframes pop{0%{transform:scale(.6)}100%{transform:scale(1)}}
 @keyframes shake2{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* ===== v22: картинки кейсов ===== */
+.case-img{width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 0 14px var(--glow));margin:0 auto;display:block}
+.case-card .case-art{display:flex;align-items:center;justify-content:center;padding:8px}
+.cf-hero .case-art{width:100px;height:100px;flex-shrink:0}
+.cf-hero .case-img{width:100px;height:100px}

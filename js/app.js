@@ -1,4 +1,4 @@
-const BUILD = 21;
+const BUILD = 22;
 const $ = id => document.getElementById(id);
 const setT = (id,v) => { const e=$(id); if(e) e.textContent=v; };
 const setH = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
@@ -10,9 +10,9 @@ const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const SUB_REWARD = 10;
 const PAY_PRESETS = [1,5,10,25,50,100,250,500];
 const STRIP_W = 104;
-const CASE_RTP = 0.80;   // кейсы: возврат не выше 80%
-const CRASH_EDGE = 0.96; // краш: возврат 96%
-const MINES_RTP = 0.94;  // мины: возврат 94% (дом 6%)
+const CASE_RTP = 0.80;
+const CRASH_EDGE = 0.96;
+const MINES_RTP = 0.94;
 
 const DEF = () => ({
   balance:ECO.START_BALANCE, xp:0, inv:[],
@@ -131,37 +131,6 @@ function modalOpen(id){ const e=$(id); if(e){e.classList.add('active'); document
 function modalClose(id){ const e=$(id); if(e)e.classList.remove('active');
   if(!document.querySelector('.modal-overlay.active')) document.body.classList.remove('modal-open'); }
 
-async function loadTgs(url){
-  const res=await fetch(url); if(!res.ok) throw new Error('http '+res.status);
-  const buf=await res.arrayBuffer();
-  if(window.DecompressionStream){
-    const stream=new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'));
-    return JSON.parse(await new Response(stream).text());
-  }
-  return JSON.parse(new TextDecoder().decode(buf));
-}
-async function buildGiftImages(){
-  if(!window.lottie) return;
-  try{ const c=JSON.parse(localStorage.getItem('cb_imgs')||'{}'); Object.assign(IMG,c);
-    if(Object.keys(c).length) renderAll(); }catch(e){}
-  const missing=GIFTS.filter(g=>g.tgs&&!IMG[g.id]);
-  if(!missing.length) return;
-  await Promise.allSettled(missing.map(async g=>{
-    try{
-      const data=await loadTgs(g.tgs);
-      const div=document.createElement('div'); div.style.cssText='width:96px;height:96px;position:fixed;left:-9999px;top:0';
-      document.body.appendChild(div);
-      const anim=lottie.loadAnimation({animationData:data,renderer:'canvas',loop:false,autoplay:false,container:div});
-      await new Promise(r=>anim.addEventListener('DOMLoaded',r,{once:true}));
-      anim.goToAndStop(Math.floor((anim.totalFrames||30)/2),true);
-      const c2=div.querySelector('canvas'); if(c2) IMG[g.id]=c2.toDataURL('image/png');
-      anim.destroy(); div.remove();
-    }catch(e){}
-  }));
-  try{ localStorage.setItem('cb_imgs', JSON.stringify(IMG)); }catch(e){}
-  renderAll();
-}
-
 let AC;
 function beep(f,d,t,v){ d=d||0.08;t=t||'square';v=v||0.12; if(!S.sound)return;
   try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)();
@@ -243,10 +212,14 @@ function spinWheel(el,segs,winIndex,cb){ if(!el)return cb&&cb(); let start=0;
 async function checkSub(){ const r=await api('/api/check_sub'); return !!(r&&r.sub); }
 function openChannel(){ try{ TG&&TG.openTelegramLink?TG.openTelegramLink(CHANNEL):window.open(CHANNEL); }catch(e){ window.open(CHANNEL); } }
 
-// ---------- КЕЙСЫ (предохранитель RTP 80%) ----------
-function caseArt(c){ const col=CASE_COLORS[c.rarity];
-  return '<div class="case-art" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+
-    '<div class="bow"></div><div class="lid"></div><div class="body"></div><div class="rv"></div><div class="rh"></div><div class="em">'+c.em+'</div></div>'; }
+// ---------- КЕЙСЫ (дизайнерские арты + RTP 80%) ----------
+function caseArt(c){
+  const col=CASE_COLORS[c.rarity];
+  const art = c.img
+    ? '<img class="case-img" src="'+c.img+'" alt="'+c.name+'" loading="lazy">'
+    : '<div class="bow"></div><div class="lid"></div><div class="body"></div><div class="rv"></div><div class="rh"></div><div class="em">'+c.em+'</div>';
+  return '<div class="case-art" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+art+'</div>';
+}
 function freeReady(){ return Date.now()-(S.freeLast||0)>=FREE_CASE_COOLDOWN; }
 function caseEV(c){ return c.drops.reduce((a,d)=>{const g=gift(d[0]);return a+(g?g.price*d[1]:0);},0); }
 function rollDrop(c){
@@ -359,7 +332,7 @@ async function spin(n){ if(spinning) return;
   if(wins.every(g=>g.rarity!=='epic'&&g.rarity!=='legendary')) sfx.win();
   spinning=false; checkAch(); save(); renderHeader(); renderCases(); renderTasks(); refreshInv(); }
 
-// ---------- CRASH LIVE (RTP 96%) ----------
+// ---------- CRASH LIVE ----------
 const crash={ phase:'bet', betEnds:Date.now()+6000, t0:0, m:1, cp:1, myBet:0, cashed:false, hist:[], lastInt:1, sparks:[], tNow:0, betVal:20, lastFrame:Date.now() };
 let crashLoopOn=false;
 function startCrashLoop(){ if(crashLoopOn)return; crashLoopOn=true; crash.lastFrame=Date.now(); crashLoop(); }
@@ -485,7 +458,7 @@ function crashDraw(){ const c=$('crashCanvas'); if(!c||!c.width)return;
 function crashHist(){ setH('crashHistory',crash.hist.map(v=>
   '<span class="ch-h '+(v>=10?'hi':v>=2?'mid':'lo')+'">'+v.toFixed(2)+'×</span>').join('')); }
 
-// ---------- MINES (RTP 94% + мин. риск) ----------
+// ---------- MINES ----------
 const mines={active:false,bet:20,m:3,field:[],rev:[],picks:0,mult:1};
 function minesFair(picks,m){ let f=1; for(let i=0;i<picks;i++) f*=(25-i)/(25-m-i); return f*MINES_RTP; }
 function minesMinPicks(){ return mines.m===3?2:(mines.m===5?3:4); }
@@ -676,7 +649,7 @@ function doPayCustom(){ const v=parseInt($('payCustom').value);
   if(!v||v<1||v>10000) return toast('Сумма от 1 до 10000','bad');
   apiPay(v); }
 
-// ---------- БАТТЛЫ (без двойных начислений) ----------
+// ---------- БАТТЛЫ ----------
 let battleWatch=null;
 function stopBattleWatch(){ if(battleWatch){clearInterval(battleWatch); battleWatch=null;} }
 function battleCard(b){
@@ -742,14 +715,14 @@ function spinBattleWheel(youWin,bet,iAmHost,replay){
     if(replay){
       setT('battleLog',youWin?'🎉 Ты победил в этом баттле (повтор, без начислений)':'💥 Ты проиграл этот баттл (повтор)');
       if(youWin){sfx.win();confetti(60);} else sfx.lose();
-      return; // ⛔ НИКАКИХ начислений в повторе
+      return;
     }
     S.stats.battles++;
     if(youWin){ S.balance+=bet*2; S.stats.bWins++; S.stats.won+=bet*2;
       setT('battleLog','🎉 ПОБЕДА! +⭐'+fmt(bet*2)); sfx.win(); confetti(100); qEvent('battle_win'); }
     else { setT('battleLog','💥 Поражение… банк ушёл сопернику'); sfx.lose(); }
     save(); renderHeader(); checkAch(); renderBattles();
-    setTimeout(refreshMe,1200); // сверяем баланс с сервером
+    setTimeout(refreshMe,1200);
   });
 }
 function runBattle(hostName,bet,youWin,replay){
@@ -803,7 +776,7 @@ function renderProfile(){ S.stats=Object.assign(DEF().stats, S.stats||{});
   setH('statsGrid',[['Уровень',li.lvl+' ур.'],['Кейсов',st.opened],['Потрачено','⭐'+fmt(st.spent)],['Выиграно','⭐'+fmt(st.won)],
     ['Лучший дроп','⭐'+fmt(st.best)],['Апгрейдов',st.upWins+'/'+st.upgrades],['Баттлов',st.bWins+'/'+st.battles],
     ['Crash побед',st.crashWins||0],['Mines',((st.minesW||0)+'/'+(st.mines||0))],
-    ['Режим',S.serverMode?'🟢 онлайн':' локально'],['Сборка','build '+BUILD]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join(''));
+    ['Режим',S.serverMode?'🟢 онлайн':'⚪ локально'],['Сборка','build '+BUILD]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join(''));
   const st1=$('soundToggle'); if(st1)st1.checked=S.sound;
   const st2=$('fairToggle'); if(st2)st2.checked=S.fair;
   setH('fairInfo',S.fair?'Seed: '+S.seed+'<br>Hash: '+hash(S.seed):'');
@@ -875,7 +848,7 @@ function addStars(){ if(S.serverMode&&TG){ openPay(); } else { S.balance+=100; s
       localStorage.setItem('cashbanni_v2',JSON.stringify(S));
     }
     renderHeader(); renderCases(); crashHist(); crashResize(); syncBetUI(); startCrashLoop();
-    save(); buildGiftImages();
+    save();
     try{ renderSection(activeTab()); }catch(e){}
     setTimeout(()=>toast(S.serverMode?'Cash Banni · build '+BUILD+' · 🟢':'Cash Banni · build '+BUILD+' · ⚪'),400);
   }catch(e){ console.error('startup',e); }
