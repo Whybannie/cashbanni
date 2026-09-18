@@ -437,3 +437,20 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 
 /* ===== v25 ===== */
 .free-badge{display:none!important}
+
+/* ===== v26: фикс схлопывания содержимого + PLINKO ===== */
+.modal.case-full{overflow-y:auto}
+.cf-head,.cf-actions{flex-shrink:0}
+.cf-contents{flex-shrink:0}
+.cf-strips{flex:0 0 auto;min-height:170px}
+.cf-actions{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(6,6,26,0),var(--bg) 25%);padding-top:8px}
+.plinko-board{position:relative;width:100%;aspect-ratio:1/0.95;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin:12px 0}
+.pl-peg{position:absolute;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:rgba(255,255,255,.35);box-shadow:0 0 6px rgba(255,255,255,.25)}
+.pl-slots{position:absolute;left:2%;right:2%;bottom:3%;display:flex;gap:3px}
+.pl-slot{flex:1;text-align:center;font-size:.5rem;font-weight:900;border-radius:6px;padding:6px 0;background:rgba(59,130,246,.25);color:#bfdbfe}
+.pl-slot:nth-child(-n+2),.pl-slot:nth-child(n+10){background:rgba(239,68,68,.3);color:#fecaca}
+.pl-slot:nth-child(3),.pl-slot:nth-child(9){background:rgba(249,115,22,.3);color:#fed7aa}
+.pl-slot:nth-child(4),.pl-slot:nth-child(8){background:rgba(251,191,36,.25);color:#fde68a}
+.pl-slot.hit{animation:pop .5s;box-shadow:0 0 18px rgba(255,255,255,.6)}
+.pl-ball{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#fbbf24 60%,#b45309);box-shadow:0 0 12px rgba(251,191,36,.8);display:none;z-index:5}
+.pl-ball.on{display:block}

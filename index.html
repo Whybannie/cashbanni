@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
-<meta name="build" content="20">
+<meta name="build" content="26">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=25">
+<link rel="stylesheet" href="css/style.css?v=26">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -117,6 +117,32 @@
     <div class="mines-grid" id="minesGrid"></div>
   </section>
 
+  <!-- PLINKO -->
+  <section class="section" id="sec-plinko">
+    <div class="crash-head">
+      <button class="back-btn" onclick="activateTab('modes')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
+      <h2>Plinko</h2>
+    </div>
+    <div class="mines-panel">
+      <div class="cp-row">
+        <div class="cp-bet">
+          <button class="cp-step" onclick="plBet(-10)">−</button>
+          <div class="cp-val">⭐<span id="plinkoBetVal">20</span></div>
+          <button class="cp-step" onclick="plBet(10)">+</button>
+        </div>
+        <div class="cp-chips">
+          <button class="cp-chip" onclick="plSet(10)">10</button>
+          <button class="cp-chip" onclick="plSet(25)">25</button>
+          <button class="cp-chip" onclick="plSet(50)">50</button>
+          <button class="cp-chip" onclick="plSet(100)">100</button>
+        </div>
+      </div>
+      <button class="btn crash-main-btn bet" id="plinkoBtn" onclick="plinkoDrop()">БРОСИТЬ ⭐20</button>
+    </div>
+    <div class="plinko-board" id="plinkoBoard"></div>
+    <div class="crash-history" id="plinkoHist"></div>
+  </section>
+
   <!-- ЗАДАНИЯ -->
   <section class="section" id="sec-tasks">
     <h2>Задания</h2>
@@ -164,6 +190,11 @@
     <div class="task-card" onclick="activateTab('crash')">
       <div class="ic-box gold"><svg class="ic"><use href="#i-rocket"/></svg></div>
       <div class="task-info"><b>Crash Live</b><span>Раунды идут 24/7</span></div>
+      <div class="hero-go">›</div>
+    </div>
+    <div class="task-card" onclick="activateTab('plinko')">
+      <div class="ic-box gold"><span class="emoji">🎯</span></div>
+      <div class="task-info"><b>Plinko</b><span>Шарик и множители до ×12</span></div>
       <div class="hero-go">›</div>
     </div>
     <div class="task-card" onclick="activateTab('mines')">
@@ -262,7 +293,7 @@
   <button data-tab="profile"><svg class="ic"><use href="#i-user"/></svg><span class="nl">Кабинет</span></button>
 </nav>
 
-<!-- КЕЙС: FULLSCREEN, состав виден ДО спина -->
+<!-- КЕЙС -->
 <div class="modal-overlay" id="caseModal">
   <div class="modal case-full">
     <div class="cf-head"><h3 id="cmTitle"></h3><button class="x" onclick="closeCaseModal()"><svg class="ic s"><use href="#i-x"/></svg></button></div>
@@ -304,7 +335,9 @@
 </div>
 
 <div class="toasts" id="toasts"></div>
-<script src="js/data.js?v=25"></script>
-<script src="js/app.js?v=25"></script><script src="js/caseimg.js?v=25"></script>
+<script src="js/data.js?v=26"></script>
+<script src="js/app.js?v=26"></script>
+<script src="js/caseimg.js?v=26"></script>
+<script src="js/plinko.js?v=26"></script>
 </body>
 </html>
