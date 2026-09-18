@@ -1,4 +1,4 @@
-// ===== МОДУЛЬ-ПАТЧ v24: переопределяет функции app.js без правки app.js =====
+// ===== МОДУЛЬ-ПАТЧ v25 =====
 const CASE_IMG = {
   free:'case_fri.JPG', fri:'case_fri.JPG',
   starter:'case_starter.JPG', start:'case_starter.JPG',
@@ -15,7 +15,7 @@ function caseArt(c){
   return '<div class="case-art'+(src?' img-art':'')+'" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+art+'</div>';
 }
 
-// ---- Кейс: состав виден В поле прокрута до спина ----
+// ---- Кейс: состав виден СРАЗУ под шапкой + превью-лента в поле прокрута ----
 function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   if(curCase.free&&!freeReady()){ const h=Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5);
     return toast('⏳ Бесплатный кейс раз в 24 часа. Ещё '+h+' ч.','bad'); }
@@ -28,13 +28,16 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
     '<div class="cf-hero">'+caseArt(curCase)+
       '<div class="cf-hero-info"><b>'+curCase.name+'</b>'+
       '<div class="price">'+(curCase.price===0?'БЕСПЛАТНО':'⭐ '+fmt(curCase.price))+'</div>'+
-      '<span class="muted">Награды кейса — ниже, в поле прокрута ↓</span></div></div>');
-  const box=$('cfStrips');
-  box.innerHTML='<div class="strip-preview"><div class="sp-label">🎁 СОДЕРЖИМОЕ КЕЙСА — ЗДЕСЬ КРУТИТСЯ</div><div class="contents">'+
-    curCase.drops.map(d=>{const g=gift(d[0]);return
+      '<span class="muted">Состав и шансы выпада:</span></div></div>'+
+    '<div class="contents">'+curCase.drops.map(d=>{const g=gift(d[0]);return
       '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'55;box-shadow:0 0 16px '+RAR[g.rarity].color+'22 inset">'+
       '<div class="ch">'+(d[1]*100).toFixed(0)+'%</div>'+gImg(g)+
-      '<div class="cname">'+g.name+'</div><div class="cprice">⭐'+g.price+'</div></div>';}).join('')+'</div></div>';
+      '<div class="cname">'+g.name+'</div><div class="cprice">⭐'+g.price+'</div></div>';}).join('')+'</div>');
+  const box=$('cfStrips'); box.innerHTML='';
+  const prev=document.createElement('div'); prev.className='roulette-container preview';
+  prev.innerHTML='<div class="preview-label">ПРЕВЬЮ ПРОКРУТА</div><div class="roulette-pointer"></div><div class="roulette-strip"></div>';
+  box.appendChild(prev);
+  buildStrip(prev.querySelector('.roulette-strip'), gift(pick(curCase.drops)[0]));
   modalOpen('caseModal'); }
 
 // ---- Задания: кнопка подписки «прожатая» + авто-проверка ----
@@ -52,7 +55,7 @@ function renderTasks(){ const fr=freeReady();
       renderTasks(); renderProfile(); } }); }
 }
 
-// ---- Баттлы: подписи сторон, без лагов (кэш списка) ----
+// ---- Баттлы: подписи сторон, легенда, без лагов ----
 let _bCache='';
 function pYou(n){ return '<div class="b-player you"><span class="emoji">😎</span><b>'+(n||S.tgName||'Ты')+'</b><span class="bp-tag you">ТЫ</span></div>'; }
 function pOpp(n){ return '<div class="b-player opp"><span class="emoji">🧑</span><b>'+(n||'Игрок')+'</b><span class="bp-tag opp">СОПЕРНИК</span></div>'; }
