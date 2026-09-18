@@ -454,3 +454,6 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 .pl-slot.hit{animation:pop .5s;box-shadow:0 0 18px rgba(255,255,255,.6)}
 .pl-ball{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#fbbf24 60%,#b45309);box-shadow:0 0 12px rgba(251,191,36,.8);display:none;z-index:5}
 .pl-ball.on{display:block}
+
+/* ===== v27: plinko ball smaller ===== */
+.pl-ball{width:11px;height:11px;margin:-5.5px 0 0 -5.5px}
