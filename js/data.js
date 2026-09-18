@@ -33,15 +33,15 @@ const GIFTS = [
 
 // ========== КЕЙСЫ (дизайнерские арты из img/) ==========
 const CASES = [
-  { id:'free', name:'Бесплатный кейс', rarity:'common', price:0, free:true, em:'🎁', img:'img/case_fri.JPG',
+  { id:'free', name:'Бесплатный кейс', rarity:'common', price:0, free:true, em:'🎁', img:'case_fri.JPG',
     drops:[['rose',.50],['heart',.30],['teddy',.15],['clover',.05]] },
-  { id:'starter', name:'Стартер', rarity:'common', price:15, em:'📦', img:'img/case_starter.JPG',
+  { id:'starter', name:'Стартер', rarity:'common', price:15, em:'📦', img:'case_starter.JPG',
     drops:[['rose',.40],['heart',.30],['teddy',.20],['clover',.07],['star',.03]] },
-  { id:'mini', name:'Мини', rarity:'rare', price:40, em:'🧰', img:'img/case_mini.JPG',
+  { id:'mini', name:'Мини', rarity:'rare', price:40, em:'🧰', img:'case_mini.JPG',
     drops:[['clover',.45],['star',.35],['rocket',.15],['crown',.05]] },
-  { id:'xaip', name:'Хайп', rarity:'epic', price:120, em:'🔥', img:'img/case_xaip.JPG',
+  { id:'xaip', name:'Хайп', rarity:'epic', price:120, em:'🔥', img:'case_xaip.JPG',
     drops:[['star',.40],['rocket',.35],['crown',.18],['diamond',.07]] },
-  { id:'premium', name:'Премиум', rarity:'legendary', price:300, em:'💎', img:'img/case_premium.JPG',
+  { id:'premium', name:'Премиум', rarity:'legendary', price:300, em:'💎', img:'case_premium.JPG',
     drops:[['rocket',.40],['crown',.35],['diamond',.18],['trophy',.07]] }
 ];
 
