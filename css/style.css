@@ -389,3 +389,10 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 .case-card .case-art{display:flex;align-items:center;justify-content:center;padding:8px}
 .cf-hero .case-art{width:100px;height:100px;flex-shrink:0}
 .cf-hero .case-img{width:100px;height:100px}
+
+/* ===== v22.1: case art на всё поле ===== */
+.case-art:has(img){background:transparent;border:none;padding:0;box-shadow:none;height:auto}
+.case-card .case-art{width:100%;height:120px;display:flex;align-items:center;justify-content:center}
+.case-img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 18px var(--glow))}
+.cf-hero .case-art{width:120px;height:120px;flex-shrink:0}
+.cf-hero .case-img{width:120px;height:120px}

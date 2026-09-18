@@ -1,70 +1,69 @@
-// ========== ЭКОНОМИКА ==========
-const ECO = { START_BALANCE: 0, DISCOUNT: 0.8, UPGRADE_EDGE: 1 };
-const FREE_CASE_COOLDOWN = 24*60*60*1000; // 24 часа
-const REF_REWARD = 5;
-const CHANNEL = "https://t.me/CashBanni";
+const TGS = 'https://raw.githubusercontent.com/MasterGroosha/telegram-gifts-catalogue/web/images/';
 
-// ========== РЕДКОСТИ ==========
 const RAR = {
-  common:    { color:'#22c55e', glow:'rgba(34,197,94,.35)' },
-  rare:      { color:'#3b82f6', glow:'rgba(59,130,246,.35)' },
-  epic:      { color:'#a855f7', glow:'rgba(168,85,247,.40)' },
-  legendary: { color:'#fbbf24', glow:'rgba(251,191,36,.45)' }
-};
-const CASE_COLORS = {
-  common:    ['#052e16','#14532d','#166534'],
-  rare:      ['#0c1a3a','#1e3a8a','#1d4ed8'],
-  epic:      ['#2e1065','#6b21a8','#7e22ce'],
-  legendary: ['#451a03','#92400e','#b45309']
+  common:    { name:'Обычный',     color:'#9ca3af', glow:'rgba(156,163,175,.3)' },
+  rare:      { name:'Редкий',      color:'#60a5fa', glow:'rgba(96,165,250,.4)' },
+  epic:      { name:'Эпический',   color:'#c084fc', glow:'rgba(192,132,252,.45)' },
+  legendary: { name:'Легендарный', color:'#fbbf24', glow:'rgba(251,191,36,.5)' },
 };
 
-// ========== ПОДАРКИ (реальные цены TG Stars) ==========
 const GIFTS = [
-  { id:'rose',    name:'Роза',    emoji:'🌹', price:15,   rarity:'common' },
-  { id:'heart',   name:'Сердце',  emoji:'❤️', price:15,   rarity:'common' },
-  { id:'teddy',   name:'Мишка',   emoji:'🧸', price:15,   rarity:'common' },
-  { id:'clover',  name:'Клевер',  emoji:'🍀', price:25,   rarity:'common' },
-  { id:'star',    name:'Звезда',  emoji:'⭐', price:50,   rarity:'rare' },
-  { id:'rocket',  name:'Ракета',  emoji:'🚀', price:100,  rarity:'rare' },
-  { id:'crown',   name:'Корона',  emoji:'👑', price:250,  rarity:'epic' },
-  { id:'diamond', name:'Алмаз',   emoji:'💎', price:500,  rarity:'legendary' },
-  { id:'trophy',  name:'Кубок',   emoji:'🏆', price:1000, rarity:'legendary' }
+  { id:'dust',    emoji:'✨', name:'Звёздная пыль', rarity:'common', price:1,   tgs:'' },
+  { id:'coin',    emoji:'🪙', name:'Монетка',       rarity:'common', price:3,   tgs:'' },
+  { id:'spark',   emoji:'💫', name:'Искра',         rarity:'common', price:5,   tgs:'' },
+  { id:'bear',    emoji:'🧸', name:'Мишка',         rarity:'common', price:15,  tgs:TGS+'5170233102089322756.tgs' },
+  { id:'heart',   emoji:'❤️', name:'Сердце',        rarity:'common', price:15,  tgs:TGS+'5170145012310081615.tgs' },
+  { id:'rose',    emoji:'🌹', name:'Роза',          rarity:'common', price:25,  tgs:TGS+'5168103777563050263.tgs' },
+  { id:'box',     emoji:'🎁', name:'Бокс',          rarity:'common', price:25,  tgs:TGS+'5170250947678437525.tgs' },
+  { id:'cake',    emoji:'🎂', name:'Тортик',        rarity:'rare',   price:50,  tgs:TGS+'5170144170496491616.tgs' },
+  { id:'bouquet', emoji:'💐', name:'Букет',         rarity:'rare',   price:50,  tgs:TGS+'5170314324215857265.tgs' },
+  { id:'rocket',  emoji:'🚀', name:'Ракета',        rarity:'rare',   price:50,  tgs:TGS+'5170564780938756245.tgs' },
+  { id:'beer',    emoji:'🍾', name:'Пиво',          rarity:'rare',   price:50,  tgs:TGS+'6028601630662853006.tgs' },
+  { id:'ring',    emoji:'💍', name:'Кольцо',        rarity:'epic',   price:100, tgs:TGS+'5170690322832818290.tgs' },
+  { id:'trophy',  emoji:'🏆', name:'Кубок',         rarity:'epic',   price:100, tgs:TGS+'5168043875654172773.tgs' },
+  { id:'diamond', emoji:'💎', name:'Алмаз',         rarity:'epic',   price:100, tgs:TGS+'5170521118301225164.tgs' },
 ];
 
-// ========== КЕЙСЫ (дизайнерские арты из img/) ==========
 const CASES = [
-  { id:'free', name:'Бесплатный кейс', rarity:'common', price:0, free:true, em:'🎁', img:'case_fri.JPG',
-    drops:[['rose',.50],['heart',.30],['teddy',.15],['clover',.05]] },
-  { id:'starter', name:'Стартер', rarity:'common', price:15, em:'📦', img:'case_starter.JPG',
-    drops:[['rose',.40],['heart',.30],['teddy',.20],['clover',.07],['star',.03]] },
-  { id:'mini', name:'Мини', rarity:'rare', price:40, em:'🧰', img:'case_mini.JPG',
-    drops:[['clover',.45],['star',.35],['rocket',.15],['crown',.05]] },
-  { id:'xaip', name:'Хайп', rarity:'epic', price:120, em:'🔥', img:'case_xaip.JPG',
-    drops:[['star',.40],['rocket',.35],['crown',.18],['diamond',.07]] },
-  { id:'premium', name:'Премиум', rarity:'legendary', price:300, em:'💎', img:'case_premium.JPG',
-    drops:[['rocket',.40],['crown',.35],['diamond',.18],['trophy',.07]] }
+  { id:'free',    name:'Бесплатный', em:'🎁', price:0,   rarity:'common', free:true,
+    drops:[['dust',.55],['coin',.25],['spark',.12],['bear',.05],['heart',.02],['rose',.01]] },
+  { id:'mini',    name:'Мини',     em:'🪙', price:5,   rarity:'common',
+    drops:[['dust',.40],['coin',.30],['spark',.15],['bear',.10],['heart',.04],['rose',.01]] },
+  { id:'starter', name:'Стартер',  em:'⭐', price:20,  rarity:'common',
+    drops:[['dust',.25],['bear',.30],['heart',.25],['rose',.12],['box',.08]] },
+  { id:'hype',    name:'Хайп',     em:'🔥', price:45,  rarity:'rare',
+    drops:[['dust',.15],['rose',.28],['box',.25],['cake',.14],['bouquet',.09],['rocket',.06],['beer',.02],['ring',.01]] },
+  { id:'premium', name:'Премиум',  em:'💎', price:110, rarity:'epic',
+    drops:[['dust',.02],['ring',.32],['trophy',.30],['diamond',.12],['rocket',.14],['beer',.10]] },
 ];
 
-// ========== КВЕСТЫ ==========
+const CASE_COLORS = {
+  common:    ['#2c2c4a','#4a4a7a','#9ca3af'],
+  rare:      ['#14304f','#1d4ed8','#60a5fa'],
+  epic:      ['#3b1656','#7e22ce','#c084fc'],
+  legendary: ['#4a2c0a','#b45309','#fbbf24'],
+};
+
 const QUESTS = [
-  { id:'q_open5',  name:'Открой 5 кейсов',           type:'open',        target:5,  reward:20 },
-  { id:'q_open25', name:'Открой 25 кейсов',          type:'open',        target:25, reward:75 },
-  { id:'q_sell3',  name:'Продай 3 предмета',         type:'sell',        target:3,  reward:15 },
-  { id:'q_buy2',   name:'Купи 2 предмета в маркете', type:'buy',         target:2,  reward:20 },
-  { id:'q_up1',    name:'Выиграй апгрейд',           type:'upgrade_win', target:1,  reward:30 },
-  { id:'q_bat1',   name:'Победи в баттле',           type:'battle_win',  target:1,  reward:40 }
+  { id:'q1', type:'open',        target:3,  reward:10, name:'Открой 3 кейса' },
+  { id:'q2', type:'open',        target:10, reward:40, name:'Открой 10 кейсов' },
+  { id:'q3', type:'sell',        target:2,  reward:8,  name:'Продай 2 предмета' },
+  { id:'q4', type:'upgrade_win', target:1,  reward:30, name:'Выиграй апгрейд' },
+  { id:'q5', type:'battle_win',  target:1,  reward:40, name:'Выиграй баттл' },
+  { id:'q6', type:'buy',         target:1,  reward:10, name:'Купи подарок в маркете' },
 ];
 
-// ========== ДОСТИЖЕНИЯ ==========
 const ACHS = [
-  { id:'a_first',  name:'Первый кейс',  emoji:'🎁', cond:S=>(S.stats.opened||0)>=1 },
-  { id:'a_open50', name:'Коллекционер', emoji:'📦', cond:S=>(S.stats.opened||0)>=50 },
-  { id:'a_rich',   name:'Богач',        emoji:'💰', cond:S=>(S.stats.won||0)>=1000 },
-  { id:'a_up10',   name:'Инженер',      emoji:'⚡', cond:S=>(S.stats.upWins||0)>=10 },
-  { id:'a_bat5',   name:'Гладиатор',    emoji:'⚔️', cond:S=>(S.stats.bWins||0)>=5 },
-  { id:'a_crash',  name:'Ловец ракет',  emoji:'🚀', cond:S=>(S.stats.crashWins||0)>=10 },
-  { id:'a_mines',  name:'Сапёр',        emoji:'💎', cond:S=>(S.stats.minesW||0)>=10 }
+  { id:'a1', emoji:'🎁', name:'Первый дроп',         cond:s=>s.stats.opened>=1 },
+  { id:'a2', emoji:'📦', name:'100 кейсов',           cond:s=>s.stats.opened>=100 },
+  { id:'a3', emoji:'💎', name:'Поймать эпику (100⭐)', cond:s=>s.stats.best>=100 },
+  { id:'a4', emoji:'💰', name:'Баланс 2 000',         cond:s=>s.balance>=2000 },
+  { id:'a5', emoji:'⚔️', name:'5 побед в баттлах',    cond:s=>s.stats.bWins>=5 },
+  { id:'a6', emoji:'⚡', name:'3 успешных апгрейда',  cond:s=>s.stats.upWins>=3 },
 ];
 
-// ========== ПРОМОКОДЫ (локальный фолбэк) ==========
-const PROMOS = { START:50, CASH:75, BANNI2026:150, MELLSTROY:250 };
+const PROMOS = { 'START':50, 'CASH':75, 'BANNI2026':150, 'MELLSTROY':250 };
+const CHANNEL = 'https://t.me/CashBanni';
+const REF_REWARD = 5;
+const FREE_CASE_COOLDOWN = 24 * 3600 * 1000; // 24 часа
+const ECO = { SELL_BACK:1, DISCOUNT:0.8, START_BALANCE:100, UPGRADE_EDGE:0.85 };
