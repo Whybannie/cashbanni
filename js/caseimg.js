@@ -1,4 +1,4 @@
-// ===== МОДУЛЬ-ПАТЧ: картинки кейсов =====
+// ===== CASEIMG v35: консолидированный модуль (без слоёв) =====
 const CASE_IMG = {
   free:'case_fri.JPG', fri:'case_fri.JPG',
   starter:'case_starter.JPG', start:'case_starter.JPG',
@@ -17,7 +17,6 @@ function caseArt(c){
   return '<div class="case-art'+(src?' img-art':'')+(c.streamer?' is-streamer':'')+'" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+art+'</div>';
 }
 
-// Стандартный рендер (как в app.js) — без разделения на витрины
 function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   if(curCase.free&&!freeReady()){ const h=Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5);
     return toast('⏳ Бесплатный кейс раз в 24 часа. Ещё '+h+' ч.','bad'); }
@@ -44,22 +43,98 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   modalOpen('caseModal');
 }
 
-// Задания: кнопка подписки «прожатая» + авто-проверка
-let _subCheckTs=0;
+// ---- Задания + понятная рефералка ----
 function renderTasks(){ const fr=freeReady();
   setT('freeCaseState',fr?'Доступен сейчас · 1 спин · подписка':'Следующий через '+Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5)+' ч.');
   const sb=$('subBtn');
   if(sb){ if(S.subDone){sb.textContent='✅ Награда получена';sb.disabled=true;sb.classList.add('pressed');}
     else {sb.textContent='Подписаться';sb.disabled=false;sb.classList.remove('pressed');} }
   setT('refCount',S.refs);
+  const re=$('refExplain');
+  if(re) re.innerHTML='<div class="ref-explain">'+
+      '<div class="re-step"><b>1.</b> Поделись ссылкой с другом</div>'+
+      '<div class="re-step"><b>2.</b> Друг заходит в игру (бесплатно)</div>'+
+      '<div class="re-step highlight"><b>3.</b> Друг делает первый депозит от ⭐5</div>'+
+      '<div class="re-step reward"><b>4.</b> Ты получаешь ⭐'+REF_REWARD+'!</div></div>';
   renderQuests(); renderAchs();
   if(S.serverMode && !S.subDone && Date.now()-_subCheckTs>15000){ _subCheckTs=Date.now();
     checkSub().then(ok=>{ if(ok){ S.subDone=true; S.balance+=SUB_REWARD; save(); renderHeader();
       sfx.win(); confetti(60); toast('📢 Подписка замечена: +⭐'+SUB_REWARD,'good');
       renderTasks(); renderProfile(); } }); }
 }
+let _subCheckTs=0;
 
-// Баттлы с подписями и кэшем
+// ---- Квесты = XP ----
+function renderQuests(){ setH('questsList',QUESTS.map(q=>{
+  const p=Math.min(S.qp[q.type]||0,q.target),done=p>=q.target,cl=S.qc.includes(q.id);
+  return '<div class="quests-row"><div class="q-head"><span>'+q.name+'</span><span class="muted">'+p+'/'+q.target+'</span></div>'+
+    '<div class="q-bar"><div class="q-fill" style="width:'+(p/q.target*100)+'%"></div></div>'+
+    '<button class="q-claim" '+(done&&!cl?'':'disabled')+' onclick="claimQuest(\''+q.id+'\')">'+(cl?'✅ Получено':'Забрать +'+(q.reward*10)+' XP')+'</button></div>';}).join('')); }
+function claimQuest(id){ const q=QUESTS.find(x=>x.id===id);
+  if(S.qc.includes(id)||(S.qp[q.type]||0)<q.target)return;
+  S.qc.push(id); S.xp+=q.reward*10; sfx.win(); toast('📜 Квест выполнен: +'+(q.reward*10)+' XP 🏅','good');
+  saveLocal(); renderHeader(); renderTasks(); }
+
+// ---- Серверные кейсы ----
+function saveLocal(){ localStorage.setItem('cashbanni_v2', JSON.stringify(S)); }
+async function spin(n){ if(spinning) return;
+  if(curCase.free&&!freeReady()) return toast('⏳ Раз в 24 часа','bad');
+  if(curCase.free) n=1;
+  spinning=true;
+  const r=await api('/api/case_open',{method:'POST',body:JSON.stringify({id:curCase.id,count:n})});
+  if(r.error){ spinning=false;
+    if(String(r.error).indexOf('подпис')>=0){ toast('📢 Только для подписчиков','bad'); openChannel(); }
+    else toast('❌ '+r.error,'bad');
+    return; }
+  S.balance=r.balance; S.inv=r.inv; S.stats=Object.assign(DEF().stats,r.stats); S.xp=r.xp||S.xp;
+  if(curCase.free) S.freeLast=Date.now();
+  saveLocal(); renderHeader();
+  const wins=r.results.map(gid=>gift(gid));
+  const box=$('cfStrips'); const avail=box.clientHeight||320; box.innerHTML='';
+  const modal=document.querySelector('#caseModal .modal'); if(n>1&&modal) modal.classList.add('compact');
+  const rows=wins.map(g=>{ const c=document.createElement('div'); c.className='roulette-container';
+    c.innerHTML='<div class="roulette-pointer"></div><div class="roulette-strip"></div>';
+    box.appendChild(c); return {c:c,strip:c.querySelector('.roulette-strip'),g:g,uid:uid()}; });
+  const rowH=Math.max(84, Math.floor(avail/n)-10);
+  rows.forEach(x=>{ x.c.style.height=rowH+'px'; if(rowH<120) x.c.classList.add('sm'); });
+  rows.forEach(x=>buildStrip(x.strip,x.g));
+  const dur=(n===1)?6000:5000;
+  await Promise.all(rows.map(x=>animateStrip(x.strip,dur)));
+  rows.forEach(x=>{ x.c.classList.add('won');
+    x.c.insertAdjacentHTML('beforeend','<div class="strip-win" data-ow="'+x.uid+'">'+gImg(x.g)+
+      '<div class="sw-info"><b>+'+x.g.name+'</b><span>⭐'+x.g.price+'</span></div>'+
+      '<div class="sw-acts"><button class="sw-btn sell" onclick="sellWon(\''+x.uid+'\')">Продать</button>'+
+      '<button class="sw-btn keep" onclick="keepWon(\''+x.uid+'\')">В инвентарь</button></div></div>'); });
+  for(const g of wins){ if(g.rarity==='epic'||g.rarity==='legendary'){ sfx.legend(); confetti(150); toast('💎 ЭПИКА: '+g.name+'!','good'); } }
+  if(wins.every(g=>g.rarity!=='epic'&&g.rarity!=='legendary')) sfx.win();
+  spinning=false; saveLocal(); renderHeader(); renderCases(); renderTasks(); refreshInv(); checkAch();
+}
+function keepWon(u){ sfx.click(); refreshInv();
+  const o=document.querySelector('[data-ow="'+u+'"]'); if(o){ o.innerHTML='📦 В инвентаре'; setTimeout(()=>o.classList.add('fade'),1000); } }
+function sellWon(u){ const idx=S.inv.findIndex(i=>i.uid===u); if(idx<0)return;
+  const g=gift(S.inv[idx].gid); if(!g)return;
+  S.inv.splice(idx,1); S.balance+=g.price; S.stats.sells=(S.stats.sells||0)+1;
+  qEvent('sell'); sfx.win(); toast('Продано: '+g.name+' +⭐'+fmt(g.price),'good');
+  save(); renderHeader(); refreshInv(); checkAch();
+  const o=document.querySelector('[data-ow="'+u+'"]'); if(o){ o.innerHTML='✅ Продано +⭐'+g.price; setTimeout(()=>o.classList.add('fade'),1000); } }
+
+// ---- Титулы (бейдж-сосед, не затирается) ----
+function playerTitle(){ const st=S.stats||{};
+  if((st.won||0)>=5000) return {t:'🐋 Кит',c:'gold'};
+  if((st.opened||0)>=200) return {t:'👑 Легенда кейсов',c:'gold'};
+  if((st.bWins||0)>=10) return {t:'⚔️ Гладиатор',c:'epic'};
+  if((st.opened||0)>=100) return {t:'📦 Коллекционер',c:'epic'};
+  if((st.won||0)>=1000) return {t:'⭐ Про',c:'rare'};
+  if((st.opened||0)>=25) return {t:'🎮 Игрок',c:'rare'};
+  return {t:'🌱 Новичок',c:'common'}; }
+const _rp0 = window.renderProfile;
+function renderProfile(){ _rp0();
+  const el=$('pName'); if(!el||!el.parentNode) return;
+  let b=document.getElementById('ptitleBadge');
+  if(!b){ b=document.createElement('span'); b.id='ptitleBadge'; el.parentNode.insertBefore(b, el.nextSibling); }
+  const ti=playerTitle(); b.className='ptitle '+ti.c; b.textContent=ti.t; }
+
+// ---- Баттлы: подписи + кэш ----
 let _bCache='';
 function pYou(n){ return '<div class="b-player you"><span class="emoji">😎</span><b>'+(n||S.tgName||'Ты')+'</b><span class="bp-tag you">ТЫ</span></div>'; }
 function pOpp(n){ return '<div class="b-player opp"><span class="emoji">🧑</span><b>'+(n||'Игрок')+'</b><span class="bp-tag opp">СОПЕРНИК</span></div>'; }
@@ -142,3 +217,13 @@ function runBattle(hostName,bet,youWin,replay){
   setT('battleLog','🎯 Крутим колесо…'); modalOpen('battleModal');
   setTimeout(()=>spinBattleWheel(youWin,bet,false,!!replay),700); }
 function closeBattle(){ stopBattleWatch(); const w=$('bWheel'); if(w)w.classList.remove('idle'); modalClose('battleModal'); _bCache=''; renderBattles(); }
+
+// ---- Flush save перед серверной перезаписью ----
+function flushSave(){ if(!S.serverMode)return Promise.resolve(); clearTimeout(saveTimer);
+  return api("/api/save",{method:"POST",body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})}); }
+async function refreshMe(){ await flushSave(); const me=await apiR('/api/me');
+  if(me&&me.tg_id){ S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
+    S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
+    S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
+    S.serverMode=true; save(); renderHeader();
+    try{ renderSection(activeTab()); }catch(e){} } }
