@@ -119,7 +119,7 @@ async function apiPay(stars){
   } else if(r.url){ modalClose('payModal'); window.open(r.url); }
   else toast("Не удалось создать счёт","bad");
 }
-function save(){ localStorage.setItem("cashbanni_v2", JSON.stringify(S)); if(S.serverMode){ clearTimeout(saveTimer); api("/api/save",{method:"POST",body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})}); } }
+function save(){ localStorage.setItem('cashbanni_v2', JSON.stringify(S)); apiSave(); }
 function validInv(){ return S.inv.filter(i=>i&&i.gid&&gift(i.gid)); }
 function refreshInv(){ try{
   if($('sec-profile')&&$('sec-profile').classList.contains('active'))renderInventory();
@@ -684,7 +684,7 @@ function renderAchs(){ setH('achList',ACHS.map(a=>{const d=a.cond(S);return
     '<div class="ach '+(d?'done':'locked')+'"><span class="emoji">'+a.emoji+'</span><div><b>'+a.name+'</b><div class="muted small">'+(d?'Выполнено ✅':'Не выполнено')+'</div></div></div>';}).join('')); }
 function claimQuest(id){ const q=QUESTS.find(x=>x.id===id);
   if(S.qc.includes(id)||(S.qp[q.type]||0)<q.target)return;
-  S.qc.push(id); S.xp+=q.reward*10; sfx.win(); toast('📜 Квест выполнен: +'+(q.reward*10)+' XP 🏅','good');
+  S.qc.push(id); S.balance+=q.reward; sfx.win(); toast('📜 Квест: +⭐'+q.reward,'good');
   save(); renderHeader(); renderTasks(); }
 function qEvent(t,n){ S.qp[t]=(S.qp[t]||0)+(n||1); save(); renderHeader(); }
 function checkAch(){ ACHS.forEach(a=>{ if(!S.ac.includes(a.id)&&a.cond(S)){S.ac.push(a.id);toast('🏅 Достижение: '+a.name+'!','good');confetti(60);} }); save(); }

@@ -1,20 +1,24 @@
-// ===== CRASH v2: история сверху, авто-кэшаут, понятные фазы =====
+// ===== CRASH SYNC v32: полное переопределение (фикс ставок + истории) =====
 var CR2 = { ROUND:15000, BET:6000, SEED:'cashbanni_v1' };
+
 function roundNumber(){ return Math.floor(Date.now()/CR2.ROUND); }
 function roundStart(r){ return r*CR2.ROUND; }
 function crashPoint(r){
-  let h = 0x811c9dc5; const s = CR2.SEED+':'+r;
+  let h = 0x811c9dc5;
+  const s = CR2.SEED + ':' + r;
   for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
-  h = (h>>>0)/0xffffffff;
+  h = (h >>> 0) / 0xffffffff;
   if(h < 0.03) return 1.00;
   return Math.min(150, Math.floor(0.96/(1-h)*100)/100);
 }
-function crashHistory(){ const cur=roundNumber(); const a=[]; for(let i=1;i<=10;i++) a.push(crashPoint(cur-i)); return a; }
-function crashHist(){
-  const html = (crash.hist||[]).map(v=>'<span class="ch-h '+(v>=10?'hi':v>=2?'mid':'lo')+'">'+v.toFixed(2)+'×</span>').join('');
-  const r1=$('crashHistRow'); if(r1) r1.innerHTML = html || '<span class="ch-h lo">—</span>';
-  const r2=$('crashHistory'); if(r2) r2.innerHTML = html;
+function crashHistory(){
+  const cur = roundNumber(); const arr=[];
+  for(let i=1;i<=10;i++) arr.push(crashPoint(cur-i));
+  return arr;
 }
+function crashHist(){ setH('crashHistory', (crash.hist||[]).map(v=>
+  '<span class="ch-h '+(v>=10?'hi':v>=2?'mid':'lo')+'">'+v.toFixed(2)+'×</span>').join('')); }
+
 function startCrashLoop(){ if(crashLoopOn) return; crashLoopOn=true; crash.lastFrame=Date.now(); requestAnimationFrame(crashLoop); }
 function crashResize(){ const c=$('crashCanvas'); if(!c)return;
   const r=c.parentElement.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
@@ -22,39 +26,27 @@ function crashResize(){ const c=$('crashCanvas'); if(!c)return;
 function syncBetUI(){ setT('crashBetVal',crash.betVal); }
 function crashBet(d){ if(crash.phase!=='bet')return; crash.betVal=Math.max(5,crash.betVal+d); syncBetUI(); sfx.click(); }
 function crashSet(v){ if(crash.phase!=='bet')return; crash.betVal=v; syncBetUI(); sfx.click(); }
-function setAuto(v){ crash.auto=v; const i=$('autoCash'); if(i) i.value=v||''; sfx.click(); }
-
-// Инъекция UI: история сверху + авто-кэшаут
-(function(){
-  const box=$('crashBox');
-  if(box && !$('crashHistRow')) box.insertAdjacentHTML('afterbegin','<div class="crash-hist-row" id="crashHistRow"></div>');
-  const panel=document.querySelector('#sec-crash .crash-panel');
-  if(panel && !$('autoCashRow')) panel.insertAdjacentHTML('afterbegin',
-    '<div class="cp-row auto-row" id="autoCashRow"><span class="auto-label">Авто-кэшаут</span>'+
-    '<input id="autoCash" type="number" min="0" step="0.1" placeholder="выкл">'+
-    '<button class="cp-chip" onclick="setAuto(0)">ВЫКЛ</button></div>');
-  const inp=$('autoCash'); if(inp) inp.onchange=()=>{ crash.auto=parseFloat(inp.value)||0; };
-  crash.hist=crashHistory(); crashHist();
-})();
 
 function syncCrashBtn(){
   const btn=$('crashBtn'); if(!btn)return;
-  const now=Date.now(); const rn=roundNumber(); const el=now-roundStart(rn);
-  if(el < CR2.BET){
+  const now=Date.now(); const rn=roundNumber(); const elapsed=now-roundStart(rn);
+  if(elapsed < CR2.BET){
     if(crash.myBet>0 && crash._betRnd===rn){ btn.textContent='ОТМЕНИТЬ ⭐'+crash.myBet; btn.className='btn crash-main-btn cancel'; }
     else { btn.textContent='ПОСТАВИТЬ ⭐'+crash.betVal; btn.className='btn crash-main-btn bet'; }
   } else {
-    const t=el-CR2.BET; const m=Math.exp(t/9000);
+    const t=elapsed-CR2.BET; const m=Math.exp(t/9000);
     if(m>=crash.cp){ btn.textContent='💥 КРАШ '+crash.cp.toFixed(2)+'×'; btn.className='btn crash-main-btn wait'; }
     else if(crash.myBet>0 && !crash.cashed && crash._betRnd===rn){ btn.textContent='ЗАБРАТЬ ⭐'+Math.floor(crash.myBet*m); btn.className='btn crash-main-btn cash'; }
     else if(crash.cashed){ btn.textContent='ЗАБРАНО ✅'; btn.className='btn crash-main-btn wait'; }
-    else { btn.textContent='ЖДЁМ СЛЕД. РАУНД…'; btn.className='btn crash-main-btn wait'; }
+    else { btn.textContent='В ПОЛЁТЕ — СТАВКА НА СЛЕД. РАУНД'; btn.className='btn crash-main-btn wait'; }
   }
 }
 
 function crashAction(){
-  const now=Date.now(); const rn=roundNumber(); const el=now-roundStart(rn);
-  if(el < CR2.BET){
+  const now=Date.now();
+  const rn=roundNumber();
+  const elapsed=now-roundStart(rn);
+  if(elapsed < CR2.BET){
     if(crash.myBet>0 && crash._betRnd===rn){
       S.balance+=crash.myBet; crash.myBet=0; crash.cashed=false; sfx.click();
       toast('Ставка отменена','good'); save(); renderHeader(); syncCrashBtn(); return;
@@ -63,58 +55,77 @@ function crashAction(){
     const bet=crash.betVal;
     if(S.balance<bet) return toast('Недостаточно Stars ⭐','bad');
     S.balance-=bet; crash.myBet=bet; crash.cashed=false; crash._betRnd=rn;
-    sfx.win(); toast('✅ Ставка ⭐'+bet+' принята!','good'); save(); renderHeader(); syncCrashBtn(); return;
+    sfx.win(); toast('✅ Ставка ⭐'+bet+' принята! Жди взлёт','good');
+    save(); renderHeader(); syncCrashBtn(); return;
   }
-  const t=el-CR2.BET; const m=Math.exp(t/9000);
-  if(m < crash.cp && crash.myBet>0 && !crash.cashed && crash._betRnd===rn){ doCashout(m); return; }
-  toast('⏳ Ставки принимаются до взлёта','bad');
-}
-function doCashout(m){
-  const win=Math.floor(crash.myBet*m);
-  S.balance+=win; S.stats.won+=win; S.stats.crashWins=(S.stats.crashWins||0)+1;
-  crash.cashed=true; sfx.win(); if(m>=5)confetti(90);
-  toast('✅ Забрал на '+m.toFixed(2)+'× → +⭐'+fmt(win),'good');
-  save(); renderHeader(); checkAch(); syncCrashBtn();
+  const t=elapsed-CR2.BET;
+  const m=Math.exp(t/9000);
+  if(m < crash.cp && crash.myBet>0 && !crash.cashed && crash._betRnd===rn){
+    const win=Math.floor(crash.myBet*m);
+    S.balance+=win; S.stats.won+=win; S.stats.crashWins=(S.stats.crashWins||0)+1;
+    crash.cashed=true;
+    sfx.win(); if(m>=5)confetti(90);
+    toast('✅ Забрал на '+m.toFixed(2)+'× → +⭐'+fmt(win),'good');
+    save(); renderHeader(); checkAch(); syncCrashBtn(); return;
+  }
+  toast('⏳ Ставки принимаются только перед взлётом','bad');
 }
 
 function crashLoop(){
   crash.lastFrame=Date.now();
-  const now=Date.now(); const rn=roundNumber(); const t0=roundStart(rn); const el=now-t0;
+  const now=Date.now();
+  const rn=roundNumber();
+  const t0=roundStart(rn);
+  const elapsed=now-t0;
+
   if(crash._rnd!==rn){
-    crash._rnd=rn; crash.myBet=0; crash.cashed=false; crash.sparks=[]; crash.lastInt=1; crash._lostRnd=0; crash._sparkRnd=0;
-    crash.hist=crashHistory(); crashHist();
+    crash._rnd=rn;
+    crash.myBet=0; crash.cashed=false; crash.sparks=[]; crash.lastInt=1;
+    crash._lostRnd=0; crash._sparkRnd=0;
+    crash.hist=crashHistory();
+    crashHist();
   }
   crash.cp=crashPoint(rn);
-  if(el < CR2.BET){
+
+  if(elapsed < CR2.BET){
     crash.phase='bet'; crash.m=1;
-    const left=(CR2.BET-el)/1000;
-    setT('crashMult', left.toFixed(1));
-    const cm=$('crashMult'); if(cm) cm.className='crash-mult betcount';
-    setH('crashStatus','🎰 СТАВКИ ОТКРЫТЫ · взлёт через '+left.toFixed(1)+' с');
-    setT('heroCrashState','Ставки: '+Math.max(0,left).toFixed(0)+' с');
+    const left=(CR2.BET-elapsed)/1000;
+    setT('crashMult','1.00×');
+    const cm=$('crashMult'); if(cm)cm.className='crash-mult';
+    setH('crashStatus','🎰 Приём ставок: '+left.toFixed(1)+' с');
+    setT('heroCrashState','Приём ставок: '+Math.max(0,left).toFixed(0)+' с');
   } else {
-    const t=el-CR2.BET; crash.m=Math.exp(t/9000); crash.t0=t0;
-    if(crash.auto>0 && crash.myBet>0 && !crash.cashed && crash._betRnd===rn && crash.m>=crash.auto && crash.m<crash.cp){ doCashout(crash.m); }
+    const t=elapsed-CR2.BET;
+    crash.m=Math.exp(t/9000);
+    crash.t0=t0;
     if(crash.m>=crash.cp){
       crash.m=crash.cp; crash.phase='crash';
-      setT('crashMult', crash.cp.toFixed(2)+'×');
-      const cm=$('crashMult'); if(cm) cm.className='crash-mult red';
-      setH('crashStatus','💥 КРАШ на '+crash.cp.toFixed(2)+'×');
+      setT('crashMult',crash.cp.toFixed(2)+'×');
+      const cm=$('crashMult'); if(cm)cm.className='crash-mult red';
+      setH('crashStatus','💥 Краш на '+crash.cp.toFixed(2)+'×');
       setT('heroCrashState','Краш '+crash.cp.toFixed(2)+'×');
-      if(crash.myBet>0 && !crash.cashed && crash._betRnd===rn && crash._lostRnd!==rn){ crash._lostRnd=rn; sfx.lose(); toast('💥 Краш! −⭐'+crash.myBet,'bad'); }
-      if(crash._sparkRnd!==rn){ crash._sparkRnd=rn; const cc=$('crashCanvas'); const dpr=window.devicePixelRatio||1;
-        if(cc) for(let i=0;i<26;i++) crash.sparks.push({x:cc.width*0.85,y:cc.height*0.25,vx:rnd(-4,4)*dpr,vy:rnd(-4,4)*dpr,l:1}); }
-      const cb=$('crashBox'); if(cb && !cb.classList.contains('shake')){ cb.classList.add('shake'); setTimeout(()=>cb.classList.remove('shake'),500); }
+      if(crash.myBet>0 && !crash.cashed && crash._betRnd===rn && crash._lostRnd!==rn){
+        crash._lostRnd=rn;
+        sfx.lose(); toast('💥 Краш! −⭐'+crash.myBet,'bad');
+      }
+      if(crash._sparkRnd!==rn){
+        crash._sparkRnd=rn;
+        const cc=$('crashCanvas'); const dpr=window.devicePixelRatio||1;
+        if(cc){ for(let i=0;i<26;i++) crash.sparks.push({x:cc.width*0.85,y:cc.height*0.25,vx:rnd(-4,4)*dpr,vy:rnd(-4,4)*dpr,l:1}); }
+      }
+      const cb=$('crashBox'); if(cb && !cb.classList.contains('shake')){cb.classList.add('shake'); setTimeout(()=>cb.classList.remove('shake'),500);}
     } else {
       crash.phase='fly';
       if(Math.floor(crash.m)>crash.lastInt){ crash.lastInt=Math.floor(crash.m); sfx.tick(); }
-      setT('crashMult', crash.m.toFixed(2)+'×');
-      const cm=$('crashMult'); if(cm) cm.className='crash-mult'+(crash.m>=10?' gold':'');
-      setH('crashStatus', (crash.myBet>0&&!crash.cashed&&crash._betRnd===rn) ? '🚀 В ПОЛЁТЕ · забирай вовремя!' : '🚀 В полёте');
-      setT('heroCrashState','LIVE '+crash.m.toFixed(2)+'×');
+      setT('crashMult',crash.m.toFixed(2)+'×');
+      const cm=$('crashMult'); if(cm)cm.className='crash-mult'+(crash.m>=10?' gold':'');
+      setH('crashStatus', (crash.myBet>0&&!crash.cashed&&crash._betRnd===rn) ? '🚀 Летим! Забирай вовремя' : '🚀 В полёте');
+      setT('heroCrashState','LIVE: '+crash.m.toFixed(2)+'×');
     }
   }
-  syncCrashBtn(); crashDraw(); requestAnimationFrame(crashLoop);
+  syncCrashBtn();
+  crashDraw();
+  requestAnimationFrame(crashLoop);
 }
 
 function crashY(m,mMax,H){ return H*0.94-(H*0.8)*((m-1)/(mMax-1||1)); }
@@ -136,8 +147,8 @@ function crashDraw(){ const c=$('crashCanvas'); if(!c||!c.width)return;
       x.beginPath();x.arc(W*0.12-14*dpr*i,H*0.8+bob,(4-i)*dpr,0,7);x.fill(); }
     return;
   }
-  const el=Date.now()-roundStart(roundNumber());
-  const tNow=crash.phase==='fly'?Math.max(0,el-CR2.BET):(4500*Math.log(crash.m)||0);
+  const elapsed=Date.now()-roundStart(roundNumber());
+  const tNow=crash.phase==='fly'?Math.max(0,elapsed-CR2.BET):(4500*Math.log(crash.m)||0);
   const N=70, pts=[];
   for(let i=0;i<=N;i++){ const tt=tNow*i/N, m=Math.exp(tt/9000);
     pts.push([W*0.05+(W*0.88)*(i/N), crashY(Math.min(m,mMax),mMax,H)]); }
@@ -150,7 +161,8 @@ function crashDraw(){ const c=$('crashCanvas'); if(!c||!c.width)return;
   const fg=x.createLinearGradient(0,0,0,H);
   fg.addColorStop(0,'rgba(168,85,247,.28)'); fg.addColorStop(1,'rgba(168,85,247,0)');
   x.fillStyle=fg; x.fill();
-  const tip=pts[N], prev=pts[N-1]||tip; const ang=Math.atan2(tip[1]-prev[1],tip[0]-prev[0]);
+  const tip=pts[N], prev=pts[N-1]||tip;
+  const ang=Math.atan2(tip[1]-prev[1],tip[0]-prev[0]);
   if(crash.phase==='fly'){
     for(let i=1;i<=3;i++){ x.fillStyle='rgba(251,191,36,'+(0.35/i)+')';
       x.beginPath(); x.arc(tip[0]-Math.cos(ang)*10*dpr*i,tip[1]-Math.sin(ang)*10*dpr*i,(5-i)*dpr,0,7); x.fill(); }
