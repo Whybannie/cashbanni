@@ -414,6 +414,7 @@ function crashLoop(){
   // синхронизация crash point и истории
   crash.cp = crashPoint(rnd);
   crash.hist = crashHistory();
+  if(crash._lastRnd !== rnd){ crash._lastRnd = rnd; crashHist(); }
 
   if(elapsed < CRASH_BET_MS){
     crash.phase = 'bet';
