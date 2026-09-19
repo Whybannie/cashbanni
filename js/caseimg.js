@@ -1,21 +1,25 @@
-// ===== МОДУЛЬ-ПАТЧ v25 =====
+// ===== МОДУЛЬ-ПАТЧ: картинки кейсов + стримерская витрина =====
 const CASE_IMG = {
   free:'case_fri.JPG', fri:'case_fri.JPG',
   starter:'case_starter.JPG', start:'case_starter.JPG',
   mini:'case_mini.JPG',
-  xaip:'case_xaip.JPG', hype:'case_xaip.JPG', haip:'case_xaip.JPG',
-  premium:'case_premium.JPG', prem:'case_premium.JPG'
+  hype:'case_xaip.JPG', xaip:'case_xaip.JPG',
+  premium:'case_premium.JPG', prem:'case_premium.JPG',
+  danya:'case_danya.JPG'
 };
+
 function caseArt(c){
-  const col=CASE_COLORS[c.rarity];
-  const src=c.img||CASE_IMG[c.id];
+  const col = CASE_COLORS[c.rarity] || CASE_COLORS.common;
+  const src = c.img || CASE_IMG[c.id];
   const art = src
     ? '<img class="case-img" src="'+src+'" alt="'+c.name+'" decoding="async">'
     : '<div class="bow"></div><div class="lid"></div><div class="body"></div><div class="rv"></div><div class="rh"></div><div class="em">'+c.em+'</div>';
-  return '<div class="case-art'+(src?' img-art':'')+'" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+art+'</div>';
+  const streamerBadge = c.streamer
+    ? '<div class="streamer-badge">🎥 '+c.streamer+'</div>'
+    : '';
+  return '<div class="case-art'+(src?' img-art':'')+(c.streamer?' is-streamer':'')+'" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+streamerBadge+art+'</div>';
 }
 
-// ---- Кейс: состав виден СРАЗУ под шапкой + превью-лента в поле прокрута ----
 function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   if(curCase.free&&!freeReady()){ const h=Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5);
     return toast('⏳ Бесплатный кейс раз в 24 часа. Ещё '+h+' ч.','bad'); }
@@ -24,10 +28,13 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   const b3=$('btnX3'),b5=$('btnX5');
   if(b3)b3.style.display=curCase.free?'none':''; if(b5)b5.style.display=curCase.free?'none':'';
   const m=document.querySelector('#caseModal .modal'); if(m) m.classList.remove('compact');
+  const heroStreamer = curCase.streamer
+    ? '<div class="cf-hero-streamer">🎥 Авторский кейс от <b>'+curCase.streamer+'</b></div>' : '';
   setH('cmContents',
     '<div class="cf-hero">'+caseArt(curCase)+
       '<div class="cf-hero-info"><b>'+curCase.name+'</b>'+
       '<div class="price">'+(curCase.price===0?'БЕСПЛАТНО':'⭐ '+fmt(curCase.price))+'</div>'+
+      heroStreamer+
       '<span class="muted">Состав и шансы выпада:</span></div></div>'+
     '<div class="contents">'+curCase.drops.map(d=>{const g=gift(d[0]);return
       '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'55;box-shadow:0 0 16px '+RAR[g.rarity].color+'22 inset">'+
@@ -38,7 +45,30 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   prev.innerHTML='<div class="preview-label">ПРЕВЬЮ ПРОКРУТА</div><div class="roulette-pointer"></div><div class="roulette-strip"></div>';
   box.appendChild(prev);
   buildStrip(prev.querySelector('.roulette-strip'), gift(pick(curCase.drops)[0]));
-  modalOpen('caseModal'); }
+  modalOpen('caseModal');
+}
+
+// ---- Витрина с разделением на обычные и стримерские ----
+function renderCases(){ setT('casesStat','Открыто: '+S.stats.opened);
+  const regular = CASES.filter(c=>!c.streamer);
+  const streamers = CASES.filter(c=>c.streamer);
+  let html = regular.map(c=>
+    '<div class="case-card" style="--glow:'+RAR[c.rarity].glow+'" onclick="openCaseModal(\''+c.id+'\')">'+
+    (c.free?'<div class="free-badge">'+(freeReady()?'ДОСТУПНО':'1/24Ч')+'</div>':'')+
+    '<div class="rt" style="background:'+RAR[c.rarity].color+';color:'+RAR[c.rarity].color+'"></div>'+
+    caseArt(c)+'<div class="name">'+c.name+'</div>'+
+    '<div class="price">'+(c.price===0?'БЕСПЛАТНО':'⭐ '+fmt(c.price))+'</div></div>').join('');
+  if(streamers.length){
+    html += '</div><div class="streamers-head"><span class="sh-label">🎥 Авторские кейсы</span><span class="sh-sub">от стримеров</span></div><div class="cases-grid cases-streamers">';
+    html += streamers.map(c=>
+      '<div class="case-card streamer" style="--glow:'+RAR[c.rarity].glow+'" onclick="openCaseModal(\''+c.id+'\')">'+
+      '<div class="streamer-tag">🎥 '+c.streamer+'</div>'+
+      '<div class="rt" style="background:'+RAR[c.rarity].color+';color:'+RAR[c.rarity].color+'"></div>'+
+      caseArt(c)+'<div class="name">'+c.name+'</div>'+
+      '<div class="price">⭐ '+fmt(c.price)+'</div></div>').join('');
+  }
+  setH('casesGrid',html);
+}
 
 // ---- Задания: кнопка подписки «прожатая» + авто-проверка ----
 let _subCheckTs=0;
@@ -48,6 +78,13 @@ function renderTasks(){ const fr=freeReady();
   if(sb){ if(S.subDone){sb.textContent='✅ Награда получена';sb.disabled=true;sb.classList.add('pressed');}
     else {sb.textContent='Подписаться';sb.disabled=false;sb.classList.remove('pressed');} }
   setT('refCount',S.refs);
+  setH('refExplain',
+    '<div class="ref-explain">'+
+      '<div class="re-step"><b>1.</b> Поделись ссылкой с другом</div>'+
+      '<div class="re-step"><b>2.</b> Друг заходит в игру (это бесплатно)</div>'+
+      '<div class="re-step highlight"><b>3.</b> Друг делает первый депозит от ⭐5</div>'+
+      '<div class="re-step reward"><b>4.</b> Ты получаешь ⭐'+REF_REWARD+'!</div>'+
+    '</div>');
   renderQuests(); renderAchs();
   if(S.serverMode && !S.subDone && Date.now()-_subCheckTs>15000){ _subCheckTs=Date.now();
     checkSub().then(ok=>{ if(ok){ S.subDone=true; S.balance+=SUB_REWARD; save(); renderHeader();
@@ -55,11 +92,11 @@ function renderTasks(){ const fr=freeReady();
       renderTasks(); renderProfile(); } }); }
 }
 
-// ---- Баттлы: подписи сторон, легенда, без лагов ----
+// ---- Баттлы с подписями и кэшем ----
 let _bCache='';
 function pYou(n){ return '<div class="b-player you"><span class="emoji">😎</span><b>'+(n||S.tgName||'Ты')+'</b><span class="bp-tag you">ТЫ</span></div>'; }
 function pOpp(n){ return '<div class="b-player opp"><span class="emoji">🧑</span><b>'+(n||'Игрок')+'</b><span class="bp-tag opp">СОПЕРНИК</span></div>'; }
-function bLegend(){ return '<div class="b-legend"><span class="lg-you">🟣 Твоя сторона колеса</span><span class="lg-opp">🩷 Сторона соперника</span></div>'; }
+function bLegend(){ return '<div class="b-legend"><span class="lg-you">🟣 Твоя сторона</span><span class="lg-opp">🩷 Соперник</span></div>'; }
 function battleCard(b){
   if(b.mine&&b.status==='wait')return '<div class="battle-card mine"><div class="bc-top"><span class="bc-wait">⏳ ОЖИДАНИЕ</span><div class="bet">⭐'+b.bet+'</div></div>'+
     '<div class="bc-mid">'+pYou()+'<div class="b-player empty"><span class="emoji">❓</span><b>Ищем соперника…</b></div></div>'+
@@ -138,3 +175,7 @@ function runBattle(hostName,bet,youWin,replay){
   setT('battleLog','🎯 Крутим колесо…'); modalOpen('battleModal');
   setTimeout(()=>spinBattleWheel(youWin,bet,false,!!replay),700); }
 function closeBattle(){ stopBattleWatch(); const w=$('bWheel'); if(w)w.classList.remove('idle'); modalClose('battleModal'); _bCache=''; renderBattles(); }
+
+// ---- Сохраняем предметы с полными данными (для безопасного вывода) ----
+const _origKeepWon = window.keepWon;
+const _origSpinItems = window.spin;
