@@ -463,3 +463,9 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 #adminUsers .pos{width:auto;font-size:.6rem;white-space:nowrap}
 #adminUsers b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 #adminUsers .won{white-space:nowrap}
+/* ===== v28: понятная рефералка ===== */
+#refExplain{margin:4px 0 14px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.25);border-radius:16px;padding:10px 12px;font-size:.78rem;line-height:1.55}
+.re-step{padding:3px 0;color:rgba(255,255,255,.7)}
+.re-step b{color:#fff;margin-right:4px}
+.re-step.highlight{color:#fde68a;font-weight:700;background:rgba(251,191,36,.08);margin:4px -12px;padding:6px 12px;border-radius:10px}
+.re-step.reward{color:#86efac;font-weight:700}

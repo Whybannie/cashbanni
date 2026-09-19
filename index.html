@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
-<meta name="build" content="26">
+<meta name="build" content="28">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=26">
+<link rel="stylesheet" href="css/style.css?v=28">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -158,9 +158,10 @@
     </div>
     <div class="task-card">
       <div class="ic-box blue"><svg class="ic"><use href="#i-users"/></svg></div>
-      <div class="task-info"><b>Пригласи друга</b><span>⭐5 когда друг зайдёт · <b id="refCount">0</b></span></div>
+      <div class="task-info"><b>Пригласи друга</b><span>⭐5 когда друг внесёт депозит от ⭐5 · <b id="refCount">0</b></span></div>
       <button class="btn btn-secondary task-btn" onclick="copyRef()">Ссылка</button>
     </div>
+    <div id="refExplain"></div>
     <h2 class="mt">Квесты</h2>
     <div id="questsList"></div>
     <h2 class="mt">Достижения</h2>
@@ -189,7 +190,7 @@
     <h2>Режимы</h2>
     <div class="task-card" onclick="activateTab('crash')">
       <div class="ic-box gold"><svg class="ic"><use href="#i-rocket"/></svg></div>
-      <div class="task-info"><b>Crash Live</b><span>Раунды идут 24/7</span></div>
+      <div class="task-info"><b>Crash Live</b><span>Общий эфир для всех игроков</span></div>
       <div class="hero-go">›</div>
     </div>
     <div class="task-card" onclick="activateTab('plinko')">
@@ -335,9 +336,9 @@
 </div>
 
 <div class="toasts" id="toasts"></div>
-<script src="js/data.js?v=26"></script>
-<script src="js/app.js?v=26"></script>
-<script src="js/caseimg.js?v=26"></script>
-<script src="js/plinko.js?v=26"></script>
+<script src="js/data.js?v=28"></script>
+<script src="js/app.js?v=28"></script>
+<script src="js/caseimg.js?v=28"></script>
+<script src="js/plinko.js?v=28"></script>
 </body>
 </html>

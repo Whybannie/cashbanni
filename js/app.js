@@ -332,70 +332,124 @@ async function spin(n){ if(spinning) return;
   if(wins.every(g=>g.rarity!=='epic'&&g.rarity!=='legendary')) sfx.win();
   spinning=false; checkAch(); save(); renderHeader(); renderCases(); renderTasks(); refreshInv(); }
 
-// ---------- CRASH LIVE ----------
-const crash={ phase:'bet', betEnds:Date.now()+6000, t0:0, m:1, cp:1, myBet:0, cashed:false, hist:[], lastInt:1, sparks:[], tNow:0, betVal:20, lastFrame:Date.now() };
-let crashLoopOn=false;
-function startCrashLoop(){ if(crashLoopOn)return; crashLoopOn=true; crash.lastFrame=Date.now(); crashLoop(); }
+// ---------- CRASH LIVE: синхронный эфир, история 10 ----------
+const CRASH_ROUND_MS = 15000; // раунд = 15 секунд
+const CRASH_BET_MS   = 6000;  // 6 сек на ставки, 9 сек полёт
+const CRASH_SEED     = "cashbanni_v1"; // общий seed для всех
+const crash = {
+  phase:'bet', m:1, cp:1, myBet:0, cashed:false,
+  hist:[], lastInt:1, sparks:[], betVal:20,
+  lastFrame:Date.now()
+};
+let crashLoopOn = false;
+
+function roundNumber(){ return Math.floor(Date.now()/CRASH_ROUND_MS); }
+function roundStart(r){ return r*CRASH_ROUND_MS; }
+function crashPoint(r){
+  // детерминированно из seed+номера раунда — у всех одинаково
+  let h = 0x811c9dc5;
+  const s = CRASH_SEED + ':' + r;
+  for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+  h = (h >>> 0) / 0xffffffff;
+  if(h < 0.03) return 1.00;
+  return Math.min(150, Math.floor(CRASH_EDGE/(1-h)*100)/100);
+}
+function crashHistory(){
+  const cur = roundNumber();
+  const arr = [];
+  for(let i=1;i<=10;i++) arr.push(crashPoint(cur - i));
+  return arr;
+}
+
+function startCrashLoop(){ if(crashLoopOn) return; crashLoopOn=true; crash.lastFrame=Date.now(); crashLoop(); }
 setInterval(()=>{ if(crashLoopOn && Date.now()-crash.lastFrame>4000){ crashLoopOn=false; startCrashLoop(); } },3000);
-function genCrash(){ const r=Math.random(); if(r<0.03)return 1.00; return Math.min(150,Math.floor(CRASH_EDGE/(1-r)*100)/100); }
+
 function crashResize(){ const c=$('crashCanvas'); if(!c)return;
   const r=c.parentElement.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
   c.width=r.width*dpr; c.height=r.height*dpr; }
-addEventListener('resize',()=>{ if($('sec-crash').classList.contains('active'))crashResize(); });
+addEventListener('resize',()=>{ if($('sec-crash')&&$('sec-crash').classList.contains('active'))crashResize(); });
 function syncBetUI(){ setT('crashBetVal',crash.betVal); }
 function crashBet(d){ crash.betVal=Math.max(5,crash.betVal+d); syncBetUI(); sfx.click(); }
 function crashSet(v){ crash.betVal=v; syncBetUI(); sfx.click(); }
+
 function crashAction(){
-  if(crash.phase==='bet'){
-    if(crash.myBet>0){ S.balance+=crash.myBet; crash.myBet=0; sfx.click();
-      toast('Ставка отменена','good'); save(); renderHeader(); return; }
-    const bet=crash.betVal;
+  const rnd = roundNumber();
+  const t0  = roundStart(rnd);
+  const now = Date.now();
+  const elapsed = now - t0;
+  const inBet = elapsed < CRASH_BET_MS;
+  const inFly = elapsed >= CRASH_BET_MS && crash.m < crash.cp;
+
+  if(inBet){
+    if(crash.myBet>0){
+      S.balance += crash.myBet; crash.myBet=0; sfx.click();
+      toast('Ставка отменена','good'); save(); renderHeader(); return;
+    }
+    const bet = crash.betVal;
     if(S.balance<bet) return toast('Недостаточно Stars ⭐','bad');
-    S.balance-=bet; crash.myBet=bet; crash.cashed=false;
+    S.balance -= bet; crash.myBet = bet; crash.cashed = false;
     sfx.win(); toast('✅ Ставка ⭐'+bet+' принята! Жди взлёт','good');
     save(); renderHeader(); return;
   }
-  if(crash.phase==='fly'&&crash.myBet>0&&!crash.cashed){
-    const win=Math.floor(crash.myBet*crash.m);
-    S.balance+=win; S.stats.won+=win; S.stats.crashWins=(S.stats.crashWins||0)+1;
-    crash.cashed=true;
-    $('crashMult').className='crash-mult green';
+  if(inFly && crash.myBet>0 && !crash.cashed){
+    const win = Math.floor(crash.myBet * crash.m);
+    S.balance += win; S.stats.won += win;
+    S.stats.crashWins = (S.stats.crashWins||0) + 1;
+    crash.cashed = true;
+    $('crashMult').className = 'crash-mult green';
     setH('crashStatus','✅ Забрал на '+crash.m.toFixed(2)+'× → +⭐'+fmt(win));
-    sfx.win(); if(crash.m>=5)confetti(90);
+    sfx.win(); if(crash.m>=5) confetti(90);
     save(); renderHeader(); checkAch(); return;
   }
   toast('⏳ Ставки принимаются только перед взлётом','bad');
 }
+
 function crashLoop(){
-  crash.lastFrame=Date.now();
-  const now=Date.now();
-  if(crash.phase==='bet'){
-    const left=(crash.betEnds-now)/1000;
-    setT('crashMult','1.00×'); const cm=$('crashMult'); if(cm)cm.className='crash-mult';
-    setH('crashStatus','🎰 Приём ставок: '+Math.max(0,left).toFixed(1)+' с');
+  crash.lastFrame = Date.now();
+  const now = Date.now();
+  const rnd = roundNumber();
+  const t0  = roundStart(rnd);
+  const elapsed = now - t0;
+
+  // синхронизация crash point и истории
+  crash.cp = crashPoint(rnd);
+  crash.hist = crashHistory();
+
+  if(elapsed < CRASH_BET_MS){
+    crash.phase = 'bet';
+    crash.m = 1;
+    const left = (CRASH_BET_MS - elapsed)/1000;
+    setT('crashMult','1.00×');
+    const cm=$('crashMult'); if(cm) cm.className='crash-mult';
+    setH('crashStatus','🎰 Приём ставок: '+left.toFixed(1)+' с');
     setT('heroCrashState','Приём ставок: '+Math.max(0,left).toFixed(0)+' с');
-    if(left<=0){ crash.phase='fly'; crash.t0=now; crash.cp=genCrash(); crash.m=1; crash.lastInt=1; crash.sparks=[];
-      if(crash.myBet>0) toast('🚀 Взлёт! Твоя ставка ⭐'+crash.myBet+' в игре','good'); }
-  } else if(crash.phase==='fly'){
-    const t=now-crash.t0; crash.tNow=t;
-    crash.m=Math.exp(t/9000);
-    if(crash.m>=crash.cp){ crash.m=crash.cp; crash.phase='crash'; crash.betEnds=now+2500;
-      setT('crashMult',crash.cp.toFixed(2)+'×'); const cm=$('crashMult'); if(cm)cm.className='crash-mult red';
-      const c=$('crashCanvas'),dpr=window.devicePixelRatio||1;
-      for(let i=0;i<26;i++)crash.sparks.push({x:c.width*0.85,y:c.height*0.25,vx:rnd(-4,4)*dpr,vy:rnd(-4,4)*dpr,l:1});
+  } else {
+    crash.phase = 'fly';
+    crash.t0 = t0;
+    const t = elapsed - CRASH_BET_MS;
+    crash.m = Math.exp(t/9000);
+    if(crash.m >= crash.cp){
+      crash.m = crash.cp;
+      crash.phase = 'crash';
+      setT('crashMult', crash.cp.toFixed(2)+'×');
+      const cm=$('crashMult'); if(cm) cm.className='crash-mult red';
+      const c=$('crashCanvas'), dpr=window.devicePixelRatio||1;
+      if(crash.sparks.length<10){
+        for(let i=0;i<26;i++) crash.sparks.push({x:c.width*0.85,y:c.height*0.25,vx:rnd(-4,4)*dpr,vy:rnd(-4,4)*dpr,l:1});
+      }
       setH('crashStatus','💥 Краш на '+crash.cp.toFixed(2)+'×');
-      if(crash.myBet>0&&!crash.cashed){ sfx.lose(); toast('💥 Краш! −⭐'+crash.myBet,'bad'); }
+      if(crash.myBet>0 && !crash.cashed){
+        sfx.lose(); toast('💥 Краш! −⭐'+crash.myBet,'bad');
+        crash.myBet = 0;
+      }
       const cb=$('crashBox'); if(cb){cb.classList.add('shake'); setTimeout(()=>cb.classList.remove('shake'),500);}
-      crash.hist.unshift(crash.cp); crash.hist=crash.hist.slice(12); crashHist(); crash.myBet=0; crash.cashed=false;
     } else {
       if(Math.floor(crash.m)>crash.lastInt){ crash.lastInt=Math.floor(crash.m); sfx.tick(); }
-      setT('crashMult',crash.m.toFixed(2)+'×');
-      const cm=$('crashMult'); if(cm)cm.className='crash-mult'+(crash.m>=10?' gold':'');
-      setH('crashStatus',crash.myBet>0?(crash.cashed?'✅ Забрано':'🚀 Летим! Множитель растёт…'):'🚀 В полёте');
+      setT('crashMult', crash.m.toFixed(2)+'×');
+      const cm=$('crashMult'); if(cm) cm.className='crash-mult'+(crash.m>=10?' gold':'');
+      setH('crashStatus', crash.myBet>0 ? (crash.cashed?'✅ Забрано':'🚀 Летим!') : '🚀 В полёте');
       setT('heroCrashState','LIVE: '+crash.m.toFixed(2)+'×');
     }
-  } else {
-    if(now>=crash.betEnds){ crash.phase='bet'; crash.betEnds=now+6000; }
   }
   const btn=$('crashBtn');
   if(btn){
@@ -411,6 +465,7 @@ function crashLoop(){
   crashDraw();
   requestAnimationFrame(crashLoop);
 }
+
 function crashY(m,mMax,H){ return H*0.94-(H*0.8)*((m-1)/(mMax-1||1)); }
 function crashDraw(){ const c=$('crashCanvas'); if(!c||!c.width)return;
   const x=c.getContext('2d'),W=c.width,H=c.height,dpr=window.devicePixelRatio||1;
@@ -430,7 +485,8 @@ function crashDraw(){ const c=$('crashCanvas'); if(!c||!c.width)return;
       x.beginPath();x.arc(W*0.12-14*dpr*i,H*0.8+bob,(4-i)*dpr,0,7);x.fill(); }
     return;
   }
-  const tNow=crash.phase==='fly'?crash.tNow:(4500*Math.log(crash.m)||0), N=70, pts=[];
+  const tNow = crash.phase==='fly' ? (Date.now()-crash.t0-CRASH_BET_MS) : (4500*Math.log(crash.m)||0);
+  const N=70, pts=[];
   for(let i=0;i<=N;i++){ const tt=tNow*i/N, m=Math.exp(tt/9000);
     pts.push([W*0.05+(W*0.88)*(i/N), crashY(Math.min(m,mMax),mMax,H)]); }
   x.save(); x.shadowColor=crash.phase==='crash'?'#ef4444':'#a855f7'; x.shadowBlur=16*dpr;
@@ -454,8 +510,9 @@ function crashDraw(){ const c=$('crashCanvas'); if(!c||!c.width)return;
   crash.sparks=crash.sparks.filter(s=>s.l>0);
   crash.sparks.forEach(s=>{ s.x+=s.vx;s.y+=s.vy;s.vy+=0.15*dpr;s.l-=0.03;
     x.fillStyle='rgba(239,68,68,'+Math.max(s.l,0)+')';
-    x.beginPath();x.arc(s.x,s.y,2.5*dpr,0,7);x.fill(); }); }
-function crashHist(){ setH('crashHistory',crash.hist.map(v=>
+    x.beginPath();x.arc(s.x,s.y,2.5*dpr,0,7);x.fill(); });
+}
+function crashHist(){ setH('crashHistory', crash.hist.map(v=>
   '<span class="ch-h '+(v>=10?'hi':v>=2?'mid':'lo')+'">'+v.toFixed(2)+'×</span>').join('')); }
 
 // ---------- MINES ----------
@@ -600,8 +657,16 @@ function doUpgrade(){ if(!upFrom||!upTo||upBusy)return;
 function renderTasks(){ const fr=freeReady();
   setT('freeCaseState',fr?'Доступен сейчас · 1 спин · подписка':'Следующий через '+Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5)+' ч.');
   const sb=$('subBtn');
-  if(sb){ if(S.subDone){sb.textContent='✅ Получено';sb.disabled=true;} else {sb.textContent='Подписаться';sb.disabled=false;} }
+  if(sb){ if(S.subDone){sb.textContent='✅ Награда получена';sb.disabled=true;sb.classList.add('pressed');}
+    else {sb.textContent='Подписаться';sb.disabled=false;sb.classList.remove('pressed');} }
   setT('refCount',S.refs);
+  setH('refExplain',
+    '<div class="ref-explain">'+
+      '<div class="re-step"><b>1.</b>Поделись ссылкой с другом</div>'+
+      '<div class="re-step"><b>2.</b>Друг заходит в игру (это бесплатно)</div>'+
+      '<div class="re-step highlight"><b>3.</b>Друг делает первый депозит от ⭐5</div>'+
+      '<div class="re-step reward"><b>4.</b>Ты получаешь ⭐'+REF_REWARD+'!</div>'+
+    '</div>');
   renderQuests(); renderAchs(); }
 async function doSub(){ openChannel();
   setTimeout(async()=>{ const r=await api('/api/check_sub');
