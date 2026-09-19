@@ -457,3 +457,9 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 
 /* ===== v27: plinko ball smaller ===== */
 .pl-ball{width:11px;height:11px;margin:-5.5px 0 0 -5.5px}
+
+/* ===== v28: админ-список без наложений ===== */
+#adminUsers .top-row{display:grid;grid-template-columns:minmax(80px,auto) minmax(0,1fr) auto;gap:8px;align-items:center}
+#adminUsers .pos{width:auto;font-size:.6rem;white-space:nowrap}
+#adminUsers b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+#adminUsers .won{white-space:nowrap}
