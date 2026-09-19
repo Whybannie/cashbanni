@@ -142,3 +142,13 @@ function runBattle(hostName,bet,youWin,replay){
   setT('battleLog','🎯 Крутим колесо…'); modalOpen('battleModal');
   setTimeout(()=>spinBattleWheel(youWin,bet,false,!!replay),700); }
 function closeBattle(){ stopBattleWatch(); const w=$('bWheel'); if(w)w.classList.remove('idle'); modalClose('battleModal'); _bCache=''; renderBattles(); }
+
+// ===== v33: flush save перед серверной перезаписью =====
+function flushSave(){ if(!S.serverMode)return Promise.resolve(); clearTimeout(saveTimer);
+  return api("/api/save",{method:"POST",body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})}); }
+async function refreshMe(){ await flushSave(); const me=await apiR('/api/me');
+  if(me&&me.tg_id){ S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
+    S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
+    S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
+    S.serverMode=true; save(); renderHeader();
+    try{ renderSection(activeTab()); }catch(e){} } }
