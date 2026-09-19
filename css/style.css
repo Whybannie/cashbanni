@@ -469,3 +469,15 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 .re-step b{color:#fff;margin-right:4px}
 .re-step.highlight{color:#fde68a;font-weight:700;background:rgba(251,191,36,.08);margin:4px -12px;padding:6px 12px;border-radius:10px}
 .re-step.reward{color:#86efac;font-weight:700}
+
+/* ===== v30: компактный стримерский стиль ===== */
+.case-art.is-streamer{filter:drop-shadow(0 0 18px rgba(244,114,182,.5))}
+.case-card:has(.is-streamer){border:1px solid rgba(244,114,182,.35);box-shadow:0 0 16px rgba(244,114,182,.2)}
+.cf-hero-streamer{margin-top:4px;font-size:.72rem;color:#f472b6;font-weight:700}
+.streamer-mini{font-size:.6rem;color:#f472b6;font-weight:800;text-transform:uppercase;letter-spacing:.03em;margin-top:-2px}
+
+/* ===== v30: компактный стримерский стиль ===== */
+.case-art.is-streamer{filter:drop-shadow(0 0 18px rgba(244,114,182,.5))}
+.case-card:has(.is-streamer){border:1px solid rgba(244,114,182,.35);box-shadow:0 0 16px rgba(244,114,182,.2)}
+.cf-hero-streamer{margin-top:4px;font-size:.72rem;color:#f472b6;font-weight:700}
+.streamer-mini{font-size:.6rem;color:#f472b6;font-weight:800;text-transform:uppercase;letter-spacing:.03em;margin-top:-2px}

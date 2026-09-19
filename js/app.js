@@ -239,7 +239,7 @@ function renderCases(){ setT('casesStat','Открыто: '+S.stats.opened);
     '<div class="case-card" style="--glow:'+RAR[c.rarity].glow+'" onclick="openCaseModal(\''+c.id+'\')">'+
     (c.free?'<div class="free-badge">'+(freeReady()?'ДОСТУПНО':'1/24Ч')+'</div>':'')+
     '<div class="rt" style="background:'+RAR[c.rarity].color+';color:'+RAR[c.rarity].color+'"></div>'+
-    caseArt(c)+'<div class="name">'+c.name+'</div>'+
+    caseArt(c)+'<div class="name">'+c.name+'</div>'+(c.streamer?'<div class="streamer-mini">Стримерский</div>':'')+
     '<div class="price">'+(c.price===0?'БЕСПЛАТНО':'⭐ '+fmt(c.price))+'</div></div>').join('')); }
 function buildStrip(strip,g){
   strip.innerHTML='';

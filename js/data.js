@@ -15,7 +15,7 @@ const GIFTS = [
   { id:'bear',    emoji:'🧸', name:'Мишка',         rarity:'common',    price:15,  tgs:TGS+'5170233102089322756.tgs' },
   { id:'heart',   emoji:'❤️', name:'Сердце',        rarity:'common',    price:15,  tgs:TGS+'5170145012310081615.tgs' },
   { id:'rose',    emoji:'🌹', name:'Роза',          rarity:'common',    price:25,  tgs:TGS+'5168103777563050263.tgs' },
-  { id:'box',     emoji:'🎃', name:'Бокс',          rarity:'common',    price:25,  tgs:TGS+'5170250947678437525.tgs' },
+  { id:'box',     emoji:'🎁', name:'Бокс',          rarity:'common',    price:25,  tgs:TGS+'5170250947678437525.tgs' },
   { id:'cake',    emoji:'🎂', name:'Тортик',        rarity:'rare',      price:50,  tgs:TGS+'5170144170496491616.tgs' },
   { id:'bouquet', emoji:'💐', name:'Букет',         rarity:'rare',      price:50,  tgs:TGS+'5170314324215857265.tgs' },
   { id:'rocket',  emoji:'🚀', name:'Ракета',        rarity:'rare',      price:50,  tgs:TGS+'5170564780938756245.tgs' },
@@ -72,7 +72,7 @@ const QUESTS = [
 ];
 
 const ACHS = [
-  { id:'a1', emoji:'🎃', name:'Первый дроп',         cond:s=>s.stats.opened>=1 },
+  { id:'a1', emoji:'🎁', name:'Первый дроп',         cond:s=>s.stats.opened>=1 },
   { id:'a2', emoji:'📦', name:'100 кейсов',           cond:s=>s.stats.opened>=100 },
   { id:'a3', emoji:'💎', name:'Поймать эпику (100⭐)', cond:s=>s.stats.best>=100 },
   { id:'a4', emoji:'💰', name:'Баланс 2 000',         cond:s=>s.balance>=2000 },
