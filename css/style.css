@@ -508,3 +508,9 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 .inv-item .emoji{font-size:2rem}
 .chip .gimg{width:100%;height:56px;object-fit:cover;border-radius:12px;filter:none}
 .strip-win .gimg{width:64px;height:64px;object-fit:cover;border-radius:14px}
+
+/* ===== v44: квадратная рулетка и инвентарь 1:1 ===== */
+.roulette-container{height:132px}
+.roulette-item{width:132px;min-width:132px;height:100%}
+.roulette-item .gimg{width:100%;height:100%;object-fit:cover}
+.inv-item .gimg{width:100%;height:auto;aspect-ratio:1/1;object-fit:cover}

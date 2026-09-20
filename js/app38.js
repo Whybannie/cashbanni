@@ -9,7 +9,7 @@ const gift = id => GIFTS.find(g=>g.id===id);
 const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const SUB_REWARD = 10;
 const PAY_PRESETS = [1,5,10,25,50,100,250,500];
-const STRIP_W = 104;
+const STRIP_W = 132;
 
 const DEF = () => ({
   balance:ECO.START_BALANCE, xp:0, inv:[],
