@@ -1,4 +1,4 @@
-const BUILD = 26;
+const BUILD = 36;
 const $ = id => document.getElementById(id);
 const setT = (id,v) => { const e=$(id); if(e) e.textContent=v; };
 const setH = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
@@ -10,13 +10,10 @@ const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const SUB_REWARD = 10;
 const PAY_PRESETS = [1,5,10,25,50,100,250,500];
 const STRIP_W = 104;
-const CASE_RTP = 0.80;
-const CRASH_EDGE = 0.96;
-const MINES_RTP = 0.94;
 
 const DEF = () => ({
   balance:ECO.START_BALANCE, xp:0, inv:[],
-  stats:{opened:0,spent:0,won:0,best:0,upgrades:0,upWins:0,battles:0,bWins:0,sells:0,buys:0,crashWins:0,mines:0,minesW:0},
+  stats:{opened:0,spent:0,won:0,best:0,upgrades:0,upWins:0,battles:0,bWins:0,sells:0,buys:0,crashWins:0,mines:0,minesW:0,plinko:0,plinkoW:0},
   qp:{}, qc:[], ac:[], promo:[], refs:0, freeLast:0, subDone:false, tgId:null, migrated:false, createdAt:null,
   sound:true, fair:false, seed:uid()+uid(), serverMode:false, isAdmin:false
 });
@@ -33,6 +30,11 @@ function load(){
     return out;
   }catch(e){ return DEF(); }
 }
+function saveLocal(){ localStorage.setItem('cashbanni_v2', JSON.stringify(S)); }
+let saveTimer=null;
+function apiSave(){ if(!S.serverMode)return; clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{ api("/api/save",{method:"POST",body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})}); },300); }
+function save(){ saveLocal(); if(S.serverMode){ clearTimeout(saveTimer); api("/api/save",{method:"POST",body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})}); } }
 
 const TG = (window.Telegram && window.Telegram.WebApp) || null;
 let FS_MODE = false;
@@ -46,35 +48,23 @@ function applySafe(){
   try{ if(TG&&TG.safeAreaInset&&TG.safeAreaInset.bottom) bot = TG.safeAreaInset.bottom||0; }catch(e){}
   document.documentElement.style.setProperty('--sab', bot+'px');
 }
-if (TG) {
-  try {
-    TG.ready(); TG.expand();
-    setTimeout(()=>{try{TG.expand()}catch(e){}},300);
-    if (TG.initData) document.body.classList.add('tg');
-    if (TG.requestFullscreen) { try{ const p=TG.requestFullscreen();
-      if(p&&p.then)p.then(()=>{FS_MODE=true;applySafe();}).catch(()=>{}); }catch(e){} }
-    if (TG.setHeaderColor) TG.setHeaderColor('#06061a');
-    if (TG.setBackgroundColor) TG.setBackgroundColor('#06061a');
-    if (TG.onEvent){ TG.onEvent('safeAreaChanged',applySafe); TG.onEvent('viewportChanged',applySafe); }
-    const u = TG.initDataUnsafe && TG.initDataUnsafe.user;
-    if (u) S.tgName = u.first_name || null;
-  } catch (e) {}
-}
+if (TG) { try {
+  TG.ready(); TG.expand(); setTimeout(()=>{try{TG.expand()}catch(e){}},300);
+  if (TG.initData) document.body.classList.add('tg');
+  if (TG.requestFullscreen) { try{ const p=TG.requestFullscreen(); if(p&&p.then)p.then(()=>{FS_MODE=true;applySafe();}).catch(()=>{}); }catch(e){} }
+  if (TG.setHeaderColor) TG.setHeaderColor('#06061a');
+  if (TG.setBackgroundColor) TG.setBackgroundColor('#06061a');
+  if (TG.onEvent){ TG.onEvent('safeAreaChanged',applySafe); TG.onEvent('viewportChanged',applySafe); }
+  const u = TG.initDataUnsafe && TG.initDataUnsafe.user; if (u) S.tgName = u.first_name || null;
+} catch (e) {} }
 applySafe();
 
-(function versionHandshake(){
-  try{
-    const m = document.querySelector('meta[name="build"]');
-    const pageBuild = m ? m.content : '0';
-    if (pageBuild !== String(BUILD)) {
-      const key = 'cb_reload_' + BUILD;
-      if (!localStorage.getItem(key)) {
-        localStorage.setItem(key, '1');
-        location.replace(location.pathname + '?cb=' + BUILD + '&' + Date.now());
-      }
-    }
-  }catch(e){}
-})();
+(function(){ try{
+  const m = document.querySelector('meta[name="build"]');
+  const pb = m ? m.content : '0';
+  if (pb !== String(BUILD)) { const key='cb_reload_'+BUILD;
+    if (!localStorage.getItem(key)) { localStorage.setItem(key,'1'); location.replace(location.pathname+'?cb='+BUILD+'&'+Date.now()); } }
+}catch(e){} })();
 
 function haptic(k){ try{ if(!TG||!TG.HapticFeedback)return;
   if(k==='success')TG.HapticFeedback.notificationOccurred('success');
@@ -93,33 +83,20 @@ async function api(path, opts = {}) {
 async function apiR(path, opts, tries) {
   tries = tries===undefined ? 2 : tries;
   let r = await api(path, opts);
-  if (r && r.error && tries > 0) {
-    await new Promise(res=>setTimeout(res,1200));
-    r = await apiR(path, opts, tries-1);
-  }
+  if (r && r.error && tries > 0) { await new Promise(res=>setTimeout(res,1200)); r = await apiR(path, opts, tries-1); }
   return r;
 }
-let saveTimer=null;
-function apiSave(){ if(!S.serverMode)return; clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>{ api("/api/save",{method:"POST",body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})}); },800); }
 async function refreshMe(){ const me=await apiR('/api/me');
   if(me&&me.tg_id){ S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
     S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
     S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
-    S.serverMode=true; save(); renderHeader();
+    S.serverMode=true; saveLocal(); renderHeader();
     try{ renderSection(activeTab()); }catch(e){} } }
 async function apiPay(stars){
   const r=await api("/api/pay",{method:"POST",body:JSON.stringify({stars})});
-  if(r.url && TG && TG.openInvoice){
-    modalClose('payModal');
-    TG.openInvoice(r.url, st=>{
-      if(st==='paid'){ toast('✅ Оплата прошла! Stars зачислены','good'); sfx.win(); confetti(80); setTimeout(refreshMe,1200); }
-      else toast('Оплата отменена','bad');
-    });
-  } else if(r.url){ modalClose('payModal'); window.open(r.url); }
-  else toast("Не удалось создать счёт","bad");
-}
-function save(){ localStorage.setItem('cashbanni_v2', JSON.stringify(S)); apiSave(); }
+  if(r.url && TG && TG.openInvoice){ modalClose('payModal');
+    TG.openInvoice(r.url, st=>{ if(st==='paid'){ toast('✅ Оплата прошла! Stars зачислены','good'); sfx.win(); confetti(80); setTimeout(refreshMe,1200); } else toast('Оплата отменена','bad'); });
+  } else if(r.url){ modalClose('payModal'); window.open(r.url); } else toast("Не удалось создать счёт","bad"); }
 function validInv(){ return S.inv.filter(i=>i&&i.gid&&gift(i.gid)); }
 function refreshInv(){ try{
   if($('sec-profile')&&$('sec-profile').classList.contains('active'))renderInventory();
@@ -133,11 +110,9 @@ function modalClose(id){ const e=$(id); if(e)e.classList.remove('active');
 
 let AC;
 function beep(f,d,t,v){ d=d||0.08;t=t||'square';v=v||0.12; if(!S.sound)return;
-  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)();
-    if(AC.state==='suspended') AC.resume();
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume();
     const o=AC.createOscillator(),g=AC.createGain(); o.type=t;o.frequency.value=f;g.gain.value=v;
-    o.connect(g);g.connect(AC.destination);o.start();
-    g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+d); o.stop(AC.currentTime+d); }catch(e){} }
+    o.connect(g);g.connect(AC.destination);o.start(); g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+d); o.stop(AC.currentTime+d); }catch(e){} }
 document.addEventListener('pointerdown',()=>{ if(S.sound){ try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended')AC.resume(); }catch(e){} } },{passive:true});
 const sfx={ click:()=>{beep(600,.05,'triangle',.07);haptic('light');},
   tick:()=>beep(800+Math.random()*400,.03,'square',.04),
@@ -145,15 +120,15 @@ const sfx={ click:()=>{beep(600,.05,'triangle',.07);haptic('light');},
   lose:()=>{beep(180,.35,'sawtooth',.1);haptic('error');},
   legend:()=>{[523,659,784,1046,1318,1568].forEach((f,i)=>setTimeout(()=>beep(f,.16,'triangle',.2),i*90));haptic('success');} };
 
-const cv=$('confetti'), cx=cv.getContext('2d'); let parts=[];
-function sizeCv(){ cv.width=innerWidth; cv.height=innerHeight; }
+const cv=$('confetti'), cx=cv?cv.getContext('2d'):null; let parts=[];
+function sizeCv(){ if(!cv)return; cv.width=innerWidth; cv.height=innerHeight; }
 sizeCv(); addEventListener('resize',sizeCv);
-function confetti(n){ n=n||140; const cols=['#a855f7','#ec4899','#fbbf24','#22c55e','#60a5fa'];
+function confetti(n){ if(!cx)return; n=n||140; const cols=['#a855f7','#ec4899','#fbbf24','#22c55e','#60a5fa'];
   for(let i=0;i<n;i++) parts.push({x:innerWidth/2,y:innerHeight/3,vx:rnd(-7,7),vy:rnd(-11,-3),s:rnd(4,9),c:pick(cols),r:rnd(0,6),vr:rnd(-.2,.2)}); }
-(function loop(){ cx.clearRect(0,0,cv.width,cv.height);
+(function loop(){ if(cx){ cx.clearRect(0,0,cv.width,cv.height);
   parts=parts.filter(p=>p.y<cv.height+20);
   parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.25;p.r+=p.vr;
-    cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/2,p.s,p.s);cx.restore();});
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/2,p.s,p.s);cx.restore();}); }
   requestAnimationFrame(loop); })();
 
 function toast(msg,type){ const d=document.createElement('div'); d.className='toast '+(type||''); d.innerHTML=msg;
@@ -170,32 +145,24 @@ function activateTab(t){ sfx.click();
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   const sec=$('sec-'+t); if(sec) sec.classList.add('active');
   try{ renderSection(t); }catch(e){ console.error('render',t,e); }
-  scrollTo({top:0,behavior:'smooth'});
-  if(t==='crash') setTimeout(crashResize,60); }
+  scrollTo({top:0,behavior:'smooth'}); }
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>activateTab(b.dataset.tab));
 function renderSection(t){
   if(t==='home') renderCases();
-  else if(t==='profile'){ S.stats=Object.assign(DEF().stats, S.stats||{}); renderProfile(); renderInventory(); renderTop(); renderRank();
+  else if(t==='profile'){ renderProfile(); renderInventory(); renderTop(); renderRank();
     if(S.serverMode) apiR('/api/me').then(me=>{ if(me&&me.tg_id){
       S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
       S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
       S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
-      save(); renderHeader(); renderProfile(); renderInventory(); renderTop(); renderRank(); } }); }
+      saveLocal(); renderHeader(); renderProfile(); renderInventory(); renderTop(); renderRank(); } }); }
   else if(t==='tasks') renderTasks();
   else if(t==='market') renderMarket();
   else if(t==='upgrade') renderUpgrade();
   else if(t==='battles') renderBattles();
   else if(t==='mines') renderMines(); }
 function renderAll(){ try{ renderHeader(); const t=activeTab(); if(t) renderSection(t); }catch(e){} }
-
-document.addEventListener('visibilitychange',()=>{
-  if(!document.hidden){
-    applySafe(); renderHeader();
-    try{ const t=activeTab(); if(t) renderSection(t); }catch(e){}
-    if($('sec-crash')&&$('sec-crash').classList.contains('active')) crashResize();
-    startCrashLoop();
-  }
-});
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ applySafe(); renderHeader();
+  try{ const t=activeTab(); if(t) renderSection(t); }catch(e){} } });
 
 function setWheel(el,segs){ if(!el)return; let acc=0;
   const stops=segs.map(s=>{const f=acc;acc+=s.pct;return s.color+' '+f+'% '+acc+'%';});
@@ -208,47 +175,27 @@ function spinWheel(el,segs,winIndex,cb){ if(!el)return cb&&cb(); let start=0;
   el.style.transition='transform 4s cubic-bezier(.12,.8,.2,1)'; el.style.transform='rotate('+R+'deg)';
   let n=0; const ti=setInterval(()=>{sfx.tick(); if(++n>26)clearInterval(ti);},150);
   setTimeout(cb,4100); }
-
 async function checkSub(){ const r=await api('/api/check_sub'); return !!(r&&r.sub); }
 function openChannel(){ try{ TG&&TG.openTelegramLink?TG.openTelegramLink(CHANNEL):window.open(CHANNEL); }catch(e){ window.open(CHANNEL); } }
 
-// ---------- КЕЙСЫ (дизайнерские арты + RTP 80%) ----------
-function caseArt(c){
-  const col=CASE_COLORS[c.rarity];
-  const art = c.img
-    ? '<img class="case-img" src="'+c.img+'" alt="'+c.name+'" loading="lazy">'
-    : '<div class="bow"></div><div class="lid"></div><div class="body"></div><div class="rv"></div><div class="rh"></div><div class="em">'+c.em+'</div>';
-  return '<div class="case-art" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+art+'</div>';
-}
+// ---------- КЕЙСЫ (рендер; спин переопределяет caseimg) ----------
+function caseArt(c){ const col=CASE_COLORS[c.rarity]||CASE_COLORS.common;
+  return '<div class="case-art" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+
+    '<div class="bow"></div><div class="lid"></div><div class="body"></div><div class="rv"></div><div class="rh"></div><div class="em">'+c.em+'</div></div>'; }
 function freeReady(){ return Date.now()-(S.freeLast||0)>=FREE_CASE_COOLDOWN; }
-function caseEV(c){ return c.drops.reduce((a,d)=>{const g=gift(d[0]);return a+(g?g.price*d[1]:0);},0); }
-function rollDrop(c){
-  if(c.price>0){
-    const ev=caseEV(c);
-    const prices=c.drops.map(d=>{const g=gift(d[0]);return g?g.price:0;});
-    const minP=Math.min.apply(null,prices);
-    if(ev>CASE_RTP*c.price && ev>minP){
-      const cut=(ev-CASE_RTP*c.price)/(ev-minP);
-      if(Math.random()<cut){ return gift(c.drops[prices.indexOf(minP)][0]); }
-    }
-  }
-  let r=Math.random(),acc=0; for(const d of c.drops){acc+=d[1]; if(r<=acc)return gift(d[0]);} return gift(c.drops[0][0]);
-}
 function renderCases(){ setT('casesStat','Открыто: '+S.stats.opened);
   setH('casesGrid',CASES.map(c=>
     '<div class="case-card" style="--glow:'+RAR[c.rarity].glow+'" onclick="openCaseModal(\''+c.id+'\')">'+
     (c.free?'<div class="free-badge">'+(freeReady()?'ДОСТУПНО':'1/24Ч')+'</div>':'')+
     '<div class="rt" style="background:'+RAR[c.rarity].color+';color:'+RAR[c.rarity].color+'"></div>'+
-    caseArt(c)+'<div class="name">'+c.name+'</div>'+(c.streamer?'<div class="streamer-mini">Стримерский</div>':'')+
+    caseArt(c)+'<div class="name">'+c.name+'</div>'+
     '<div class="price">'+(c.price===0?'БЕСПЛАТНО':'⭐ '+fmt(c.price))+'</div></div>').join('')); }
-function buildStrip(strip,g){
-  strip.innerHTML='';
-  const winIdx=42;
+function buildStrip(strip,g){ strip.innerHTML=''; const winIdx=42;
   for(let i=0;i<50;i++){ const it=(i===winIdx)?g:gift(pick(curCase.drops)[0]);
     const d=document.createElement('div'); d.className='roulette-item'; d.style.background=RAR[it.rarity].color+'18';
-    d.innerHTML=gImg(it)+'<span class="name">'+it.name+'</span>'; strip.appendChild(d); }
-}
+    d.innerHTML=gImg(it)+'<span class="name">'+it.name+'</span>'; strip.appendChild(d); } }
 function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
+  if(!curCase) return;
   if(curCase.free&&!freeReady()){ const h=Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5);
     return toast('⏳ Бесплатный кейс раз в 24 часа. Ещё '+h+' ч.','bad'); }
   setT('cmTitle',curCase.name);
@@ -256,20 +203,18 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   const b3=$('btnX3'),b5=$('btnX5');
   if(b3)b3.style.display=curCase.free?'none':''; if(b5)b5.style.display=curCase.free?'none':'';
   const m=document.querySelector('#caseModal .modal'); if(m) m.classList.remove('compact');
-  setH('cmContents',
-    '<div class="cf-hero">'+caseArt(curCase)+
-      '<div class="cf-hero-info"><b>'+curCase.name+'</b>'+
-      '<div class="price">'+(curCase.price===0?'БЕСПЛАТНО':'⭐ '+fmt(curCase.price))+'</div>'+
-      '<span class="muted">Состав и шансы выпада:</span></div></div>'+
+  setH('cmContents','<div class="cf-hero">'+caseArt(curCase)+
+    '<div class="cf-hero-info"><b>'+curCase.name+'</b>'+
+    '<div class="price">'+(curCase.price===0?'БЕСПЛАТНО':'⭐ '+fmt(curCase.price))+'</div>'+
+    '<span class="muted">Состав и шансы выпада:</span></div></div>'+
     '<div class="contents">'+curCase.drops.map(d=>{const g=gift(d[0]);return
-      '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'55;box-shadow:0 0 16px '+RAR[g.rarity].color+'22 inset">'+
+      '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'55">'+
       '<div class="ch">'+(d[1]*100).toFixed(0)+'%</div>'+gImg(g)+
       '<div class="cname">'+g.name+'</div><div class="cprice">⭐'+g.price+'</div></div>';}).join('')+'</div>');
   const box=$('cfStrips'); box.innerHTML='';
   const prev=document.createElement('div'); prev.className='roulette-container preview';
   prev.innerHTML='<div class="preview-label">ПРЕВЬЮ</div><div class="roulette-pointer"></div><div class="roulette-strip"></div>';
-  box.appendChild(prev);
-  buildStrip(prev.querySelector('.roulette-strip'), gift(pick(curCase.drops)[0]));
+  box.appendChild(prev); buildStrip(prev.querySelector('.roulette-strip'), gift(pick(curCase.drops)[0]));
   modalOpen('caseModal'); }
 function closeCaseModal(){ if(spinning) return;
   const m=document.querySelector('#caseModal .modal'); if(m) m.classList.remove('compact');
@@ -287,236 +232,13 @@ function sellWon(u){ const idx=S.inv.findIndex(i=>i.uid===u); if(idx<0)return;
   const g=gift(S.inv[idx].gid); if(!g)return;
   S.inv.splice(idx,1); S.balance+=g.price; S.stats.sells++;
   qEvent('sell'); sfx.win(); toast('Продано: '+g.name+' +⭐'+fmt(g.price),'good');
-  save(); renderHeader(); refreshInv(); checkAch();
-  const o=document.querySelector('[data-ow="'+u+'"]');
-  if(o){ o.innerHTML='✅ Продано +⭐'+g.price; setTimeout(()=>o.classList.add('fade'),1000); } }
-function keepWon(u){ sfx.click(); refreshInv();
-  const o=document.querySelector('[data-ow="'+u+'"]');
-  if(o){ o.innerHTML='📦 В инвентаре'; setTimeout(()=>o.classList.add('fade'),1000); } }
-async function spin(n){ if(spinning) return;
-  if(curCase.free){ if(!freeReady()) return toast('⏳ Раз в 24 часа','bad');
-    const sub=await checkSub();
-    if(!sub){ toast('📢 Только для подписчиков канала','bad'); openChannel(); return; } }
-  if(curCase.free) n=1;
-  const cost=curCase.price*n;
-  if(S.balance<cost) return toast('Недостаточно Stars ⭐','bad');
-  spinning=true; S.balance-=cost; S.stats.spent+=cost;
-  if(curCase.free) S.freeLast=Date.now();
-  save(); renderHeader();
-  const box=$('cfStrips');
-  const avail=box.clientHeight||320;
-  box.innerHTML='';
-  const modal=document.querySelector('#caseModal .modal');
-  if(n>1&&modal) modal.classList.add('compact');
-  const wins=[]; for(let i=0;i<n;i++) wins.push(rollDrop(curCase));
-  const rows=wins.map(g=>{ const c=document.createElement('div'); c.className='roulette-container';
-    c.innerHTML='<div class="roulette-pointer"></div><div class="roulette-strip"></div>';
-    box.appendChild(c); return {c,strip:c.querySelector('.roulette-strip'),g,uid:uid()}; });
-  const rowH=Math.max(84, Math.floor(avail/n)-10);
-  rows.forEach(r=>{ r.c.style.height=rowH+'px'; if(rowH<120) r.c.classList.add('sm'); });
-  rows.forEach(r=>buildStrip(r.strip,r.g));
-  const dur=(n===1)?6000:5000;
-  await Promise.all(rows.map(r=>animateStrip(r.strip,dur)));
-  rows.forEach(r=>{ r.c.classList.add('won');
-    r.c.insertAdjacentHTML('beforeend',
-      '<div class="strip-win" data-ow="'+r.uid+'">'+gImg(r.g)+
-      '<div class="sw-info"><b>+'+r.g.name+'</b><span>⭐'+r.g.price+'</span></div>'+
-      '<div class="sw-acts"><button class="sw-btn sell" onclick="sellWon(\''+r.uid+'\')">Продать</button>'+
-      '<button class="sw-btn keep" onclick="keepWon(\''+r.uid+'\')">В инвентарь</button></div></div>'); });
-  for(const r of rows){ const g=r.g;
-    S.inv.push({uid:r.uid,gid:g.id}); S.stats.opened++; S.stats.won+=g.price; S.xp+=Math.floor(Math.max(curCase.price,1)/5);
-    if(g.price>S.stats.best)S.stats.best=g.price;
-    if(g.rarity==='epic'||g.rarity==='legendary'){sfx.legend();confetti(150);toast('💎 ЭПИКА: '+g.name+'!','good');}
-    qEvent('open',1);
-  }
-  if(wins.every(g=>g.rarity!=='epic'&&g.rarity!=='legendary')) sfx.win();
-  spinning=false; checkAch(); save(); renderHeader(); renderCases(); renderTasks(); refreshInv(); }
-
-// ---------- CRASH LIVE: синхронный эфир, история 10 ----------
-const CRASH_ROUND_MS = 15000; // раунд = 15 секунд
-const CRASH_BET_MS   = 6000;  // 6 сек на ставки, 9 сек полёт
-const CRASH_SEED     = "cashbanni_v1"; // общий seed для всех
-const crash = {
-  phase:'bet', m:1, cp:1, myBet:0, cashed:false,
-  hist:[], lastInt:1, sparks:[], betVal:20,
-  lastFrame:Date.now()
-};
-let crashLoopOn = false;
-
-function roundNumber(){ return Math.floor(Date.now()/CRASH_ROUND_MS); }
-function roundStart(r){ return r*CRASH_ROUND_MS; }
-function crashPoint(r){
-  // детерминированно из seed+номера раунда — у всех одинаково
-  let h = 0x811c9dc5;
-  const s = CRASH_SEED + ':' + r;
-  for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
-  h = (h >>> 0) / 0xffffffff;
-  if(h < 0.03) return 1.00;
-  return Math.min(150, Math.floor(CRASH_EDGE/(1-h)*100)/100);
-}
-function crashHistory(){
-  const cur = roundNumber();
-  const arr = [];
-  for(let i=1;i<=10;i++) arr.push(crashPoint(cur - i));
-  return arr;
-}
-
-function startCrashLoop(){ if(crashLoopOn) return; crashLoopOn=true; crash.lastFrame=Date.now(); crashLoop(); }
-setInterval(()=>{ if(crashLoopOn && Date.now()-crash.lastFrame>4000){ crashLoopOn=false; startCrashLoop(); } },3000);
-
-function crashResize(){ const c=$('crashCanvas'); if(!c)return;
-  const r=c.parentElement.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
-  c.width=r.width*dpr; c.height=r.height*dpr; }
-addEventListener('resize',()=>{ if($('sec-crash')&&$('sec-crash').classList.contains('active'))crashResize(); });
-function syncBetUI(){ setT('crashBetVal',crash.betVal); }
-function crashBet(d){ crash.betVal=Math.max(5,crash.betVal+d); syncBetUI(); sfx.click(); }
-function crashSet(v){ crash.betVal=v; syncBetUI(); sfx.click(); }
-
-function crashAction(){
-  const rnd = roundNumber();
-  const t0  = roundStart(rnd);
-  const now = Date.now();
-  const elapsed = now - t0;
-  const inBet = elapsed < CRASH_BET_MS;
-  const inFly = elapsed >= CRASH_BET_MS && crash.m < crash.cp;
-
-  if(inBet){
-    if(crash.myBet>0){
-      S.balance += crash.myBet; crash.myBet=0; sfx.click();
-      toast('Ставка отменена','good'); save(); renderHeader(); return;
-    }
-    const bet = crash.betVal;
-    if(S.balance<bet) return toast('Недостаточно Stars ⭐','bad');
-    S.balance -= bet; crash.myBet = bet; crash.cashed = false;
-    sfx.win(); toast('✅ Ставка ⭐'+bet+' принята! Жди взлёт','good');
-    save(); renderHeader(); return;
-  }
-  if(inFly && crash.myBet>0 && !crash.cashed){
-    const win = Math.floor(crash.myBet * crash.m);
-    S.balance += win; S.stats.won += win;
-    S.stats.crashWins = (S.stats.crashWins||0) + 1;
-    crash.cashed = true;
-    $('crashMult').className = 'crash-mult green';
-    setH('crashStatus','✅ Забрал на '+crash.m.toFixed(2)+'× → +⭐'+fmt(win));
-    sfx.win(); if(crash.m>=5) confetti(90);
-    save(); renderHeader(); checkAch(); return;
-  }
-  toast('⏳ Ставки принимаются только перед взлётом','bad');
-}
-
-function crashLoop(){
-  crash.lastFrame = Date.now();
-  const now = Date.now();
-  const rnd = roundNumber();
-  const t0  = roundStart(rnd);
-  const elapsed = now - t0;
-
-  // синхронизация crash point и истории
-  crash.cp = crashPoint(rnd);
-  crash.hist = crashHistory();
-  if(crash._lastRnd !== rnd){ crash._lastRnd = rnd; crashHist(); }
-
-  if(elapsed < CRASH_BET_MS){
-    crash.phase = 'bet';
-    crash.m = 1;
-    const left = (CRASH_BET_MS - elapsed)/1000;
-    setT('crashMult','1.00×');
-    const cm=$('crashMult'); if(cm) cm.className='crash-mult';
-    setH('crashStatus','🎰 Приём ставок: '+left.toFixed(1)+' с');
-    setT('heroCrashState','Приём ставок: '+Math.max(0,left).toFixed(0)+' с');
-  } else {
-    crash.phase = 'fly';
-    crash.t0 = t0;
-    const t = elapsed - CRASH_BET_MS;
-    crash.m = Math.exp(t/9000);
-    if(crash.m >= crash.cp){
-      crash.m = crash.cp;
-      crash.phase = 'crash';
-      setT('crashMult', crash.cp.toFixed(2)+'×');
-      const cm=$('crashMult'); if(cm) cm.className='crash-mult red';
-      const c=$('crashCanvas'), dpr=window.devicePixelRatio||1;
-      if(crash.sparks.length<10){
-        for(let i=0;i<26;i++) crash.sparks.push({x:c.width*0.85,y:c.height*0.25,vx:rnd(-4,4)*dpr,vy:rnd(-4,4)*dpr,l:1});
-      }
-      setH('crashStatus','💥 Краш на '+crash.cp.toFixed(2)+'×');
-      if(crash.myBet>0 && !crash.cashed){
-        sfx.lose(); toast('💥 Краш! −⭐'+crash.myBet,'bad');
-        crash.myBet = 0;
-      }
-      const cb=$('crashBox'); if(cb){cb.classList.add('shake'); setTimeout(()=>cb.classList.remove('shake'),500);}
-    } else {
-      if(Math.floor(crash.m)>crash.lastInt){ crash.lastInt=Math.floor(crash.m); sfx.tick(); }
-      setT('crashMult', crash.m.toFixed(2)+'×');
-      const cm=$('crashMult'); if(cm) cm.className='crash-mult'+(crash.m>=10?' gold':'');
-      setH('crashStatus', crash.myBet>0 ? (crash.cashed?'✅ Забрано':'🚀 Летим!') : '🚀 В полёте');
-      setT('heroCrashState','LIVE: '+crash.m.toFixed(2)+'×');
-    }
-  }
-  const btn=$('crashBtn');
-  if(btn){
-    if(crash.phase==='bet'){
-      if(crash.myBet>0){ btn.textContent='ОТМЕНИТЬ СТАВКУ ⭐'+crash.myBet; btn.className='btn crash-main-btn cancel'; }
-      else { btn.textContent='ПОСТАВИТЬ ⭐'+crash.betVal; btn.className='btn crash-main-btn bet'; }
-    } else if(crash.phase==='fly'){
-      if(crash.myBet>0&&!crash.cashed){ btn.textContent='ЗАБРАТЬ ⭐'+Math.floor(crash.myBet*crash.m); btn.className='btn crash-main-btn cash'; }
-      else if(crash.cashed){ btn.textContent='ЗАБРАНО ✅'; btn.className='btn crash-main-btn wait'; }
-      else { btn.textContent='В ПОЛЁТЕ — СТАВКА НА СЛЕД. РАУНД'; btn.className='btn crash-main-btn wait'; }
-    } else { btn.textContent='💥 КРАШ…'; btn.className='btn crash-main-btn wait'; }
-  }
-  crashDraw();
-  requestAnimationFrame(crashLoop);
-}
-
-function crashY(m,mMax,H){ return H*0.94-(H*0.8)*((m-1)/(mMax-1||1)); }
-function crashDraw(){ const c=$('crashCanvas'); if(!c||!c.width)return;
-  const x=c.getContext('2d'),W=c.width,H=c.height,dpr=window.devicePixelRatio||1;
-  x.clearRect(0,0,W,H);
-  const mMax=Math.max(crash.m*1.15,2);
-  x.font=(10*dpr)+'px system-ui'; x.textAlign='right';
-  [1,1.5,2,3,5,10,25,50,100].filter(v=>v<=mMax).forEach(v=>{
-    const y=crashY(v,mMax,H);
-    x.strokeStyle='rgba(255,255,255,.05)'; x.lineWidth=1*dpr;
-    x.beginPath();x.moveTo(0,y);x.lineTo(W,y);x.stroke();
-    x.fillStyle='rgba(255,255,255,.28)'; x.fillText(v+'×',W-8*dpr,y-4*dpr); });
-  if(crash.phase==='bet'){
-    const bob=Math.sin(Date.now()/300)*4*dpr;
-    x.font=(30*dpr)+'px serif'; x.textAlign='center';
-    x.fillText('🚀',W*0.12,H*0.8+bob);
-    for(let i=1;i<=3;i++){ x.fillStyle='rgba(251,191,36,'+(0.3/i)+')';
-      x.beginPath();x.arc(W*0.12-14*dpr*i,H*0.8+bob,(4-i)*dpr,0,7);x.fill(); }
-    return;
-  }
-  const tNow = crash.phase==='fly' ? (Date.now()-crash.t0-CRASH_BET_MS) : (4500*Math.log(crash.m)||0);
-  const N=70, pts=[];
-  for(let i=0;i<=N;i++){ const tt=tNow*i/N, m=Math.exp(tt/9000);
-    pts.push([W*0.05+(W*0.88)*(i/N), crashY(Math.min(m,mMax),mMax,H)]); }
-  x.save(); x.shadowColor=crash.phase==='crash'?'#ef4444':'#a855f7'; x.shadowBlur=16*dpr;
-  const grad=x.createLinearGradient(0,H,W,0);
-  grad.addColorStop(0,'#a855f7'); grad.addColorStop(1,crash.phase==='crash'?'#ef4444':'#ec4899');
-  x.strokeStyle=grad; x.lineWidth=3.5*dpr; x.lineJoin='round';
-  x.beginPath(); pts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke(); x.restore();
-  x.lineTo(pts[N][0],H); x.lineTo(pts[0][0],H); x.closePath();
-  const fg=x.createLinearGradient(0,0,0,H);
-  fg.addColorStop(0,'rgba(168,85,247,.28)'); fg.addColorStop(1,'rgba(168,85,247,0)');
-  x.fillStyle=fg; x.fill();
-  const tip=pts[N], prev=pts[N-1]||tip;
-  const ang=Math.atan2(tip[1]-prev[1],tip[0]-prev[0]);
-  if(crash.phase==='fly'){
-    for(let i=1;i<=3;i++){ x.fillStyle='rgba(251,191,36,'+(0.35/i)+')';
-      x.beginPath(); x.arc(tip[0]-Math.cos(ang)*10*dpr*i,tip[1]-Math.sin(ang)*10*dpr*i,(5-i)*dpr,0,7); x.fill(); }
-    x.save(); x.translate(tip[0],tip[1]); x.rotate(ang);
-    x.font=(26*dpr)+'px serif'; x.textAlign='center'; x.textBaseline='middle';
-    x.fillText('🚀',6*dpr,0); x.restore();
-  } else { x.font=(30*dpr)+'px serif'; x.textAlign='center'; x.fillText('💥',tip[0],tip[1]); }
-  crash.sparks=crash.sparks.filter(s=>s.l>0);
-  crash.sparks.forEach(s=>{ s.x+=s.vx;s.y+=s.vy;s.vy+=0.15*dpr;s.l-=0.03;
-    x.fillStyle='rgba(239,68,68,'+Math.max(s.l,0)+')';
-    x.beginPath();x.arc(s.x,s.y,2.5*dpr,0,7);x.fill(); });
-}
-function crashHist(){ setH('crashHistory', crash.hist.map(v=>
-  '<span class="ch-h '+(v>=10?'hi':v>=2?'mid':'lo')+'">'+v.toFixed(2)+'×</span>').join('')); }
+  save(); renderHeader(); refreshInv(); checkAch(); }
+function keepWon(u){ sfx.click(); refreshInv(); }
+async function spin(n){ if(spinning) return; spinning=true;
+  toast('⏳ Обновление…',''); spinning=false; }
 
 // ---------- MINES ----------
+const MINES_RTP = 0.94;
 const mines={active:false,bet:20,m:3,field:[],rev:[],picks:0,mult:1};
 function minesFair(picks,m){ let f=1; for(let i=0;i<picks;i++) f*=(25-i)/(25-m-i); return f*MINES_RTP; }
 function minesMinPicks(){ return mines.m===3?2:(mines.m===5?3:4); }
@@ -528,11 +250,9 @@ function minesSetM(m){ if(mines.active)return; mines.m=m;
 function syncMines(){ setT('minesBetVal',mines.bet);
   const btn=$('minesBtn'); if(!btn)return;
   if(!mines.active){ btn.textContent='СТАРТ ⭐'+mines.bet; btn.className='btn crash-main-btn bet'; }
-  else {
-    const need=minesMinPicks();
+  else { const need=minesMinPicks();
     if(mines.picks<need){ btn.textContent='ОТКРОЙ ЕЩЁ '+(need-mines.picks); btn.className='btn crash-main-btn wait'; }
-    else { const win=Math.floor(mines.bet*mines.mult); btn.textContent='ЗАБРАТЬ ⭐'+win; btn.className='btn crash-main-btn cash'; }
-  }
+    else { const win=Math.floor(mines.bet*mines.mult); btn.textContent='ЗАБРАТЬ ⭐'+win; btn.className='btn crash-main-btn cash'; } }
   setT('minesMult','x'+mines.mult.toFixed(2));
   setT('minesProfit','Профит: ⭐'+(mines.active?Math.floor(mines.bet*mines.mult)-mines.bet:0)); }
 function renderMines(){ const g=$('minesGrid'); if(!g)return;
@@ -553,13 +273,9 @@ function minesStart(){ if(mines.active)return;
 function minePick(i){ if(!mines.active||mines.rev[i])return;
   mines.rev[i]=true;
   const t=document.querySelector('.mine-tile[data-i="'+i+'"]');
-  if(mines.field[i]){
-    t.classList.add('boom'); t.textContent='💣';
-    revealMines(); mines.active=false;
-    S.stats.mines=(S.stats.mines||0)+1;
-    sfx.lose(); haptic('error'); toast('💥 Мина! −⭐'+mines.bet,'bad');
-    save(); syncMines(); return;
-  }
+  if(mines.field[i]){ t.classList.add('boom'); t.textContent='💣'; revealMines(); mines.active=false;
+    S.stats.mines=(S.stats.mines||0)+1; sfx.lose(); haptic('error'); toast('💥 Мина! −⭐'+mines.bet,'bad');
+    save(); syncMines(); return; }
   t.classList.add('gem'); t.textContent='💎';
   mines.picks++; mines.mult=minesFair(mines.picks,mines.m);
   sfx.tick(); haptic('light');
@@ -571,25 +287,22 @@ function revealMines(){ document.querySelectorAll('.mine-tile').forEach(t=>{ con
 function minesCash(){ if(!mines.active||mines.picks<minesMinPicks())return;
   const win=Math.floor(mines.bet*mines.mult);
   S.balance+=win; S.stats.won+=win; S.stats.mines=(S.stats.mines||0)+1; S.stats.minesW=(S.stats.minesW||0)+1;
-  mines.active=false; revealMines();
-  sfx.win(); if(mines.mult>=5)confetti(90);
+  mines.active=false; revealMines(); sfx.win(); if(mines.mult>=5)confetti(90);
   toast('✅ Забрал +⭐'+win+' (x'+mines.mult.toFixed(2)+')','good');
   save(); renderHeader(); syncMines(); checkAch(); }
 
 // ---------- ИНВЕНТАРЬ ----------
-function itemCard(g,noActs){ return '<div class="inv-item">'+
+function itemCard(g){ return '<div class="inv-item">'+
   '<div class="rt" style="background:'+RAR[g.rarity].color+'"></div>'+
   gImg(g)+'<div class="name">'+g.name+'</div><div class="price">⭐ '+fmt(g.price)+'</div>'+
-  (noActs?'':'<div class="acts">'+
-    '<button class="mini-btn gift" onclick="withdrawItem(\''+g.uid+'\')">🎁 Вывести</button>'+
-    '<button class="mini-btn sell" onclick="sellItem(\''+g.uid+'\')">Продать ⭐'+g.price+'</button>'+
-    '<button class="mini-btn up" onclick="toUpgrade(\''+g.uid+'\')">⚡</button>'+
-    '</div>')+'</div>'; }
+  '<div class="acts"><button class="mini-btn gift" onclick="withdrawItem(\''+g.uid+'\')">🎁 Вывести</button>'+
+  '<button class="mini-btn sell" onclick="sellItem(\''+g.uid+'\')">Продать ⭐'+g.price+'</button>'+
+  '<button class="mini-btn up" onclick="toUpgrade(\''+g.uid+'\')">⚡</button></div></div>'; }
 function renderInventory(){ const items=validInv();
   const val=items.reduce((a,i)=>a+gift(i.gid).price,0);
   setT('invValue','Предметов: '+items.length+' · ⭐'+fmt(val));
   setH('inventoryGrid',items.length?items.map(i=>itemCard(Object.assign({},gift(i.gid),{uid:i.uid}))).join('')
-    :'<div class="inv-empty"><div class="ie-ico">🎁</div><b>Портфель пуст</b><span>Открой первый кейс — и подарки появятся здесь</span><button class="btn btn-primary" onclick="activateTab(\'home\')">К кейсам</button></div>'); }
+    :'<div class="inv-empty"><div class="ie-ico">🎁</div><b>Портфель пуст</b><span>Открой первый кейс — подарки появятся здесь</span><button class="btn btn-primary" onclick="activateTab(\'home\')">К кейсам</button></div>'); }
 function sellItem(u){ const idx=S.inv.findIndex(i=>i.uid===u); if(idx<0)return;
   const g=gift(S.inv[idx].gid); if(!g)return;
   S.inv.splice(idx,1); S.balance+=g.price; S.stats.sells++;
@@ -601,15 +314,11 @@ async function withdrawItem(u){
   if(!confirm('🎁 Вывести «'+g.name+'» себе в Telegram?\nКомиссия 10% спишется с баланса. Лимит: 3 в день.'))return;
   toast('⏳ Отправляю подарок…','');
   const r=await api('/api/withdraw',{method:'POST',body:JSON.stringify({uid:u, price:g.price, emoji:g.emoji||''})});
-  if(r.ok){
-    const idx=S.inv.findIndex(i=>i.uid===u); if(idx>=0)S.inv.splice(idx,1);
+  if(r.ok){ const idx=S.inv.findIndex(i=>i.uid===u); if(idx>=0)S.inv.splice(idx,1);
     sfx.win(); confetti(80);
-    toast('🎁 Подарок отправлен! Комиссия ⭐'+(r.fee||0)+'. Осталось выводов сегодня: '+(r.left_today!==undefined?r.left_today:'—'),'good');
+    toast('🎁 Подарок отправлен! Комиссия ⭐'+(r.fee||0)+'. Осталось выводов: '+(r.left_today!==undefined?r.left_today:'—'),'good');
     save(); renderHeader(); renderInventory(); refreshInv();
-  } else {
-    toast('❌ '+(r.error||'Не удалось вывести подарок'),'bad');
-  }
-}
+  } else toast('❌ '+(r.error||'Не удалось вывести подарок'),'bad'); }
 function sellAll(){ const items=validInv(); if(!items.length)return;
   let t=0; items.forEach(i=>t+=gift(i.gid).price);
   if(!confirm('Продать всё за ⭐'+fmt(t)+'?'))return;
@@ -654,20 +363,13 @@ function doUpgrade(){ if(!upFrom||!upTo||upBusy)return;
     upFrom=null;upTo=null;upBusy=false;
     save(); renderHeader(); renderUpgrade(); renderInventory(); checkAch(); }); }
 
-// ---------- ЗАДАНИЯ ----------
+// ---------- ЗАДАНИЯ / КВЕСТЫ XP / ДОСТИЖЕНИЯ ----------
 function renderTasks(){ const fr=freeReady();
   setT('freeCaseState',fr?'Доступен сейчас · 1 спин · подписка':'Следующий через '+Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5)+' ч.');
   const sb=$('subBtn');
   if(sb){ if(S.subDone){sb.textContent='✅ Награда получена';sb.disabled=true;sb.classList.add('pressed');}
     else {sb.textContent='Подписаться';sb.disabled=false;sb.classList.remove('pressed');} }
   setT('refCount',S.refs);
-  setH('refExplain',
-    '<div class="ref-explain">'+
-      '<div class="re-step"><b>1.</b>Поделись ссылкой с другом</div>'+
-      '<div class="re-step"><b>2.</b>Друг заходит в игру (это бесплатно)</div>'+
-      '<div class="re-step highlight"><b>3.</b>Друг делает первый депозит от ⭐5</div>'+
-      '<div class="re-step reward"><b>4.</b>Ты получаешь ⭐'+REF_REWARD+'!</div>'+
-    '</div>');
   renderQuests(); renderAchs(); }
 async function doSub(){ openChannel();
   setTimeout(async()=>{ const r=await api('/api/check_sub');
@@ -679,15 +381,15 @@ function renderQuests(){ setH('questsList',QUESTS.map(q=>{
   const p=Math.min(S.qp[q.type]||0,q.target),done=p>=q.target,cl=S.qc.includes(q.id);
   return '<div class="quests-row"><div class="q-head"><span>'+q.name+'</span><span class="muted">'+p+'/'+q.target+'</span></div>'+
     '<div class="q-bar"><div class="q-fill" style="width:'+(p/q.target*100)+'%"></div></div>'+
-    '<button class="q-claim" '+(done&&!cl?'':'disabled')+' onclick="claimQuest(\''+q.id+'\')">'+(cl?'✅ Получено':'Забрать ⭐'+q.reward)+'</button></div>';}).join('')); }
+    '<button class="q-claim" '+(done&&!cl?'':'disabled')+' onclick="claimQuest(\''+q.id+'\')">'+(cl?'✅ Получено':'Забрать +'+(q.reward*10)+' XP')+'</button></div>';}).join('')); }
 function renderAchs(){ setH('achList',ACHS.map(a=>{const d=a.cond(S);return
     '<div class="ach '+(d?'done':'locked')+'"><span class="emoji">'+a.emoji+'</span><div><b>'+a.name+'</b><div class="muted small">'+(d?'Выполнено ✅':'Не выполнено')+'</div></div></div>';}).join('')); }
 function claimQuest(id){ const q=QUESTS.find(x=>x.id===id);
   if(S.qc.includes(id)||(S.qp[q.type]||0)<q.target)return;
-  S.qc.push(id); S.balance+=q.reward; sfx.win(); toast('📜 Квест: +⭐'+q.reward,'good');
-  save(); renderHeader(); renderTasks(); }
-function qEvent(t,n){ S.qp[t]=(S.qp[t]||0)+(n||1); save(); renderHeader(); }
-function checkAch(){ ACHS.forEach(a=>{ if(!S.ac.includes(a.id)&&a.cond(S)){S.ac.push(a.id);toast('🏅 Достижение: '+a.name+'!','good');confetti(60);} }); save(); }
+  S.qc.push(id); S.xp+=q.reward*10; sfx.win(); toast('📜 Квест выполнен: +'+(q.reward*10)+' XP 🏅','good');
+  saveLocal(); renderHeader(); renderTasks(); }
+function qEvent(t,n){ S.qp[t]=(S.qp[t]||0)+(n||1); saveLocal(); renderHeader(); }
+function checkAch(){ ACHS.forEach(a=>{ if(!S.ac.includes(a.id)&&a.cond(S)){S.ac.push(a.id);toast('🏅 Достижение: '+a.name+'!','good');confetti(60);} }); saveLocal(); }
 
 // ---------- МАРКЕТ ----------
 function dailyDiscount(){ return GIFTS[3+new Date().getDate()%(GIFTS.length-3)].id; }
@@ -715,120 +417,54 @@ function doPayCustom(){ const v=parseInt($('payCustom').value);
   if(!v||v<1||v>10000) return toast('Сумма от 1 до 10000','bad');
   apiPay(v); }
 
-// ---------- БАТТЛЫ ----------
+// ---------- БАТТЛЫ (база; рендер переопределяет caseimg) ----------
 let battleWatch=null;
 function stopBattleWatch(){ if(battleWatch){clearInterval(battleWatch); battleWatch=null;} }
-function battleCard(b){
-  if(b.mine&&b.status==='wait')return '<div class="battle-card mine"><div class="bc-top"><span class="bc-wait">⏳ ОЖИДАНИЕ</span><div class="bet">⭐'+b.bet+'</div></div>'+
-    '<div class="bc-mid"><div class="bc-player"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div><div class="bc-player empty"><span class="emoji">❓</span><b>Ищем соперника…</b></div></div>'+
-    '<button class="btn btn-secondary" onclick="openBattleHost(\''+b.id+'\','+b.bet+')">Открыть баттл</button></div>';
-  if(b.mine&&b.status==='done')return '<div class="battle-card mine"><div class="bc-top"><span class="bc-done">✅ СЫГРАН</span><div class="bet">⭐'+b.bet+'</div></div><button class="btn btn-primary" onclick="showMyResult(\''+b.id+'\')">🎬 Результат</button></div>';
-  return '<div class="battle-card"><div class="bc-top"><span class="bc-live">🔴 АКТИВЕН</span><div class="bet">⭐'+b.bet+'</div></div>'+
-    '<div class="bc-mid"><div class="bc-player"><span class="emoji">🧑</span><b>'+(b.host_name||'Игрок')+'</b></div><div class="bc-player empty"><span class="emoji">🎯</span><b>Твой слот</b></div></div>'+
-    '<button class="btn btn-primary" onclick="joinBattle(\''+b.id+'\')">Войти за ⭐'+b.bet+'</button></div>';
-}
 function renderBattles(){ if(!S.serverMode){setH('battlesList','<div class="muted">Баттлы доступны в Telegram-версии.</div>');return;}
-  apiR('/api/battles').then(r=>{ if(r.error){setH('battlesList','<div class="muted">Сервер недоступен.</div>');return;}
-    const list=r.battles||[];
-    if(!list.length){setH('battlesList','<div class="battle-empty"><span class="emoji">⚔️</span><b>Нет активных баттлов</b><span class="muted">Создай свой — соперник найдётся за секунды</span></div>');return;}
-    setH('battlesList',list.map(battleCard).join('')); }); }
-function showMyResult(id){ api('/api/battles/result?id='+id).then(r=>{ if(!r.error)runBattle(r.host_name,r.bet,r.you_win,true); }); }
+  apiR('/api/battles').then(r=>{ const list=(r&&r.battles)||[];
+    setH('battlesList',list.length?list.map(b=>
+      '<div class="battle-card"><div class="bc-top"><span class="bc-live">🔴 АКТИВЕН</span><div class="bet">⭐'+b.bet+'</div></div>'+
+      '<div class="bc-mid"><div class="bc-player"><span class="emoji">🧑</span><b>'+(b.host_name||'Игрок')+'</b></div></div>'+
+      '<button class="btn btn-primary" onclick="joinBattle(\''+b.id+'\')">Войти за ⭐'+b.bet+'</button></div>').join('')
+      :'<div class="battle-empty"><span class="emoji">⚔️</span><b>Нет активных баттлов</b></div>'); }); }
 function createBattle(){ if(!S.serverMode)return toast('Только в Telegram-версии','bad');
   const bet=parseInt(prompt('Твоя ставка (Stars):','50')); if(!bet||bet<10)return;
   if(S.balance<bet)return toast('Недостаточно Stars','bad');
   api('/api/battles/create',{method:'POST',body:JSON.stringify({bet})}).then(r=>{
     if(r.error)return toast(r.error,'bad');
-    S.balance-=bet; save(); renderHeader();
-    openBattleHost(r.id,bet); renderBattles(); }); }
-function openBattleHost(bid,bet){
-  stopBattleWatch();
-  setT('battlePot',fmt(bet*2));
-  const w=$('bWheel'); setWheel(w,[{pct:50,color:'#a855f7'},{pct:50,color:'#ec4899'}]);
-  if(w){ w.classList.add('idle'); w.style.transition='none'; w.style.transform='none'; }
-  setH('battlePlayers','<div class="b-player"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div>'+
-    '<div class="b-player empty pulse"><span class="emoji">❓</span><b>Ищем соперника…</b></div>');
-  setT('battleLog','⏳ Баттл виден всем игрокам — ждём соперника');
-  modalOpen('battleModal');
-  battleWatch=setInterval(async()=>{
-    const r=await api('/api/battles/result?id='+bid);
-    if(r&&!r.error){ stopBattleWatch();
-      const ww=$('bWheel'); if(ww) ww.classList.remove('idle');
-      setH('battlePlayers','<div class="b-player me"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div>'+
-        '<div class="b-player"><span class="emoji">🧑</span><b>'+(r.guest_name||'Соперник')+'</b></div>');
-      setT('battleLog','🎯 Соперник найден! Крутим колесо…');
-      setTimeout(()=>spinBattleWheel(r.you_win,r.bet,true,false),700);
-    }
-  },3000);
-}
+    S.balance-=bet; save(); renderHeader(); renderBattles(); }); }
 function joinBattle(id){ api('/api/battles/join',{method:'POST',body:JSON.stringify({id})}).then(r=>{
     if(r.error)return toast(r.error,'bad');
     S.balance-=r.bet; save(); renderHeader();
-    setH('battlePlayers','<div class="b-player"><span class="emoji">🧑</span><b>'+r.host_name+'</b></div>'+
-      '<div class="b-player me"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div>');
-    setT('battleLog','🎯 Крутим колесо…');
-    const w=$('bWheel'); setWheel(w,[{pct:50,color:'#ec4899'},{pct:50,color:'#a855f7'}]); if(w)w.classList.remove('idle');
-    modalOpen('battleModal');
-    setTimeout(()=>spinBattleWheel(r.you_win,r.bet,false,false),700); }); }
-function spinBattleWheel(youWin,bet,iAmHost,replay){
-  setT('battlePot',fmt(bet*2));
-  const segs=iAmHost?[{pct:50,color:'#a855f7'},{pct:50,color:'#ec4899'}]:[{pct:50,color:'#ec4899'},{pct:50,color:'#a855f7'}];
-  const winIndex=iAmHost?(youWin?0:1):(youWin?1:0);
-  if(replay) setT('battleLog','🎬 Повтор результата…');
-  spinWheel($('bWheel'),segs,winIndex,()=>{
-    const my=document.querySelector('.b-player.me');
-    const op=document.querySelector('.b-player:not(.me)');
-    if(youWin&&my)my.classList.add('win'); if(!youWin&&op)op.classList.add('win');
-    if(replay){
-      setT('battleLog',youWin?'🎉 Ты победил в этом баттле (повтор, без начислений)':'💥 Ты проиграл этот баттл (повтор)');
-      if(youWin){sfx.win();confetti(60);} else sfx.lose();
-      return;
-    }
-    S.stats.battles++;
-    if(youWin){ S.balance+=bet*2; S.stats.bWins++; S.stats.won+=bet*2;
-      setT('battleLog','🎉 ПОБЕДА! +⭐'+fmt(bet*2)); sfx.win(); confetti(100); qEvent('battle_win'); }
-    else { setT('battleLog','💥 Поражение… банк ушёл сопернику'); sfx.lose(); }
-    save(); renderHeader(); checkAch(); renderBattles();
-    setTimeout(refreshMe,1200);
-  });
-}
-function runBattle(hostName,bet,youWin,replay){
-  setH('battlePlayers','<div class="b-player"><span class="emoji">🧑</span><b>'+hostName+'</b></div><div class="b-player me"><span class="emoji">😎</span><b>'+(S.tgName||'Ты')+'</b></div>');
-  const w=$('bWheel'); setWheel(w,[{pct:50,color:'#ec4899'},{pct:50,color:'#a855f7'}]); if(w)w.classList.remove('idle');
-  setT('battleLog','🎯 Крутим колесо…'); modalOpen('battleModal');
-  setTimeout(()=>spinBattleWheel(youWin,bet,false,!!replay),700); }
-function closeBattle(){ stopBattleWatch(); const w=$('bWheel'); if(w)w.classList.remove('idle'); modalClose('battleModal'); renderBattles(); }
-setInterval(()=>{ try{ const b=$('sec-battles'); if(b&&b.classList.contains('active'))renderBattles(); }catch(e){} },6000);
+    toast(r.you_win?'🎉 Победа! +⭐'+(r.bet*2):'💥 Поражение', r.you_win?'good':'bad');
+    if(r.you_win){sfx.win();confetti(80);} else sfx.lose();
+    setTimeout(refreshMe,800); renderBattles(); }); }
+function showMyResult(id){ toast('🎬 Результат сохранён в истории',''); }
 
-// ---------- КАБИНЕТ / ТОП / АДМИН ----------
+// ---------- КАБИНЕТ (полный) ----------
+function playerTitle(){ const st=S.stats||{};
+  if((st.won||0)>=5000) return {t:'🐋 Кит',c:'gold'};
+  if((st.opened||0)>=200) return {t:'👑 Легенда кейсов',c:'gold'};
+  if((st.bWins||0)>=10) return {t:'⚔️ Гладиатор',c:'epic'};
+  if((st.opened||0)>=100) return {t:'📦 Коллекционер',c:'epic'};
+  if((st.won||0)>=1000) return {t:'⭐ Про',c:'rare'};
+  if((st.opened||0)>=25) return {t:'🎮 Игрок',c:'rare'};
+  return {t:'🌱 Новичок',c:'common'}; }
 function ensureBanner(){ let b=$('connBanner');
   if(!b){ b=document.createElement('div'); b.id='connBanner'; b.className='conn-banner';
     const sec=$('sec-profile'); if(sec) sec.insertBefore(b, sec.firstChild); }
   return b; }
-async function retryConnect(){ const b=$('connBanner');
-  if(b) b.innerHTML='<span>⏳ Подключение…</span>';
-  const me=await apiR('/api/me');
-  if(me&&me.tg_id){ S.tgId=me.tg_id; S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
-    S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
-    S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
-    S.serverMode=true; S.migrated=true; save(); renderHeader(); renderSection('profile');
-    toast('🟢 Подключено к серверу','good'); }
-  else { if(b) b.innerHTML='<span>⚠️ Нет соединения с сервером</span><button class="btn btn-secondary" onclick="retryConnect()">Повторить</button>'; } }
-function renderRank(){ const rc=$('rankCard'); if(!rc)return;
-  if(!S.serverMode){ rc.innerHTML='<div class="ic-box gold"><svg class="ic"><use href="#i-trophy"/></svg></div><div><b>Твоё место: #1</b><span>Лидерборд живых — в Telegram</span></div>'; return; }
-  apiR('/api/rank').then(r=>{ if(r.error)return;
-    rc.innerHTML='<div class="ic-box gold"><svg class="ic"><use href="#i-trophy"/></svg></div>'+
-      '<div><b>Твоё место: #'+r.rank+' из '+r.total+'</b><span>Выиграно: ⭐'+fmt(r.won)+'</span></div>'; }); }
-function renderTop(){ const tl=$('topList'); if(!tl)return;
-  if(!S.serverMode){ tl.innerHTML='<div class="top-row me"><div class="pos">🥇</div><b>😎 '+(S.tgName||'ТЫ')+'</b><div class="won">⭐'+fmt(S.stats.won)+'</div></div>'; return; }
-  apiR('/api/top?limit=50').then(r=>{ const rows=r.rows||[];
-    if(!rows.length){tl.innerHTML='<div class="muted">Пока пусто — стань первым!</div>';return;}
-    tl.innerHTML=rows.map((x,i)=>'<div class="top-row '+(x.me?'me':'')+'"><div class="pos">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1)+'</div><b>'+(x.me?'😎 ':'🧑 ')+x.name+'</b><div class="won">⭐'+fmt(x.won)+'</div></div>').join(''); }); }
-function renderProfile(){ S.stats=Object.assign(DEF().stats, S.stats||{});
-  const st=S.stats,li=levelInfo();
+function renderProfile(){
+  const st=Object.assign(DEF().stats, S.stats||{}); S.stats=st;
+  const li=levelInfo();
   const b=ensureBanner();
   if(b){ if(S.serverMode) b.style.display='none';
-    else { b.style.display='flex'; b.innerHTML='<span>⚠️ Нет соединения с сервером — кабинет в локальном режиме</span><button class="btn btn-secondary" onclick="retryConnect()">Повторить</button>'; } }
+    else { b.style.display='flex'; b.innerHTML='<span>⚠️ Нет соединения — кабинет в локальном режиме</span><button class="btn btn-secondary" onclick="retryConnect()">Повторить</button>'; } }
   setT('pName',S.tgName||'Игрок');
+  const el=$('pName');
+  if(el&&el.parentNode){ let bd=document.getElementById('ptitleBadge');
+    if(!bd){ bd=document.createElement('span'); bd.id='ptitleBadge'; el.parentNode.insertBefore(bd, el.nextSibling); }
+    const ti=playerTitle(); bd.className='ptitle '+ti.c; bd.textContent=ti.t; }
   setT('pAva',(S.tgName||'😎').charAt(0).toUpperCase());
   setT('myId',S.tgId||'—');
   setT('pReg',S.createdAt?new Date(S.createdAt).toLocaleDateString('ru-RU'):'—');
@@ -841,20 +477,39 @@ function renderProfile(){ S.stats=Object.assign(DEF().stats, S.stats||{});
   setT('subState',S.subDone?'Активна ✅':'Награда ⭐'+SUB_REWARD);
   setH('statsGrid',[['Уровень',li.lvl+' ур.'],['Кейсов',st.opened],['Потрачено','⭐'+fmt(st.spent)],['Выиграно','⭐'+fmt(st.won)],
     ['Лучший дроп','⭐'+fmt(st.best)],['Апгрейдов',st.upWins+'/'+st.upgrades],['Баттлов',st.bWins+'/'+st.battles],
-    ['Crash побед',st.crashWins||0],['Mines',((st.minesW||0)+'/'+(st.mines||0))],
+    ['Crash побед',st.crashWins||0],['Mines',(st.minesW||0)+'/'+(st.mines||0)],['Plinko',(st.plinkoW||0)+'/'+(st.plinko||0)],
     ['Режим',S.serverMode?'🟢 онлайн':'⚪ локально'],['Сборка','build '+BUILD]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join(''));
   const st1=$('soundToggle'); if(st1)st1.checked=S.sound;
   const st2=$('fairToggle'); if(st2)st2.checked=S.fair;
   setH('fairInfo',S.fair?'Seed: '+S.seed+'<br>Hash: '+hash(S.seed):'');
   const ab=$('adminBlock');
   if(ab){ if(S.isAdmin){ ab.style.display='block'; renderAdmin(); } else ab.style.display='none'; } }
+async function retryConnect(){ const b=$('connBanner');
+  if(b) b.innerHTML='<span>⏳ Подключение…</span>';
+  const me=await apiR('/api/me');
+  if(me&&me.tg_id){ S.tgId=me.tg_id; S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
+    S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
+    S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.serverMode=true; S.migrated=true;
+    saveLocal(); renderHeader(); renderSection('profile'); toast('🟢 Подключено','good'); }
+  else if(b) b.innerHTML='<span>⚠️ Нет соединения</span><button class="btn btn-secondary" onclick="retryConnect()">Повторить</button>'; }
+function renderRank(){ const rc=$('rankCard'); if(!rc)return;
+  if(!S.serverMode){ rc.innerHTML='<div class="ic-box gold"><svg class="ic"><use href="#i-trophy"/></svg></div><div><b>Твоё место: #1</b><span>Лидерборд живых — в Telegram</span></div>'; return; }
+  apiR('/api/rank').then(r=>{ if(r.error)return;
+    rc.innerHTML='<div class="ic-box gold"><svg class="ic"><use href="#i-trophy"/></svg></div>'+
+      '<div><b>Твоё место: #'+r.rank+' из '+r.total+'</b><span>Выиграно: ⭐'+fmt(r.won)+'</span></div>'; }); }
+function renderTop(){ const tl=$('topList'); if(!tl)return;
+  if(!S.serverMode){ tl.innerHTML='<div class="top-row me"><div class="pos">🥇</div><b>😎 '+(S.tgName||'ТЫ')+'</b><div class="won">⭐'+fmt(S.stats.won)+'</div></div>'; return; }
+  apiR('/api/top?limit=50').then(r=>{ const rows=(r&&r.rows)||[];
+    if(!rows.length){tl.innerHTML='<div class="muted">Пока пусто — стань первым!</div>';return;}
+    tl.innerHTML=rows.map((x,i)=>'<div class="top-row '+(x.me?'me':'')+'"><div class="pos">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1)+'</div><b>'+(x.tl||'')+' '+(x.me?'😎 ':'🧑 ')+x.name+'</b><div class="won">⭐'+fmt(x.won)+'</div></div>').join(''); }); }
 function renderAdmin(){ api('/api/admin/stats').then(r=>{ if(r.error)return;
   setH('adminStats',[
-    ['Игроков',r.total],['Новых 24ч',r.new24],['Новых 7д',r.new7],['Актив 24ч',r.active24],
-    ['Балансы','⭐'+fmt(r.sumBalance)],['Средний','⭐'+fmt(r.avgBalance)],['Потрачено','⭐'+fmt(r.sumSpent)],['Выиграно','⭐'+fmt(r.sumWon)],
-    ['Кейсов',r.sumOpened],['Апгрейдов',r.sumUpW+'/'+r.sumUpA],['Crash побед',r.sumCrashW],['Баттлов',r.battles],
-    ['Покупок',r.sumBuys],['Продаж',r.sumSells],['Рефералов',r.sumRefs],['Платежи',r.payments+' / ⭐'+fmt(r.payStars)]
-  ].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('')); });
+    ['Игроков',r.total],['Новых 24ч',r.new24],['Актив 24ч',r.active24],['Ботов',r.bots],
+    ['Балансы','⭐'+fmt(r.sumBalance)],['Потрачено','⭐'+fmt(r.sumSpent)],['Выиграно','⭐'+fmt(r.sumWon)],['Кейсов',r.sumOpened],
+    ['Платежи',r.payments+' / ⭐'+fmt(r.payStars)],['Баттлов',r.battles],['Покупок',r.sumBuys],['Продаж',r.sumSells]
+  ].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join(''));
+  const co=r.caseOpens||{}; const cs=$('adminCaseOpens');
+  if(cs) cs.innerHTML=Object.keys(co).length?Object.entries(co).map(e=>e[0]+': <b>'+e[1]+'</b>').join(' · '):'нет данных'; });
   api('/api/admin/users').then(r=>{ if(r.error)return;
   setH('adminUsers',(r.rows||[]).map(x=>'<div class="top-row"><div class="pos">#'+x.tg_id+'</div><b>'+x.name+'</b><div class="won">⭐'+fmt(x.balance)+'</div></div>').join('')); });
   api('/api/admin/promo/list').then(r=>{ if(r.error)return;
@@ -883,38 +538,30 @@ async function applyPromo(){ const pi=$('promoInput'); const c=pi?pi.value.trim(
   else toast('❌ '+(r.error||'Неверный код'),'bad'); }
 function copyRef(){ const code=S.tgId||S.seed.slice(0,8);
   navigator.clipboard.writeText('https://t.me/CashBanni_bot?start=ref_'+code);
-  toast('🤝 Ссылка скопирована! Друг зайдёт — получишь ⭐'+REF_REWARD,'good'); }
-function toggleSound(){ S.sound=$('soundToggle').checked; save(); }
-function toggleFair(){ S.fair=$('fairToggle').checked; save(); renderProfile(); }
-function addStars(){ if(S.serverMode&&TG){ openPay(); } else { S.balance+=100; sfx.click(); toast('⭐ +100 (демо)'); save(); renderHeader(); } }
+  toast('🤝 Ссылка скопирована! Друг зайдёт и внесёт депозит — получишь ⭐'+REF_REWARD,'good'); }
+function toggleSound(){ S.sound=$('soundToggle').checked; saveLocal(); }
+function toggleFair(){ S.fair=$('fairToggle').checked; saveLocal(); renderProfile(); }
+function addStars(){ if(S.serverMode&&TG){ openPay(); } else { S.balance+=100; sfx.click(); toast('⭐ +100 (демо)'); saveLocal(); renderHeader(); } }
 
-(function(){ const cols=['#a855f7','#ec4899','#3b82f6','#f59e0b'];
+(function(){ const cols=['#a855f7','#ec4899','#3b82f6','#f59e0b']; const bb=$('bubbles');
+  if(!bb)return;
   for(let i=0;i<6;i++){ const d=document.createElement('div'); d.className='bubble';
     const s=rnd(200,420); d.style.width=d.style.height=s+'px';
     d.style.left=rnd(0,100)+'%'; d.style.top=rnd(0,100)+'%';
     d.style.background=pick(cols); d.style.animationDelay=rnd(0,8)+'s';
-    $('bubbles').appendChild(d); } })();
+    bb.appendChild(d); } })();
 
 (async function startup(){
   try{
-    if(S.inv.length!==validInv().length){ S.inv=validInv(); localStorage.setItem('cashbanni_v2',JSON.stringify(S)); }
+    if(S.inv.length!==validInv().length){ S.inv=validInv(); saveLocal(); }
     const me=await apiR('/api/me');
     if(me&&me.tg_id){
       S.tgId=me.tg_id; S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
-      const serverEmpty=(!me.stats||!me.stats.opened)&&me.balance===0&&!me.inv.length;
-      const localHas=S.stats.opened>0||S.inv.length>0||S.balance!==0;
-      if(serverEmpty&&localHas&&!S.migrated){
-        await api('/api/save',{method:'POST',body:JSON.stringify({balance:S.balance,inv:S.inv,stats:S.stats,xp:S.xp})});
-        S.migrated=true; toast('📦 Локальный прогресс перенесён на сервер!','good');
-      } else {
-        S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
-        S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0; S.migrated=true;
-      }
-      S.serverMode=true;
-      localStorage.setItem('cashbanni_v2',JSON.stringify(S));
+      S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
+      S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
+      S.serverMode=true; saveLocal();
     }
-    renderHeader(); renderCases(); crashHist(); crashResize(); syncBetUI(); startCrashLoop();
-    save();
+    renderHeader(); renderCases();
     try{ renderSection(activeTab()); }catch(e){}
     setTimeout(()=>toast(S.serverMode?'Cash Banni · build '+BUILD+' · 🟢':'Cash Banni · build '+BUILD+' · ⚪'),400);
   }catch(e){ console.error('startup',e); }

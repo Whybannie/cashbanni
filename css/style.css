@@ -481,3 +481,6 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 .case-card:has(.is-streamer){border:1px solid rgba(244,114,182,.35);box-shadow:0 0 16px rgba(244,114,182,.2)}
 .cf-hero-streamer{margin-top:4px;font-size:.72rem;color:#f472b6;font-weight:700}
 .streamer-mini{font-size:.6rem;color:#f472b6;font-weight:800;text-transform:uppercase;letter-spacing:.03em;margin-top:-2px}
+
+/* ===== v36 ===== */
+.crash-history{display:none!important}
