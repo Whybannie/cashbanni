@@ -168,3 +168,7 @@ function crashDraw(){ var c=$('crashCanvas'); if(!c||!c.width)return;
     x.fillStyle='rgba(239,68,68,'+Math.max(s.l,0)+')';
     x.beginPath();x.arc(s.x,s.y,2.5*dpr,0,7);x.fill(); });
 }
+
+addEventListener('resize', function(){ try{crashResize();}catch(e){} });
+(function(){ var a0=window.activateTab; if(a0){ window.activateTab=function(t){ var r=a0(t); if(t==='crash'){ setTimeout(crashResize,60); setTimeout(crashResize,300); } return r; }; } })();
+setTimeout(function(){ try{crashResize();}catch(e){} },200);

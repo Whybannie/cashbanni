@@ -90,7 +90,7 @@ async function refreshMe(){ const me=await apiR('/api/me');
   if(me&&me.tg_id){ S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
     S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
     S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
-    S.serverMode=true; saveLocal(); renderHeader();
+    S.serverMode=true; if(!S.tgName&&me.first_name)S.tgName=me.first_name; saveLocal(); renderHeader();
     try{ renderSection(activeTab()); }catch(e){} } }
 async function apiPay(stars){
   const r=await api("/api/pay",{method:"POST",body:JSON.stringify({stars})});
@@ -550,7 +550,7 @@ function addStars(){ if(S.serverMode&&TG){ openPay(); } else { S.balance+=100; s
       S.tgId=me.tg_id; S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
       S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
       S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
-      S.serverMode=true; saveLocal();
+      S.serverMode=true; if(!S.tgName&&me.first_name)S.tgName=me.first_name; saveLocal();
     }
     renderHeader(); renderCases();
     try{ renderSection(activeTab()); }catch(e){}
