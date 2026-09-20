@@ -330,16 +330,5 @@ window.addEventListener("error",function(e){try{var d=document.getElementById("e
 <script src="js/caseimg38.js"></script>
 <script src="js/plinko38.js"></script>
 <script src="js/crash38.js"></script>
-<script>
-setTimeout(function(){try{
-  var msg = "BUILD="+(document.querySelector('meta[name=build]').content||'?');
-  msg += " | SM="+(window.S && S.serverMode ? "ON" : "OFF");
-  msg += " | NAME="+(window.S && S.tgName || "—");
-  msg += " | STATS="+document.querySelectorAll('#statsGrid .stat-card').length;
-  msg += " | BAL="+(window.S && S.balance || 0);
-  if(window.toast) toast(msg,"");
-  else { var d=document.createElement("div"); d.style.cssText="position:fixed;left:10px;right:10px;top:80px;background:#444;color:#fff;font:11px/1.4 monospace;padding:8px;border-radius:10px;z-index:9999;word-break:break-all"; d.textContent=msg; document.body.appendChild(d); }
-}catch(e){}},1500);
-</script>
 </body>
 </html>

@@ -40,12 +40,6 @@ function setAuto(v){ crash.auto=v; var i=$('autoCash'); if(i) i.value=v||''; sfx
 (function(){
   var box=$('crashBox');
   if(box && !$('crashHistRow')) box.insertAdjacentHTML('afterbegin','<div class="crash-hist-row" id="crashHistRow"></div>');
-  var panel=document.querySelector('#sec-crash .crash-panel');
-  if(panel && !$('autoCashRow')) panel.insertAdjacentHTML('afterbegin',
-    '<div class="cp-row auto-row" id="autoCashRow"><span class="auto-label">Авто-кэшаут</span>'+
-    '<input id="autoCash" type="number" min="0" step="0.1" placeholder="выкл">'+
-    '<button class="cp-chip" onclick="setAuto(0)">ВЫКЛ</button></div>');
-  var inp=$('autoCash'); if(inp) inp.onchange=function(){ crash.auto=parseFloat(inp.value)||0; };
   crash.hist=crashHistory(); crashHist();
   startCrashLoop();
 })();
@@ -187,10 +181,9 @@ setTimeout(function(){ try{crashResize();}catch(e){} },200);
         if(!S.tgName&&me.first_name)S.tgName=me.first_name;
         S.serverMode=true; saveLocal(); renderHeader();
         try{renderSection(activeTab());}catch(e){}
-        toast('🟢 Сервер подключён','good');
+        
       } else { setTimeout(heal,5000); }
     });
   }
   setTimeout(heal,4000);
-  setTimeout(function(){ try{ toast("DBG2 SM="+(S.serverMode?"ON":"OFF")+" NAME="+(S.tgName||"—")+" STATS="+document.querySelectorAll('#statsGrid .stat-card').length,""); }catch(e){} },8000);
 })();

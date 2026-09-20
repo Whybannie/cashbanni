@@ -472,7 +472,7 @@ function renderProfile(){
     ['Режим',S.serverMode?'🟢 онлайн':'⚪ локально'],['Сборка','build '+BUILD]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join(''));
   const st1=$('soundToggle'); if(st1)st1.checked=S.sound;
   const st2=$('fairToggle'); if(st2)st2.checked=S.fair;
-  setH('fairInfo',S.fair?'Seed: '+S.seed+'<br>Hash: '+hash(S.seed):'');
+  setH('fairInfo',(S.isAdmin&&S.fair)?'Seed: '+S.seed+'<br>Hash: '+hash(S.seed):'');
   const ab=$('adminBlock');
   if(ab){ if(S.isAdmin){ ab.style.display='block'; renderAdmin(); } else ab.style.display='none'; } }
 async function retryConnect(){ const b=$('connBanner');
@@ -552,8 +552,8 @@ function addStars(){ if(S.serverMode&&TG){ openPay(); } else { S.balance+=100; s
       S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
       S.serverMode=true; if(!S.tgName&&me.first_name)S.tgName=me.first_name; saveLocal();
     }
-    renderHeader(); renderCases();
+    renderHeader();
     try{ renderSection(activeTab()); }catch(e){}
-    setTimeout(()=>toast(S.serverMode?'Cash Banni · build '+BUILD+' · 🟢':'Cash Banni · build '+BUILD+' · ⚪'),400);
+    setTimeout(()=>{ if(S.isAdmin) toast('Cash Banni · build '+BUILD+' · '+(S.serverMode?'🟢':'')); },400);
   }catch(e){ console.error('startup',e); }
 })();

@@ -490,3 +490,6 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 .crash-hist-row{position:absolute;top:8px;left:10px;right:10px;display:flex;gap:5px;overflow-x:auto;z-index:4;scrollbar-width:none}
 .crash-hist-row::-webkit-scrollbar{display:none}
 .crash-hist-row .ch-h{border-radius:8px;padding:3px 8px;font-size:.65rem;font-weight:900;background:rgba(0,0,0,.45);backdrop-filter:blur(8px)}
+
+/* v39: placeholder case img */
+.case-img{background:rgba(255,255,255,.04)}
