@@ -127,12 +127,6 @@ function playerTitle(){ const st=S.stats||{};
   if((st.won||0)>=1000) return {t:'⭐ Про',c:'rare'};
   if((st.opened||0)>=25) return {t:'🎮 Игрок',c:'rare'};
   return {t:'🌱 Новичок',c:'common'}; }
-const _rp0 = window.renderProfile;
-function renderProfile(){ _rp0();
-  const el=$('pName'); if(!el||!el.parentNode) return;
-  let b=document.getElementById('ptitleBadge');
-  if(!b){ b=document.createElement('span'); b.id='ptitleBadge'; el.parentNode.insertBefore(b, el.nextSibling); }
-  const ti=playerTitle(); b.className='ptitle '+ti.c; b.textContent=ti.t; }
 
 // ---- Баттлы: подписи + кэш ----
 let _bCache='';
