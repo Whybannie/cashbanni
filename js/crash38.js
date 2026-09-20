@@ -172,3 +172,25 @@ function crashDraw(){ var c=$('crashCanvas'); if(!c||!c.width)return;
 addEventListener('resize', function(){ try{crashResize();}catch(e){} });
 (function(){ var a0=window.activateTab; if(a0){ window.activateTab=function(t){ var r=a0(t); if(t==='crash'){ setTimeout(crashResize,60); setTimeout(crashResize,300); } return r; }; } })();
 setTimeout(function(){ try{crashResize();}catch(e){} },200);
+
+// ===== v38.4: heal-подключение к серверу + перерисовка =====
+(function(){
+  var tries=0;
+  function heal(){
+    if(S.serverMode){ try{renderSection(activeTab());}catch(e){} return; }
+    if(tries++>20) return;
+    apiR('/api/me').then(function(me){
+      if(me&&me.tg_id){
+        S.tgId=me.tg_id; S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
+        S.stats=Object.assign(DEF().stats,me.stats||{}); S.xp=Number(me.xp)||0;
+        S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
+        if(!S.tgName&&me.first_name)S.tgName=me.first_name;
+        S.serverMode=true; saveLocal(); renderHeader();
+        try{renderSection(activeTab());}catch(e){}
+        toast('🟢 Сервер подключён','good');
+      } else { setTimeout(heal,5000); }
+    });
+  }
+  setTimeout(heal,4000);
+  setTimeout(function(){ try{ toast("DBG2 SM="+(S.serverMode?"ON":"OFF")+" NAME="+(S.tgName||"—")+" STATS="+document.querySelectorAll('#statsGrid .stat-card').length,""); }catch(e){} },8000);
+})();
