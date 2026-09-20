@@ -220,7 +220,7 @@ function closeCaseModal(){ if(spinning) return;
   modalClose('caseModal'); }
 function animateStrip(strip,dur){ return new Promise(res=>{
   const cw=strip.parentElement.offsetWidth;
-  const off=42*STRIP_W-cw/2+STRIP_W/2+rnd(-30,30);
+  const tw=(strip.children[0]&&strip.children[0].offsetWidth)||STRIP_W; const off=42*tw-cw/2+tw/2+rnd(-30,30);
   strip.classList.remove('spinning'); strip.style.transition='none'; strip.style.transform='translateX(0)';
   void strip.offsetWidth;
   let tk=0; const ti=setInterval(()=>{sfx.tick(); if(++tk>Math.floor(dur/140))clearInterval(ti);},140);

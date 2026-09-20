@@ -518,3 +518,12 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 /* ===== v45: рулетка всегда 132px, квадраты стабильны ===== */
 .cf-strips .roulette-container{height:132px;flex-shrink:0}
 .roulette-container.sm .roulette-item .gimg{width:100%;height:100%;object-fit:cover}
+
+/* ===== v46: содержимое всегда видно + адаптивные квадраты ===== */
+.modal.case-full .cf-contents{display:block!important}
+.cf-contents .contents{max-height:38vh}
+#cfStrips{--tile:132px}
+#cfStrips[data-n="3"]{--tile:104px}
+#cfStrips[data-n="5"]{--tile:84px}
+.cf-strips .roulette-container{height:var(--tile,132px)}
+.roulette-item{width:var(--tile,132px);min-width:var(--tile,132px)}
