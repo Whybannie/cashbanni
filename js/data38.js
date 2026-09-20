@@ -85,3 +85,10 @@ const CHANNEL = 'https://t.me/CashBanni';
 const REF_REWARD = 5;
 const FREE_CASE_COOLDOWN = 24 * 3600 * 1000;
 const ECO = { SELL_BACK:1, DISCOUNT:0.8, START_BALANCE:0, UPGRADE_EDGE:0.85 };
+
+const GIFT_IMG = {
+  dust:'gift_dust.png', coin:'gift_coin.png', spark:'gift_spark.png',
+  bear:'gift_bear.png', heart:'gift_heart.png', rose:'gift_rose.png', box:'gift_box.png',
+  cake:'gift_cake.png', bouquet:'gift_bouquet.png', rocket:'gift_rocket.png', beer:'gift_beer.png',
+  ring:'gift_ring.png', trophy:'gift_trophy.png', diamond:'gift_diamond.png'
+};

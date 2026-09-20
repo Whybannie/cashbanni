@@ -221,3 +221,10 @@ async function refreshMe(){ await flushSave(); const me=await apiR('/api/me');
     S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.createdAt=me.created_at||S.createdAt;
     S.serverMode=true; save(); renderHeader();
     try{ renderSection(activeTab()); }catch(e){} } }
+
+// ===== v42: дизайнерские дропы с картинками (как фотки кейсов) =====
+function gImg(g,cls){ cls=cls||'gimg';
+  var src=(window.GIFT_IMG||{})[g.id];
+  if(!src) return '<span class="emoji">'+g.emoji+'</span>';
+  return '<img class="'+cls+'" src="'+src+'" alt="" decoding="async" onerror="this.style.display=\'none\';if(this.nextElementSibling)this.nextElementSibling.style.display=\'block\'">'+
+         '<span class="emoji" style="display:none">'+g.emoji+'</span>'; }
