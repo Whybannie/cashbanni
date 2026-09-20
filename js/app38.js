@@ -144,7 +144,7 @@ function activateTab(t){ sfx.click();
   document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   const sec=$('sec-'+t); if(sec) sec.classList.add('active');
-  try{ renderSection(t); }catch(e){ console.error('render',t,e); }
+  try{ renderSection(t); }catch(e){ console.error('render',t,e); try{ toast('ERR '+t+': '+e.message+' | '+String(e.stack).split(String.fromCharCode(10))[1],'bad'); }catch(_){} }
   scrollTo({top:0,behavior:'smooth'}); }
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>activateTab(b.dataset.tab));
 function renderSection(t){
