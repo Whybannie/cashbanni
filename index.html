@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
-<meta name="build" content="28">
+<meta name="build" content="36">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=28">
+<link rel="stylesheet" href="css/style.css?v=36">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -44,7 +44,6 @@
 
 <main class="container">
 
-  <!-- ГЛАВНАЯ -->
   <section class="section active" id="sec-home">
     <div class="hero-card" onclick="activateTab('crash')">
       <div class="ic-box gold"><svg class="ic"><use href="#i-rocket"/></svg></div>
@@ -55,7 +54,6 @@
     <div class="cases-grid" id="casesGrid"></div>
   </section>
 
-  <!-- КРАШ -->
   <section class="section" id="sec-crash">
     <div class="crash-head">
       <button class="back-btn" onclick="activateTab('home')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
@@ -83,10 +81,8 @@
       </div>
       <button class="btn crash-main-btn bet" id="crashBtn" onclick="crashAction()">ПОСТАВИТЬ ⭐20</button>
     </div>
-    <div class="crash-history" id="crashHistory"></div>
   </section>
 
-  <!-- МИНЫ -->
   <section class="section" id="sec-mines">
     <div class="crash-head">
       <button class="back-btn" onclick="activateTab('modes')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
@@ -117,7 +113,6 @@
     <div class="mines-grid" id="minesGrid"></div>
   </section>
 
-  <!-- PLINKO -->
   <section class="section" id="sec-plinko">
     <div class="crash-head">
       <button class="back-btn" onclick="activateTab('modes')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
@@ -143,7 +138,6 @@
     <div class="crash-history" id="plinkoHist"></div>
   </section>
 
-  <!-- ЗАДАНИЯ -->
   <section class="section" id="sec-tasks">
     <h2>Задания</h2>
     <div class="task-card" onclick="openCaseModal('free')">
@@ -168,7 +162,6 @@
     <div id="achList"></div>
   </section>
 
-  <!-- АПГРЕЙД -->
   <section class="section" id="sec-upgrade">
     <h2>Апгрейд</h2>
     <div class="up-layout">
@@ -185,7 +178,6 @@
     </div>
   </section>
 
-  <!-- РЕЖИМЫ -->
   <section class="section" id="sec-modes">
     <h2>Режимы</h2>
     <div class="task-card" onclick="activateTab('crash')">
@@ -215,7 +207,6 @@
     </div>
   </section>
 
-  <!-- БАТТЛЫ -->
   <section class="section" id="sec-battles">
     <div class="crash-head">
       <button class="back-btn" onclick="activateTab('modes')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
@@ -225,7 +216,6 @@
     <div id="battlesList"></div>
   </section>
 
-  <!-- МАРКЕТ -->
   <section class="section" id="sec-market">
     <div class="crash-head">
       <button class="back-btn" onclick="activateTab('modes')"><svg class="ic s"><use href="#i-back"/></svg> Назад</button>
@@ -235,7 +225,6 @@
     <div class="market-grid" id="marketGrid"></div>
   </section>
 
-  <!-- ЛИЧНЫЙ КАБИНЕТ -->
   <section class="section" id="sec-profile">
     <div class="pcard">
       <div class="pava" id="pAva">😎</div>
@@ -271,7 +260,8 @@
     <div class="muted small" id="fairInfo"></div>
     <div id="adminBlock" style="display:none">
       <h2 class="mt">🛡 Админ-панель</h2>
-      <div class="stats-grid" id="adminStats"></div><div class="muted small" id="adminCaseOpens" style="margin:6px 0"></div>
+      <div class="stats-grid" id="adminStats"></div>
+      <div class="muted small" id="adminCaseOpens" style="margin:6px 0"></div>
       <h3 class="mt">Начислить Stars по ID</h3>
       <div class="row"><input id="admId" placeholder="ID"><input id="admSum" placeholder="Сумма"><button class="btn btn-primary" onclick="admGrant()">OK</button></div>
       <h3 class="mt">Рассылка всем игрокам</h3>
@@ -285,7 +275,6 @@
   </section>
 </main>
 
-<!-- НИЖНЯЯ НАВИГАЦИЯ -->
 <nav class="bottom-nav">
   <button data-tab="home" class="active"><svg class="ic"><use href="#i-home"/></svg><span class="nl">Главная</span></button>
   <button data-tab="tasks"><svg class="ic"><use href="#i-tasks"/></svg><span class="nl">Задания</span></button>
@@ -294,7 +283,6 @@
   <button data-tab="profile"><svg class="ic"><use href="#i-user"/></svg><span class="nl">Кабинет</span></button>
 </nav>
 
-<!-- КЕЙС -->
 <div class="modal-overlay" id="caseModal">
   <div class="modal case-full">
     <div class="cf-head"><h3 id="cmTitle"></h3><button class="x" onclick="closeCaseModal()"><svg class="ic s"><use href="#i-x"/></svg></button></div>
@@ -308,7 +296,6 @@
   </div>
 </div>
 
-<!-- ПОПОЛНЕНИЕ -->
 <div class="modal-overlay" id="payModal">
   <div class="modal">
     <div class="sheet-grab"></div>
@@ -319,7 +306,6 @@
   </div>
 </div>
 
-<!-- БАТТЛ -->
 <div class="modal-overlay" id="battleModal">
   <div class="modal">
     <div class="sheet-grab"></div>
@@ -336,9 +322,10 @@
 </div>
 
 <div class="toasts" id="toasts"></div>
-<script src="js/data.js?v=28"></script>
-<script src="js/app.js?v=28"></script>
-<script src="js/caseimg.js?v=32"></script><script src="js/crash.js?v=32"></script>
-<script src="js/plinko.js?v=28"></script>
+<script src="js/data.js?v=36"></script>
+<script src="js/app.js?v=36"></script>
+<script src="js/caseimg.js?v=36"></script>
+<script src="js/plinko.js?v=36"></script>
+<script src="js/crash.js?v=36"></script>
 </body>
 </html>

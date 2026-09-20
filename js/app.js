@@ -1,4 +1,4 @@
-const BUILD = 36;
+const BUILD = 37;
 const $ = id => document.getElementById(id);
 const setT = (id,v) => { const e=$(id); if(e) e.textContent=v; };
 const setH = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
@@ -178,7 +178,6 @@ function spinWheel(el,segs,winIndex,cb){ if(!el)return cb&&cb(); let start=0;
 async function checkSub(){ const r=await api('/api/check_sub'); return !!(r&&r.sub); }
 function openChannel(){ try{ TG&&TG.openTelegramLink?TG.openTelegramLink(CHANNEL):window.open(CHANNEL); }catch(e){ window.open(CHANNEL); } }
 
-// ---------- КЕЙСЫ (рендер; спин переопределяет caseimg) ----------
 function caseArt(c){ const col=CASE_COLORS[c.rarity]||CASE_COLORS.common;
   return '<div class="case-art" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+
     '<div class="bow"></div><div class="lid"></div><div class="body"></div><div class="rv"></div><div class="rh"></div><div class="em">'+c.em+'</div></div>'; }
@@ -237,7 +236,6 @@ function keepWon(u){ sfx.click(); refreshInv(); }
 async function spin(n){ if(spinning) return; spinning=true;
   toast('⏳ Обновление…',''); spinning=false; }
 
-// ---------- MINES ----------
 const MINES_RTP = 0.94;
 const mines={active:false,bet:20,m:3,field:[],rev:[],picks:0,mult:1};
 function minesFair(picks,m){ let f=1; for(let i=0;i<picks;i++) f*=(25-i)/(25-m-i); return f*MINES_RTP; }
@@ -291,7 +289,6 @@ function minesCash(){ if(!mines.active||mines.picks<minesMinPicks())return;
   toast('✅ Забрал +⭐'+win+' (x'+mines.mult.toFixed(2)+')','good');
   save(); renderHeader(); syncMines(); checkAch(); }
 
-// ---------- ИНВЕНТАРЬ ----------
 function itemCard(g){ return '<div class="inv-item">'+
   '<div class="rt" style="background:'+RAR[g.rarity].color+'"></div>'+
   gImg(g)+'<div class="name">'+g.name+'</div><div class="price">⭐ '+fmt(g.price)+'</div>'+
@@ -327,7 +324,6 @@ function sellAll(){ const items=validInv(); if(!items.length)return;
   save(); renderHeader(); renderInventory(); renderUpgrade(); }
 function toUpgrade(u){ upFrom=S.inv.find(i=>i.uid===u)||null; upTo=null; activateTab('upgrade'); }
 
-// ---------- АПГРЕЙД ----------
 function upChanceVal(){ if(!(upFrom&&upTo))return 0;
   return Math.min(90, Math.max(2, Math.round(gift(upFrom.gid).price/upTo.price*100))); }
 function selFrom(u){ upFrom=S.inv.find(i=>i.uid===u)||null; upTo=null; sfx.click(); renderUpgrade(); }
@@ -363,7 +359,6 @@ function doUpgrade(){ if(!upFrom||!upTo||upBusy)return;
     upFrom=null;upTo=null;upBusy=false;
     save(); renderHeader(); renderUpgrade(); renderInventory(); checkAch(); }); }
 
-// ---------- ЗАДАНИЯ / КВЕСТЫ XP / ДОСТИЖЕНИЯ ----------
 function renderTasks(){ const fr=freeReady();
   setT('freeCaseState',fr?'Доступен сейчас · 1 спин · подписка':'Следующий через '+Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5)+' ч.');
   const sb=$('subBtn');
@@ -391,7 +386,6 @@ function claimQuest(id){ const q=QUESTS.find(x=>x.id===id);
 function qEvent(t,n){ S.qp[t]=(S.qp[t]||0)+(n||1); saveLocal(); renderHeader(); }
 function checkAch(){ ACHS.forEach(a=>{ if(!S.ac.includes(a.id)&&a.cond(S)){S.ac.push(a.id);toast('🏅 Достижение: '+a.name+'!','good');confetti(60);} }); saveLocal(); }
 
-// ---------- МАРКЕТ ----------
 function dailyDiscount(){ return GIFTS[3+new Date().getDate()%(GIFTS.length-3)].id; }
 function renderMarket(){ const disc=dailyDiscount();
   const note=$('marketNote');
@@ -408,7 +402,6 @@ function buyGift(id,p){ if(S.balance<p)return toast('Недостаточно St
   qEvent('buy'); sfx.win(); toast('Куплено: '+gift(id).name+' за ⭐'+p,'good');
   save(); renderHeader(); renderMarket(); refreshInv(); checkAch(); }
 
-// ---------- ПОПОЛНЕНИЕ ----------
 function openPay(){ sfx.click();
   setH('payGrid',PAY_PRESETS.map(v=>'<div class="pay-chip" onclick="doPay('+v+')">⭐'+v+'</div>').join(''));
   modalOpen('payModal'); }
@@ -417,7 +410,6 @@ function doPayCustom(){ const v=parseInt($('payCustom').value);
   if(!v||v<1||v>10000) return toast('Сумма от 1 до 10000','bad');
   apiPay(v); }
 
-// ---------- БАТТЛЫ (база; рендер переопределяет caseimg) ----------
 let battleWatch=null;
 function stopBattleWatch(){ if(battleWatch){clearInterval(battleWatch); battleWatch=null;} }
 function renderBattles(){ if(!S.serverMode){setH('battlesList','<div class="muted">Баттлы доступны в Telegram-версии.</div>');return;}
@@ -441,7 +433,6 @@ function joinBattle(id){ api('/api/battles/join',{method:'POST',body:JSON.string
     setTimeout(refreshMe,800); renderBattles(); }); }
 function showMyResult(id){ toast('🎬 Результат сохранён в истории',''); }
 
-// ---------- КАБИНЕТ (полный) ----------
 function playerTitle(){ const st=S.stats||{};
   if((st.won||0)>=5000) return {t:'🐋 Кит',c:'gold'};
   if((st.opened||0)>=200) return {t:'👑 Легенда кейсов',c:'gold'};
