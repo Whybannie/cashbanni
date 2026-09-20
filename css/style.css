@@ -493,3 +493,18 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 
 /* v39: placeholder case img */
 .case-img{background:rgba(255,255,255,.04)}
+
+/* ===== v43: full-bleed арты в рулетке и карточках ===== */
+.roulette-container{background:transparent}
+.roulette-item{width:112px;min-width:112px;padding:0;position:relative;border-right:1px solid rgba(255,255,255,.06)}
+.roulette-item .gimg{width:100%;height:100%;object-fit:cover;display:block;border-radius:0;filter:none}
+.roulette-item .emoji{font-size:2.6rem}
+.roulette-item .name{position:absolute;left:0;right:0;bottom:0;margin:0;padding:12px 4px 5px;font-size:.56rem;font-weight:900;color:#fff;text-align:center;background:linear-gradient(180deg,transparent,rgba(0,0,0,.78));text-shadow:0 1px 4px #000}
+.c-item{padding:6px 6px 8px}
+.c-item .gimg{width:100%;height:64px;object-fit:cover;border-radius:12px;filter:none}
+.c-item .emoji{font-size:1.8rem}
+.inv-item{padding:8px 6px 10px}
+.inv-item .gimg{width:100%;height:72px;object-fit:cover;border-radius:14px;filter:none}
+.inv-item .emoji{font-size:2rem}
+.chip .gimg{width:100%;height:56px;object-fit:cover;border-radius:12px;filter:none}
+.strip-win .gimg{width:64px;height:64px;object-fit:cover;border-radius:14px}
