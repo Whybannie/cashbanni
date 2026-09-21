@@ -633,3 +633,7 @@ h2,h3{color:#fff}
 .wheel.low ~ .wheel-center{color:#f87171;text-shadow:0 0 24px rgba(239,68,68,.55)}
 .up-layout{position:relative;overflow:hidden}
 .up-layout::before{content:'';position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent)}
+
+/* ===== v53: plinko perf + lock ===== */
+.pl-ball{box-shadow:0 0 10px rgba(251,191,36,.55)}
+.pl-ball.on::after{display:none}

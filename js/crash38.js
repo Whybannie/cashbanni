@@ -147,22 +147,13 @@ function crashDraw(){ var c=$('crashCanvas'); if(!c||!c.width)return;
   var N=70, pts=[];
   for(var i=0;i<=N;i++){ var tt=tNow*i/N, m=Math.exp(tt/9000);
     pts.push([W*0.05+(W*0.88)*(i/N), crashY(Math.min(m,mMax),mMax,H)]); }
-  x.save(); x.shadowColor=crash.phase==='crash'?'#ef4444':'#fbbf24'; x.shadowBlur=16*dpr;
-  var grad=x.createLinearGradient(0,H,W,0);
-  grad.addColorStop(0,'#ffffff'); grad.addColorStop(1,crash.phase==='crash'?'#ef4444':'#fbbf24');
-  x.strokeStyle=grad; x.lineWidth=3.5*dpr; x.lineJoin='round';
-  x.beginPath(); pts.forEach(function(p,i){if(i)x.lineTo(p[0],p[1]);else x.moveTo(p[0],p[1]);}); x.stroke(); x.restore();
-  x.lineTo(pts[N][0],H); x.lineTo(pts[0][0],H); x.closePath();
-  var fg=x.createLinearGradient(0,0,0,H);
-  fg.addColorStop(0,'rgba(251,191,36,.22)'); fg.addColorStop(1,'rgba(251,191,36,0)');
-  x.fillStyle=fg; x.fill();
   var tip=pts[N], prev=pts[N-1]||tip; var ang=Math.atan2(tip[1]-prev[1],tip[0]-prev[0]);
   if(crash.phase==='fly'){
     var ft=Date.now()/40;
-    for(var fi=1;fi<=7;fi++){
-      var fd=fi*9*dpr + Math.sin(ft+fi)*2*dpr;
-      var fr=(7-fi)*1.1*dpr + Math.sin(ft*1.7+fi)*0.8*dpr;
-      x.fillStyle= fi<3 ? 'rgba(255,220,120,'+(0.55-fi*0.08)+')' : 'rgba(251,146,60,'+(0.45-fi*0.05)+')';
+    for(var fi=1;fi<=12;fi++){
+      var fd=fi*11*dpr + Math.sin(ft+fi)*3*dpr;
+      var fr=(12-fi)*1.6*dpr + Math.sin(ft*1.7+fi)*1.2*dpr;
+      x.fillStyle= fi<4 ? 'rgba(255,230,140,'+(0.7-fi*0.05)+')' : (fi<8 ? 'rgba(251,146,60,'+(0.55-fi*0.04)+')' : 'rgba(239,68,68,'+(0.35-fi*0.02)+')');
       x.beginPath(); x.arc(tip[0]-Math.cos(ang)*fd, tip[1]-Math.sin(ang)*fd, Math.max(fr,0.5), 0, 7); x.fill();
     }
     x.save(); x.translate(tip[0],tip[1]); x.rotate(ang);
@@ -199,3 +190,8 @@ setTimeout(function(){ try{crashResize();}catch(e){} },200);
   }
   setTimeout(heal,4000);
 })();
+
+// v53: plinkoDrop wrap — анти-лаг лимит шаров
+(function(){ var pd=window.plinkoDrop; if(pd){ window.plinkoDrop=function(){
+  if(document.querySelectorAll('.pl-ball.on').length>=6){ if(window.toast) toast('⏳ Подожди, пока шары упадут','bad'); return; }
+  return pd.apply(this,arguments); }; } })();

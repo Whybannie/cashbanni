@@ -225,3 +225,8 @@ function gImg(g,cls){ cls=cls||'gimg';
   if(!src) return '<span class="emoji">'+g.emoji+'</span>';
   return '<img class="'+cls+'" src="'+src+'" alt="" decoding="async" onerror="this.style.display=\'none\';if(this.nextElementSibling)this.nextElementSibling.style.display=\'block\'">'+
          '<span class="emoji" style="display:none">'+g.emoji+'</span>'; }
+
+// ===== v53: баттлы на замке =====
+function renderBattles(){ setH('battlesList','<div class="battle-empty"><span class="emoji">🔒</span><b>Баттлы временно закрыты</b><span class="muted">Режим на обслуживании — скоро вернём с обновлением</span></div>'); }
+function createBattle(){ toast('🔒 Баттлы временно закрыты — скоро откроем','bad'); }
+function joinBattle(id){ toast('🔒 Баттлы временно закрыты','bad'); }
