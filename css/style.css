@@ -576,3 +576,49 @@ h2,h3{color:#fff}
 .plinko-board{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)}
 .inv-empty,.battle-empty{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.10)}
 .x{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
+
+/* ===== v51: CRASH / MINES / UPGRADE / PLINKO premium ===== */
+.crash-head h2::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 12px #22c55e;margin-right:8px;animation:pulse 1.4s infinite}
+.crash-box{border-radius:26px;background:radial-gradient(ellipse at 50% 120%,rgba(251,191,36,.06),transparent 60%),#0d1017;border:1px solid rgba(255,255,255,.09)}
+.crash-box::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(ellipse at 50% 50%,#000 30%,transparent 75%);mask-image:radial-gradient(ellipse at 50% 50%,#000 30%,transparent 75%)}
+.crash-mult{font-size:clamp(2.8rem,13vw,4.2rem);letter-spacing:-1.5px;color:#fff;text-shadow:0 0 44px rgba(251,191,36,.5),0 0 90px rgba(251,191,36,.25);font-variant-numeric:tabular-nums}
+.crash-mult.gold{color:#fbbf24;text-shadow:0 0 44px rgba(251,191,36,.75)}
+.crash-mult.red{color:#ef4444;text-shadow:0 0 44px rgba(239,68,68,.75)}
+.crash-mult.betcount{color:#9fb0c9;text-shadow:0 0 30px rgba(159,176,201,.45)}
+.crash-status{width:fit-content;margin:0 auto;bottom:10px;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.10);border-radius:50px;padding:6px 16px;font-size:.78rem}
+.crash-hist-row .ch-h{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px)}
+.crash-panel{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.10);border-radius:24px;padding:14px}
+.cp-bet{background:rgba(0,0,0,.35);border-color:rgba(255,255,255,.10)}
+.cp-step{background:rgba(255,255,255,.10)}
+.cp-step:active{background:rgba(255,255,255,.22)}
+.cp-val{color:#fff}
+.cp-chip{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.10)}
+.mines-panel{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.10);border-radius:24px}
+.mines-info{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:10px 14px}
+#minesMult{font-size:1.35rem;font-weight:900;color:#22c55e;text-shadow:0 0 20px rgba(34,197,94,.55);font-variant-numeric:tabular-nums}
+.mines-grid{gap:10px}
+.mine-tile{border-radius:18px;background:linear-gradient(180deg,#1b212b,#12161d);border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 6px 14px rgba(0,0,0,.45)}
+.mine-tile:active{transform:scale(.93)}
+.mine-tile.gem{background:linear-gradient(180deg,rgba(34,197,94,.4),rgba(34,197,94,.16));border-color:#22c55e;box-shadow:0 0 26px rgba(34,197,94,.5),inset 0 0 20px rgba(34,197,94,.3)}
+.mine-tile.boom{background:linear-gradient(180deg,rgba(239,68,68,.45),rgba(239,68,68,.2));border-color:#ef4444;box-shadow:0 0 30px rgba(239,68,68,.55),inset 0 0 22px rgba(239,68,68,.3)}
+.mine-tile.mine-show{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.4)}
+.mine-tile.safe-show{opacity:.45}
+.mc{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.10)}
+.mc.sel{background:rgba(255,255,255,.14);border-color:#fff;color:#fff}
+.up-layout{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.10);border-radius:28px;padding:18px}
+.wheel{box-shadow:0 0 0 8px rgba(255,255,255,.06),0 0 70px rgba(255,255,255,.14),inset 0 0 44px rgba(0,0,0,.65)}
+.wheel-pointer{border-top-color:#fbbf24;filter:drop-shadow(0 0 10px rgba(251,191,36,.8))}
+.wheel-center{background:radial-gradient(circle at 35% 30%,#1d2430,#0e1117);border:1px solid rgba(255,255,255,.14);color:#fff;font-size:1.9rem;font-weight:900;text-shadow:0 0 22px rgba(255,255,255,.35)}
+.wheel-center::after{content:'ШАНС';position:absolute;bottom:14%;left:0;right:0;font-size:.55rem;letter-spacing:2px;color:rgba(255,255,255,.4);text-shadow:none}
+.chip{background:linear-gradient(180deg,#1b212b,#12161d);border-color:rgba(255,255,255,.10)}
+.chip.sel{border-color:#fff;background:rgba(255,255,255,.10);box-shadow:0 0 0 3px rgba(255,255,255,.14),0 10px 26px rgba(0,0,0,.5)}
+#upBtn{background:#fff;color:#0b0d12;box-shadow:0 10px 30px rgba(255,255,255,.18)}
+.plinko-board{background:radial-gradient(ellipse at 50% 0%,rgba(140,160,200,.08),transparent 60%),#0e1117;border:1px solid rgba(255,255,255,.09);border-radius:24px}
+.pl-peg{width:7px;height:7px;margin:-3.5px 0 0 -3.5px;background:radial-gradient(circle at 35% 30%,#fff,#8fa3c0 55%,#3a4658);box-shadow:0 0 7px rgba(255,255,255,.4),0 2px 4px rgba(0,0,0,.5)}
+.pl-slot{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.09);border-radius:9px;color:#e8ecf5;font-size:.55rem;font-weight:900}
+.pl-slot:nth-child(-n+2),.pl-slot:nth-child(n+10){background:linear-gradient(180deg,rgba(239,68,68,.4),rgba(239,68,68,.14));border-color:rgba(239,68,68,.45);color:#fecaca}
+.pl-slot:nth-child(3),.pl-slot:nth-child(9){background:linear-gradient(180deg,rgba(249,115,22,.38),rgba(249,115,22,.13));border-color:rgba(249,115,22,.4);color:#fed7aa}
+.pl-slot:nth-child(4),.pl-slot:nth-child(8){background:linear-gradient(180deg,rgba(251,191,36,.35),rgba(251,191,36,.12));border-color:rgba(251,191,36,.4);color:#fde68a}
+.pl-ball{background:radial-gradient(circle at 35% 30%,#fff,#fbbf24 55%,#b45309);box-shadow:0 0 16px rgba(251,191,36,.9),0 0 34px rgba(251,191,36,.4)}
+.pl-ball.on::after{content:'';position:absolute;inset:-7px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.35),transparent 70%)}
+.pl-slot.hit{animation:pop .5s;box-shadow:0 0 26px rgba(255,255,255,.55);border-color:#fff}

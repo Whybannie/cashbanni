@@ -142,14 +142,14 @@ function crashDraw(){ var c=$('crashCanvas'); if(!c||!c.width)return;
   var N=70, pts=[];
   for(var i=0;i<=N;i++){ var tt=tNow*i/N, m=Math.exp(tt/9000);
     pts.push([W*0.05+(W*0.88)*(i/N), crashY(Math.min(m,mMax),mMax,H)]); }
-  x.save(); x.shadowColor=crash.phase==='crash'?'#ef4444':'#a855f7'; x.shadowBlur=16*dpr;
+  x.save(); x.shadowColor=crash.phase==='crash'?'#ef4444':'#fbbf24'; x.shadowBlur=16*dpr;
   var grad=x.createLinearGradient(0,H,W,0);
-  grad.addColorStop(0,'#a855f7'); grad.addColorStop(1,crash.phase==='crash'?'#ef4444':'#ec4899');
+  grad.addColorStop(0,'#ffffff'); grad.addColorStop(1,crash.phase==='crash'?'#ef4444':'#fbbf24');
   x.strokeStyle=grad; x.lineWidth=3.5*dpr; x.lineJoin='round';
   x.beginPath(); pts.forEach(function(p,i){if(i)x.lineTo(p[0],p[1]);else x.moveTo(p[0],p[1]);}); x.stroke(); x.restore();
   x.lineTo(pts[N][0],H); x.lineTo(pts[0][0],H); x.closePath();
   var fg=x.createLinearGradient(0,0,0,H);
-  fg.addColorStop(0,'rgba(168,85,247,.28)'); fg.addColorStop(1,'rgba(168,85,247,0)');
+  fg.addColorStop(0,'rgba(251,191,36,.22)'); fg.addColorStop(1,'rgba(251,191,36,0)');
   x.fillStyle=fg; x.fill();
   var tip=pts[N], prev=pts[N-1]||tip; var ang=Math.atan2(tip[1]-prev[1],tip[0]-prev[0]);
   if(crash.phase==='fly'){
