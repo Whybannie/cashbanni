@@ -368,9 +368,8 @@ function renderTasks(){ const fr=freeReady();
   renderQuests(); renderAchs(); }
 async function doSub(){ openChannel();
   setTimeout(async()=>{ const r=await api('/api/check_sub');
-    if(r&&r.sub&&!S.subDone){ S.subDone=true; const cr=await api('/api/claim_sub');
-      if(cr&&cr.ok){ sfx.win(); confetti(60); toast('📢 Подписка подтверждена: +⭐'+cr.amount,'good'); setTimeout(refreshMe,500); }
-      else toast('Подписка есть ✅','good');
+    if(r&&r.sub&&!S.subDone){ S.subDone=true; sfx.win();
+      toast('📢 Подписка подтверждена! Бесплатный кейс доступен','good');
       saveLocal(); renderHeader(); renderTasks(); renderProfile(); }
     else if(r&&r.sub){ S.subDone=true; toast('Подписка есть ✅','good'); renderProfile(); }
     else toast('Ты не подписан на канал','bad'); },2500); }

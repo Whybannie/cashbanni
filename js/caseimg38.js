@@ -58,9 +58,7 @@ function renderTasks(){ const fr=freeReady();
       '<div class="re-step reward"><b>4.</b> Ты получаешь ⭐'+REF_REWARD+'!</div></div>';
   renderQuests(); renderAchs();
   if(S.serverMode && !S.subDone && Date.now()-_subCheckTs>15000){ _subCheckTs=Date.now();
-    checkSub().then(ok=>{ if(ok){ S.subDone=true;
-      api('/api/claim_sub').then(cr=>{ if(cr&&cr.ok){ sfx.win(); confetti(60); toast('📢 Бонус за подписку: +⭐'+cr.amount,'good'); setTimeout(refreshMe,500); } });
-      renderTasks(); renderProfile(); } }); }
+    checkSub().then(ok=>{ if(ok){ S.subDone=true; renderTasks(); renderProfile(); } }); }
 }
 let _subCheckTs=0;
 
