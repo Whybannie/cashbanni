@@ -118,6 +118,7 @@ const sfx={ click:()=>{beep(600,.05,'triangle',.07);haptic('light');},
   tick:()=>beep(800+Math.random()*400,.03,'square',.04),
   win:()=>{beep(523,.1);setTimeout(()=>beep(659,.1),100);setTimeout(()=>beep(784,.2),200);haptic('success');},
   lose:()=>{beep(180,.35,'sawtooth',.1);haptic('error');},
+  crash:()=>{beep(320,.5,'sawtooth',.14);setTimeout(()=>beep(240,.5,'sawtooth',.14),120);setTimeout(()=>beep(160,.7,'sawtooth',.16),260);setTimeout(()=>beep(90,.9,'square',.18),420);haptic('error');},
   legend:()=>{[523,659,784,1046,1318,1568].forEach((f,i)=>setTimeout(()=>beep(f,.16,'triangle',.2),i*90));haptic('success');} };
 
 const cv=$('confetti'), cx=cv?cv.getContext('2d'):null; let parts=[];
@@ -172,9 +173,9 @@ function spinWheel(el,segs,winIndex,cb){ if(!el)return cb&&cb(); let start=0;
   const a=zones[winIndex][0],b=zones[winIndex][1];
   const t=(a+(b-a)*rnd(0.15,0.85))*3.6, R=5*360+(360-t);
   el.style.transition='none'; el.style.transform='rotate(0deg)'; void el.offsetWidth;
-  el.style.transition='transform 4s cubic-bezier(.12,.8,.2,1)'; el.style.transform='rotate('+R+'deg)';
-  let n=0; const ti=setInterval(()=>{sfx.tick(); if(++n>26)clearInterval(ti);},150);
-  setTimeout(cb,4100); }
+  el.style.transition='transform 6.5s cubic-bezier(.1,.85,.15,1)'; el.style.transform='rotate('+R+'deg)';
+  let n=0; const ti=setInterval(()=>{sfx.tick(); if(++n>44)clearInterval(ti);},150);
+  setTimeout(cb,6700); }
 async function checkSub(){ const r=await api('/api/check_sub'); return !!(r&&r.sub); }
 function openChannel(){ try{ TG&&TG.openTelegramLink?TG.openTelegramLink(CHANNEL):window.open(CHANNEL); }catch(e){ window.open(CHANNEL); } }
 
@@ -272,7 +273,7 @@ function minePick(i){ if(!mines.active||mines.rev[i])return;
   mines.rev[i]=true;
   const t=document.querySelector('.mine-tile[data-i="'+i+'"]');
   if(mines.field[i]){ t.classList.add('boom'); t.textContent='💣'; revealMines(); mines.active=false;
-    S.stats.mines=(S.stats.mines||0)+1; sfx.lose(); haptic('error'); toast('💥 Мина! −⭐'+mines.bet,'bad');
+    S.stats.mines=(S.stats.mines||0)+1; sfx.crash(); toast('💥 Мина! −⭐'+mines.bet,'bad');
     save(); syncMines(); return; }
   t.classList.add('gem'); t.textContent='💎';
   mines.picks++; mines.mult=minesFair(mines.picks,mines.m);
@@ -339,7 +340,7 @@ function renderUpgrade(){ const items=validInv();
   setH('upTarget',targets.length?targets.map(g=>
     '<button class="chip '+(upTo&&upTo.id===g.id?'sel':'')+'" onclick="selTo(\''+g.id+'\')">'+gImg(g)+'<div class="name">'+g.name+'</div><div class="price">⭐'+g.price+'</div></button>').join('')
     :'<div class="chip empty">Нет целей дороже</div>');
-  const ch=upChanceVal(); setT('upChance',ch+'%');
+  const ch=upChanceVal(); setT('upChance',ch+'%'); const wEl=$('upWheel'); if(wEl){ wEl.classList.toggle('hi',ch>=50); wEl.classList.toggle('mid',ch>=20&&ch<50); wEl.classList.toggle('low',ch<20); }
   const w=$('upWheel');
   if(upFrom&&upTo)setWheel(w,[{pct:ch,color:'#22c55e'},{pct:100-ch,color:'#2a2a4a'}]);
   else setWheel(w,[{pct:100,color:'#2a2a4a'}]);
@@ -355,7 +356,7 @@ function doUpgrade(){ if(!upFrom||!upTo||upBusy)return;
     if(win){ S.inv[idx]={uid:uid(),gid:upTo.id}; S.stats.upWins++; S.stats.won+=upTo.price;
       sfx.win(); toast('⚡ Апгрейд успешен: '+upTo.name+'!','good');
       if(upTo.rarity==='epic'){confetti(150);sfx.legend();} qEvent('upgrade_win'); }
-    else { if(idx>=0)S.inv.splice(idx,1); sfx.lose(); toast('💥 Не повезло...','bad'); }
+    else { if(idx>=0)S.inv.splice(idx,1); sfx.crash(); toast('💥 Не повезло...','bad'); }
     upFrom=null;upTo=null;upBusy=false;
     save(); renderHeader(); renderUpgrade(); renderInventory(); checkAch(); }); }
 

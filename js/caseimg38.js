@@ -95,7 +95,7 @@ async function spin(n){ if(spinning) return;
     c.innerHTML='<div class="roulette-pointer"></div><div class="roulette-strip"></div>';
     box.appendChild(c); return {c:c,strip:c.querySelector('.roulette-strip'),g:g,uid:(newItems[i]&&newItems[i].uid)||uid()}; });
   rows.forEach(x=>buildStrip(x.strip,x.g));
-  const dur=(n===1)?6000:5000;
+  const dur=(n===1)?8500:7000;
   await Promise.all(rows.map(x=>animateStrip(x.strip,dur)));
   rows.forEach(x=>{ x.c.classList.add('won');
     x.c.insertAdjacentHTML('beforeend','<div class="strip-win" data-ow="'+x.uid+'">'+gImg(x.g)+

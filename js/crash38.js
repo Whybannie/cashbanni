@@ -25,7 +25,10 @@ function crashPoint(r){
 }
 function crashHistory(){ var cur=roundNumber(); var a=[]; for(var i=1;i<=10;i++) a.push(crashPoint(cur-i)); return a; }
 function crashHist(){
-  var html=(crash.hist||[]).map(function(v){return '<span class="ch-h '+(v>=10?'hi':v>=2?'mid':'lo')+'">'+v.toFixed(2)+'×</span>';}).join('');
+  var cur=roundNumber(); var arr=[];
+  for(var i=1;i<=10;i++){ var rn=cur-i; var v=(crash.seen&&crash.seen[rn])?crash.seen[rn]:crashPoint(rn); arr.push(v); }
+  crash.hist=arr;
+  var html=arr.map(function(v){return '<span class="ch-h '+(v>=10?'hi':v>=2?'mid':'lo')+'">'+v.toFixed(2)+'×</span>';}).join('');
   var r1=$('crashHistRow'); if(r1) r1.innerHTML=html||'<span class="ch-h lo">—</span>';
 }
 function startCrashLoop(){ if(crashLoopOn) return; crashLoopOn=true; crash.lastFrame=Date.now(); requestAnimationFrame(crashLoop); }
@@ -101,11 +104,13 @@ function crashLoop(){
       if(crash.auto>0 && crash.myBet>0 && !crash.cashed && crash._betRnd===rn && crash.m>=crash.auto && crash.m<crash.cp){ doCashout(crash.m); }
       if(crash.m>=crash.cp){
         crash.m=crash.cp; crash.phase='crash';
+      if(!crash.seen)crash.seen={}; crash.seen[rn]=crash.cp;
+      var ks=Object.keys(crash.seen); if(ks.length>12){ delete crash.seen[ks[0]]; }
         setT('crashMult', crash.cp.toFixed(2)+'×');
         var cm2=$('crashMult'); if(cm2) cm2.className='crash-mult red';
         setH('crashStatus','💥 КРАШ на '+crash.cp.toFixed(2)+'× · новый раунд скоро');
         setT('heroCrashState','Краш '+crash.cp.toFixed(2)+'×');
-        if(crash.myBet>0 && !crash.cashed && crash._betRnd===rn && crash._lostRnd!==rn){ crash._lostRnd=rn; sfx.lose(); toast('💥 Краш! −⭐'+crash.myBet,'bad'); }
+        if(crash.myBet>0 && !crash.cashed && crash._betRnd===rn && crash._lostRnd!==rn){ crash._lostRnd=rn; sfx.crash(); toast('💥 Краш! −⭐'+crash.myBet,'bad'); }
         if(crash._sparkRnd!==rn){ crash._sparkRnd=rn; var cc=$('crashCanvas'); var dpr=window.devicePixelRatio||1;
           if(cc) for(var i=0;i<26;i++) crash.sparks.push({x:cc.width*0.85,y:cc.height*0.25,vx:rnd(-4,4)*dpr,vy:rnd(-4,4)*dpr,l:1}); }
       } else {
@@ -153,6 +158,13 @@ function crashDraw(){ var c=$('crashCanvas'); if(!c||!c.width)return;
   x.fillStyle=fg; x.fill();
   var tip=pts[N], prev=pts[N-1]||tip; var ang=Math.atan2(tip[1]-prev[1],tip[0]-prev[0]);
   if(crash.phase==='fly'){
+    var ft=Date.now()/40;
+    for(var fi=1;fi<=7;fi++){
+      var fd=fi*9*dpr + Math.sin(ft+fi)*2*dpr;
+      var fr=(7-fi)*1.1*dpr + Math.sin(ft*1.7+fi)*0.8*dpr;
+      x.fillStyle= fi<3 ? 'rgba(255,220,120,'+(0.55-fi*0.08)+')' : 'rgba(251,146,60,'+(0.45-fi*0.05)+')';
+      x.beginPath(); x.arc(tip[0]-Math.cos(ang)*fd, tip[1]-Math.sin(ang)*fd, Math.max(fr,0.5), 0, 7); x.fill();
+    }
     x.save(); x.translate(tip[0],tip[1]); x.rotate(ang);
     x.font=(26*dpr)+'px serif'; x.textAlign='center'; x.textBaseline='middle';
     x.fillText('🚀',6*dpr,0); x.restore();
