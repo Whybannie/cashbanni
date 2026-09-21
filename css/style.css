@@ -527,3 +527,52 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 #cfStrips[data-n="5"]{--tile:84px}
 .cf-strips .roulette-container{height:var(--tile,132px)}
 .roulette-item{width:var(--tile,132px);min-width:var(--tile,132px)}
+
+/* ===== v50: GRAPHITE PREMIUM redesign ===== */
+:root{--bg:#0b0d12;--card:rgba(255,255,255,.045);--line:rgba(255,255,255,.08)}
+body{background:var(--bg)}
+body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;background:
+  radial-gradient(60% 40% at 15% 0%,rgba(140,160,200,.10),transparent 60%),
+  radial-gradient(50% 35% at 85% 10%,rgba(90,110,150,.08),transparent 60%),
+  radial-gradient(70% 50% at 50% 100%,rgba(60,70,95,.10),transparent 65%)}
+.bubble{opacity:.14!important;filter:blur(90px)!important}
+.bubble:nth-child(odd){background:#232b3a!important}
+.bubble:nth-child(even){background:#2e3a4e!important}
+.header{background:rgba(11,13,18,.72);border-bottom:1px solid rgba(255,255,255,.06)}
+.logo{font-size:clamp(26px,6vw,38px);font-weight:900;letter-spacing:-.8px;
+  background:linear-gradient(110deg,#ffffff 35%,#b9c4d8 50%,#ffffff 65%);
+  background-size:220% 100%;-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;animation:logoshine 3.6s linear infinite}
+.logo span{background:none;-webkit-text-fill-color:inherit}
+@keyframes logoshine{0%{background-position:120% 0}100%{background-position:-120% 0}}
+.xp-line div{background:linear-gradient(90deg,#fff,#9fb0c9);box-shadow:0 0 10px rgba(255,255,255,.35)}
+.balance{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10)}
+.add-btn{background:#fff;box-shadow:0 4px 14px rgba(255,255,255,.25)}
+.add-btn .ic{stroke:#0b0d12}
+.bottom-nav{background:rgba(14,17,24,.82);border:1px solid rgba(255,255,255,.08)}
+.bottom-nav button.active{background:#fff;color:#0b0d12;box-shadow:0 6px 24px rgba(255,255,255,.18)}
+.bottom-nav button.active .ic{filter:none;transform:none;stroke:#0b0d12}
+.btn-primary{background:#fff;color:#0b0d12;box-shadow:0 8px 28px rgba(255,255,255,.16)}
+.btn-secondary{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+.case-card{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08)}
+.case-card:hover{border-color:rgba(255,255,255,.28);box-shadow:0 16px 48px rgba(0,0,0,.5)}
+.task-card,.inv-item,.stat-card,.quests-row,.battle-card,.mines-panel,.crash-panel,.rank-card,.top-row{
+  background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}
+.pcard{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.10)}
+.rank-card{background:rgba(251,191,36,.06);border-color:rgba(251,191,36,.25)}
+h2,h3{color:#fff}
+.crash-box{background:radial-gradient(ellipse at 20% 100%,rgba(120,140,190,.10),transparent 60%),#0e1117;border-color:rgba(255,255,255,.08)}
+.crash-main-btn.bet{background:#fff;color:#0b0d12;box-shadow:0 8px 28px rgba(255,255,255,.16)}
+.crash-main-btn.cash{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#221303;animation:pulse 1s infinite}
+.q-claim{background:#fff;color:#0b0d12}
+.sw-btn.keep{background:rgba(255,255,255,.12);color:#fff}
+.modal{background:#12151d;border-color:rgba(255,255,255,.10)}
+.toast{background:#171b26;border-color:rgba(255,255,255,.14)}
+.pay-chip{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.10)}
+.chip{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.10)}
+.chip.sel{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.15)}
+.wheel-center{background:#12151d}
+.mine-tile{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border-color:rgba(255,255,255,.08)}
+.plinko-board{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)}
+.inv-empty,.battle-empty{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.10)}
+.x{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
