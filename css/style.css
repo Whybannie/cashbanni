@@ -637,3 +637,9 @@ h2,h3{color:#fff}
 /* ===== v53: plinko perf + lock ===== */
 .pl-ball{box-shadow:0 0 10px rgba(251,191,36,.55)}
 .pl-ball.on::after{display:none}
+
+/* ===== v54: NFT holo frames ===== */
+.gimg.nft-ultra,.emoji.nft-ultra{border-radius:14px;animation:ultraPulse 2.2s ease-in-out infinite}
+.gimg.nft-mythic,.emoji.nft-mythic{border-radius:14px;animation:mythicPulse 1.8s ease-in-out infinite}
+@keyframes ultraPulse{0%,100%{box-shadow:0 0 0 2px rgba(34,211,238,.9),0 0 16px rgba(34,211,238,.6),0 0 34px rgba(34,211,238,.3)}50%{box-shadow:0 0 0 2px rgba(168,85,247,.9),0 0 18px rgba(168,85,247,.65),0 0 40px rgba(168,85,247,.35)}}
+@keyframes mythicPulse{0%,100%{box-shadow:0 0 0 2px #fff,0 0 14px rgba(255,255,255,.8),0 0 30px rgba(168,85,247,.7),0 0 50px rgba(34,211,238,.5)}50%{box-shadow:0 0 0 2px #fbbf24,0 0 16px rgba(251,191,36,.85),0 0 34px rgba(236,72,153,.6),0 0 54px rgba(34,211,238,.45)}}

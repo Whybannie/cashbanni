@@ -221,10 +221,11 @@ async function refreshMe(){ await flushSave(); const me=await apiR('/api/me');
 
 // ===== v42: дизайнерские дропы с картинками (как фотки кейсов) =====
 function gImg(g,cls){ cls=cls||'gimg';
+  var tier=(g.rarity==='nft')?(g.price>=28000?' nft-mythic':(g.price>=8000?' nft-ultra':'')):'';
   var src=(typeof GIFT_IMG!=='undefined'?GIFT_IMG:{})[g.id];
-  if(!src) return '<span class="emoji">'+g.emoji+'</span>';
-  return '<img class="'+cls+'" src="'+src+'" alt="" decoding="async" onerror="this.style.display=\'none\';if(this.nextElementSibling)this.nextElementSibling.style.display=\'block\'">'+
-         '<span class="emoji" style="display:none">'+g.emoji+'</span>'; }
+  if(!src) return '<span class="emoji'+tier+'">'+g.emoji+'</span>';
+  return '<img class="'+cls+tier+'" src="'+src+'" alt="" decoding="async" onerror="this.style.display=\'none\';if(this.nextElementSibling)this.nextElementSibling.style.display=\'block\'">'+
+         '<span class="emoji'+tier+'" style="display:none">'+g.emoji+'</span>'; }
 
 // ===== v53: баттлы на замке =====
 function renderBattles(){ setH('battlesList','<div class="battle-empty"><span class="emoji">🔒</span><b>Баттлы временно закрыты</b><span class="muted">Режим на обслуживании — скоро вернём с обновлением</span></div>'); }
