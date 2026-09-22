@@ -231,3 +231,11 @@ function gImg(g,cls){ cls=cls||'gimg';
 function renderBattles(){ setH('battlesList','<div class="battle-empty"><span class="emoji">🔒</span><b>Баттлы временно закрыты</b><span class="muted">Режим на обслуживании — скоро вернём с обновлением</span></div>'); }
 function createBattle(){ toast('🔒 Баттлы временно закрыты — скоро откроем','bad'); }
 function joinBattle(id){ toast('🔒 Баттлы временно закрыты','bad'); }
+
+// ===== v55: live NFT prices with server =====
+async function syncNftPrices(){ const r=await api('/api/gifts');
+  if(r&&r.rows){ r.rows.forEach(x=>{ const g=GIFTS.find(q=>q.id===x.id);
+    if(g){ g.price=x.price||g.price; g.name=x.name||g.name; g.emoji=x.emoji||g.emoji; } });
+    try{ renderCases(); }catch(e){} } }
+setTimeout(syncNftPrices,3000);
+setInterval(syncNftPrices,600000);
