@@ -26,31 +26,18 @@ const GIFTS = [
 ];
 
 const CASES = [
-  { id:'free',    name:'Бесплатный',     em:'🎃', price:0,   rarity:'common', free:true,
-    drops[['dust',0.54994],['coin',0.25],['spark',0.12],['bear',0.05],['heart',0.02],['rose',0.01],['nft_bag',2e-05],['nft_snoop_hand',2e-05],['nft_cat',1e-05],['nft_cap',1e-05]],['coin',.25],['spark',.12],['bear',.05],['heart',.02],['rose',.01]] },
-  { id:'mini',    name:'Мини',           em:'🪙', price:5,   rarity:'common',
-    drops[['dust',0.3991],['coin',0.3],['spark',0.15],['bear',0.1],['heart',0.04],['rose',0.01],['nft_dog',0.0001],['nft_doshirak',0.0001],['nft_lolipop',0.0001],['nft_backpack',0.0001],['nft_poop',0.0001],['nft_socks',0.0001],['nft_sword',0.0001],['nft_monkey',0.0001],['nft_egg',0.0001]],['coin',.30],['spark',.15],['bear',.10],['heart',.04],['rose',.01]] },
-  { id:'starter', name:'Стартер',        em:'⭐', price:20,  rarity:'common',
-    drops[['dust',0.2466],['bear',0.3],['heart',0.25],['rose',0.12],['box',0.08],['nft_dog',0.0003],['nft_doshirak',0.0003],['nft_lolipop',0.0003],['nft_backpack',0.0003],['nft_poop',0.0003],['nft_socks',0.0003],['nft_sword',0.0003],['nft_monkey',0.0003],['nft_egg',0.0003],['nft_cigar_snoop',0.0001],['nft_candybox',0.0001],['nft_cylinder',0.0001],['nft_shoes',0.0001],['nft_hairdryer',0.0001],['nft_pumpkin',0.0001],['nft_watch',0.0001]],['bear',.30],['heart',.25],['rose',.12],['box',.08]] },
-  { id:'hype',    name:'Хайп',           em:'🔥', price:45,  rarity:'rare',
-    drops[['dust',0.14663],['rose',0.28],['box',0.25],['cake',0.14],['bouquet',0.09],['rocket',0.06],['beer',0.02],['ring',0.01],['nft_cigar_snoop',0.0003],['nft_candybox',0.0003],['nft_cylinder',0.0003],['nft_shoes',0.0003],['nft_hairdryer',0.0003],['nft_pumpkin',0.0003],['nft_watch',0.0003],['nft_rose_flask',6e-05],['nft_ring_case',6e-05],['nft_bear_pink',6e-05],['nft_cigar',6e-05],['nft_motohelm',6e-05],['nft_bonder_ring',6e-05],['nft_brick',6e-05],['nft_genie_lamp',6e-05],['nft_nft_ring',6e-05],['nft_snoop_car',6e-05],['nft_frog',6e-05],['nft_lips',6e-05],['nft_tephy_statue',6e-05],['nft_snoop_hand',1.5e-05],['nft_arm_statue',1.5e-05],['nft_bag',1.5e-05],['nft_cartier',1.5e-05],['nft_perfume',1.5e-05],['nft_spartan_helm',1.5e-05]],['rose',.28],['box',.25],['cake',.14],['bouquet',.09],['rocket',.06],['beer',.02],['ring',.01]] },
-  { id:'premium', name:'Премиум',        em:'💎', price:110, rarity:'epic',
-    drops[['dust',0.01568],['ring',0.32],['trophy',0.3],['diamond',0.12],['rocket',0.14],['beer',0.1],['nft_rose_flask',0.0002],['nft_ring_case',0.0002],['nft_bear_pink',0.0002],['nft_cigar',0.0002],['nft_motohelm',0.0002],['nft_bonder_ring',0.0002],['nft_brick',0.0002],['nft_genie_lamp',0.0002],['nft_nft_ring',0.0002],['nft_snoop_car',0.0002],['nft_frog',0.0002],['nft_lips',0.0002],['nft_tephy_statue',0.0002],['nft_snoop_hand',5e-05],['nft_arm_statue',5e-05],['nft_bag',5e-05],['nft_cartier',5e-05],['nft_perfume',5e-05],['nft_spartan_helm',5e-05],['nft_cat',1e-05],['nft_cap',1e-05]],['ring',.32],['trophy',.30],['diamond',.12],['rocket',.14],['beer',.10]] },
-
-  // 🎥 КЕЙС ДАНИ ГРОШЕВОГО (стримерский)
-  { id:'danya',   name:'Кейс Дани Грошевого', em:'🎥', price:75, rarity:'streamer',
-    streamer:'Даня Грошевой',
-    img:'case_danya.JPG',
-    drops[['rose',0.13983],['box',0.13],['cake',0.15],['bouquet',0.13],['rocket',0.12],['beer',0.08],['ring',0.09],['trophy',0.09],['diamond',0.06],['nft_dog',0.0005],['nft_doshirak',0.0005],['nft_lolipop',0.0005],['nft_backpack',0.0005],['nft_poop',0.0005],['nft_socks',0.0005],['nft_sword',0.0005],['nft_monkey',0.0005],['nft_egg',0.0005],['nft_cigar_snoop',0.0004],['nft_candybox',0.0004],['nft_cylinder',0.0004],['nft_shoes',0.0004],['nft_hairdryer',0.0004],['nft_pumpkin',0.0004],['nft_watch',0.0004],['nft_rose_flask',0.0001],['nft_ring_case',0.0001],['nft_bear_pink',0.0001],['nft_cigar',0.0001],['nft_motohelm',0.0001],['nft_bonder_ring',0.0001],['nft_brick',0.0001],['nft_genie_lamp',0.0001],['nft_nft_ring',0.0001],['nft_snoop_car',0.0001],['nft_frog',0.0001],['nft_lips',0.0001],['nft_tephy_statue',0.0001],['nft_snoop_hand',4e-05],['nft_arm_statue',4e-05],['nft_bag',4e-05],['nft_cartier',4e-05],['nft_perfume',4e-05],['nft_spartan_helm',4e-05],['nft_cat',1.5e-05],['nft_cap',1.5e-05]],
-      ['box',     .13],
-      ['cake',    .15],
-      ['bouquet', .13],
-      ['rocket',  .12],
-      ['beer',    .08],
-      ['ring',    .09],
-      ['trophy',  .09],
-      ['diamond', .06]
-    ] }
+  { id:'free', name:'Бесплатный', em:'🎁', price:0, rarity:'common',
+    drops:[['dust',0.54994],['coin',0.25],['spark',0.12],['bear',0.05],['heart',0.02],['rose',0.01],['nft_bag',2e-05],['nft_snoop_hand',2e-05],['nft_cat',1e-05],['nft_cap',1e-05]] },
+  { id:'mini', name:'Мини', em:'🎁', price:5, rarity:'common',
+    drops:[['dust',0.3991],['coin',0.3],['spark',0.15],['bear',0.1],['heart',0.04],['rose',0.01],['nft_dog',0.0001],['nft_doshirak',0.0001],['nft_lolipop',0.0001],['nft_backpack',0.0001],['nft_poop',0.0001],['nft_socks',0.0001],['nft_sword',0.0001],['nft_monkey',0.0001],['nft_egg',0.0001]] },
+  { id:'starter', name:'Стартер', em:'🎁', price:20, rarity:'rare',
+    drops:[['dust',0.2466],['bear',0.3],['heart',0.25],['rose',0.12],['box',0.08],['nft_dog',0.0003],['nft_doshirak',0.0003],['nft_lolipop',0.0003],['nft_backpack',0.0003],['nft_poop',0.0003],['nft_socks',0.0003],['nft_sword',0.0003],['nft_monkey',0.0003],['nft_egg',0.0003],['nft_cigar_snoop',0.0001],['nft_candybox',0.0001],['nft_cylinder',0.0001],['nft_shoes',0.0001],['nft_hairdryer',0.0001],['nft_pumpkin',0.0001],['nft_watch',0.0001]] },
+  { id:'hype', name:'Хайп', em:'🔥', price:45, rarity:'rare',
+    drops:[['dust',0.14663],['rose',0.28],['box',0.25],['cake',0.14],['bouquet',0.09],['rocket',0.06],['beer',0.02],['ring',0.01],['nft_cigar_snoop',0.0003],['nft_candybox',0.0003],['nft_cylinder',0.0003],['nft_shoes',0.0003],['nft_hairdryer',0.0003],['nft_pumpkin',0.0003],['nft_watch',0.0003],['nft_rose_flask',6e-05],['nft_ring_case',6e-05],['nft_bear_pink',6e-05],['nft_cigar',6e-05],['nft_motohelm',6e-05],['nft_bonder_ring',6e-05],['nft_brick',6e-05],['nft_genie_lamp',6e-05],['nft_nft_ring',6e-05],['nft_snoop_car',6e-05],['nft_frog',6e-05],['nft_lips',6e-05],['nft_tephy_statue',6e-05],['nft_snoop_hand',1.5e-05],['nft_arm_statue',1.5e-05],['nft_bag',1.5e-05],['nft_cartier',1.5e-05],['nft_perfume',1.5e-05],['nft_spartan_helm',1.5e-05]] },
+  { id:'premium', name:'Премиум', em:'💎', price:110, rarity:'epic',
+    drops:[['dust',0.01568],['ring',0.32],['trophy',0.3],['diamond',0.12],['rocket',0.14],['beer',0.1],['nft_rose_flask',0.0002],['nft_ring_case',0.0002],['nft_bear_pink',0.0002],['nft_cigar',0.0002],['nft_motohelm',0.0002],['nft_bonder_ring',0.0002],['nft_brick',0.0002],['nft_genie_lamp',0.0002],['nft_nft_ring',0.0002],['nft_snoop_car',0.0002],['nft_frog',0.0002],['nft_lips',0.0002],['nft_tephy_statue',0.0002],['nft_snoop_hand',5e-05],['nft_arm_statue',5e-05],['nft_bag',5e-05],['nft_cartier',5e-05],['nft_perfume',5e-05],['nft_spartan_helm',5e-05],['nft_cat',1e-05],['nft_cap',1e-05]] },
+  { id:'danya', name:'Кейс Дани', em:'🎥', price:75, rarity:'streamer', streamer:'Danya',
+    drops:[['rose',0.13983],['box',0.13],['cake',0.15],['bouquet',0.13],['rocket',0.12],['beer',0.08],['ring',0.09],['trophy',0.09],['diamond',0.06],['nft_dog',0.0005],['nft_doshirak',0.0005],['nft_lolipop',0.0005],['nft_backpack',0.0005],['nft_poop',0.0005],['nft_socks',0.0005],['nft_sword',0.0005],['nft_monkey',0.0005],['nft_egg',0.0005],['nft_cigar_snoop',0.0004],['nft_candybox',0.0004],['nft_cylinder',0.0004],['nft_shoes',0.0004],['nft_hairdryer',0.0004],['nft_pumpkin',0.0004],['nft_watch',0.0004],['nft_rose_flask',0.0001],['nft_ring_case',0.0001],['nft_bear_pink',0.0001],['nft_cigar',0.0001],['nft_motohelm',0.0001],['nft_bonder_ring',0.0001],['nft_brick',0.0001],['nft_genie_lamp',0.0001],['nft_nft_ring',0.0001],['nft_snoop_car',0.0001],['nft_frog',0.0001],['nft_lips',0.0001],['nft_tephy_statue',0.0001],['nft_snoop_hand',4e-05],['nft_arm_statue',4e-05],['nft_bag',4e-05],['nft_cartier',4e-05],['nft_perfume',4e-05],['nft_spartan_helm',4e-05],['nft_cat',1.5e-05],['nft_cap',1.5e-05]] }
 ];
 
 const CASE_COLORS = {
