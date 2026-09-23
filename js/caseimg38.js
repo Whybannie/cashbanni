@@ -30,7 +30,7 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
     '<div class="cf-hero">'+caseArt(curCase)+
       '<div class="cf-hero-info"><b>'+curCase.name+'</b>'+
       (curCase.streamer?'<div class="cf-hero-streamer">🎥 '+curCase.streamer+'</div>':'')+
-      '<div class="price">'+(curCase.price===0?'БЕСПЛАТНО':'⭐ '+fmt(curCase.price))+'</div>'+
+      '<div class="price">'+(curCase.id==='secret'?'🔐 ПО ПРОМОКОДУ':(curCase.price===0?'БЕСПЛАТНО':'⭐ '+fmt(curCase.price)))+'</div>'+
       '<span class="muted">Состав и шансы выпада:</span></div></div>'+
     '<div class="contents">'+curCase.drops.map(d=>{const g=gift(d[0]);return
       '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'55;box-shadow:0 0 16px '+RAR[g.rarity].color+'22 inset">'+
@@ -42,17 +42,25 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   box.appendChild(prev);
   buildStrip(prev.querySelector('.roulette-strip'), gift(pick(curCase.drops)[0]));
   modalOpen('caseModal');
+  var oldRow=document.getElementById('secretCodeRow'); if(oldRow) oldRow.remove();
+  if(curCase.id==='secret'){
+    var act2=document.querySelector('#caseModal .cf-actions');
+    if(act2) act2.insertAdjacentHTML('beforebegin','<div id="secretCodeRow" style="display:flex;gap:8px;margin:10px 0 0;"><input id="secretCodeInput" placeholder="🔐 ВВЕДИ ПРОМОКОД КЕЙСА" style="flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:13px;padding:12px;color:#fff;font-size:.85rem;outline:none;min-height:48px;text-transform:uppercase;"></div>');
+    var b1=$('btnX1'); if(b1) b1.innerHTML='🔐 ОТКРЫТЬ ПО КОДУ';
+    if(b3)b3.style.display='none'; if(b5)b5.style.display='none';
+  }
+
   var modalEl=document.querySelector('#caseModal .modal');
   var oldBlock=document.getElementById('caseContentsBlock'); if(oldBlock) oldBlock.remove();
   if(modalEl){
     var items=curCase.drops.map(function(dd){ var g=gift(dd[0]); var pct=dd[1]*100; var pc=pct<1?pct.toFixed(2):pct.toFixed(0);
-      return '<div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 8px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid '+RAR[g.rarity].color+'55;">'+
-        '<div style="position:absolute;top:5px;right:6px;font-size:.55rem;font-weight:900;background:rgba(0,0,0,.45);border-radius:50px;padding:2px 7px;color:#fff;">'+pc+'%</div>'+
-        gImg(g)+'<div style="font-size:.62rem;font-weight:800;text-align:center;color:rgba(255,255,255,.85);">'+g.name+'</div>'+
-        '<div style="font-size:.6rem;font-weight:900;color:#fbbf24;">⭐'+g.price+'</div></div>'; }).join('');
-    modalEl.insertAdjacentHTML('afterbegin','<div id="caseContentsBlock" style="display:block;margin:0 0 12px;flex:0 0 auto;">'+
+      return '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'55;">'+
+        '<div class="ch">'+pc+'%</div>'+
+        gImg(g)+'<div class="cname">'+g.name+'</div>'+
+        '<div class="cprice">⭐'+g.price+'</div></div>'; }).join('');
+    var act0=modalEl.querySelector('.cf-actions'); (act0||modalEl).insertAdjacentHTML('beforebegin','<div id="caseContentsBlock" style="display:block;margin:0 0 12px;flex:0 0 auto;">'+
       '<div style="font-size:.82rem;font-weight:900;margin-bottom:8px;color:#fff;">🎁 Содержимое кейса</div>'+
-      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:40vh;overflow-y:auto;padding:2px;">'+items+'</div></div>');
+      '<div class="contents" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:34vh;overflow-y:auto;padding:2px;">'+items+'</div></div>');
   }
   var cf=$('cmContents');
   if(cf){
@@ -101,7 +109,7 @@ async function spin(n){ if(spinning) return;
   if(curCase.free) n=1;
   spinning=true;
   var caseCode='';
-  if(curCase.id==='secret'){ caseCode=(prompt('🔐 Введи промокод кейса:')||'').trim().toUpperCase(); if(!caseCode){ spinning=false; return; } }
+  if(curCase.id==='secret'){ var ci=$('secretCodeInput'); caseCode=(ci?ci.value:'').trim().toUpperCase(); if(!caseCode){ spinning=false; toast('🔐 Введи промокод кейса','bad'); return; } }
   const r=await api('/api/case_open',{method:'POST',body:JSON.stringify({id:curCase.id,count:n,code:caseCode})});
   if(r.error){ spinning=false;
     if(String(r.error).indexOf('подпис')>=0){ toast('📢 Только для подписчиков','bad'); openChannel(); }

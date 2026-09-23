@@ -189,7 +189,7 @@ function renderCases(){ setT('casesStat','Открыто: '+S.stats.opened);
     (c.free?'<div class="free-badge">'+(freeReady()?'ДОСТУПНО':'1/24Ч')+'</div>':'')+
     '<div class="rt" style="background:'+RAR[c.rarity].color+';color:'+RAR[c.rarity].color+'"></div>'+
     caseArt(c)+'<div class="name">'+c.name+'</div>'+
-    '<div class="price">'+(c.price===0?'БЕСПЛАТНО':'⭐ '+fmt(c.price))+'</div></div>').join('')); }
+    '<div class="price">'+(c.id==='secret'?'🔐 ПО ПРОМОКОДУ':(c.price===0?'БЕСПЛАТНО':'⭐ '+fmt(c.price)))+'</div></div>').join('')); }
 function buildStrip(strip,g){ strip.innerHTML=''; const winIdx=42;
   for(let i=0;i<50;i++){ const it=(i===winIdx)?g:gift(pick(curCase.drops)[0]);
     const d=document.createElement('div'); d.className='roulette-item'; d.style.background=RAR[it.rarity].color+'18';
