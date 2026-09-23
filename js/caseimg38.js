@@ -41,6 +41,7 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   box.appendChild(prev);
   buildStrip(prev.querySelector('.roulette-strip'), gift(pick(curCase.drops)[0]));
   modalOpen('caseModal');
+  var cf=$('cmContents'); if(cf){ cf.style.display='block'; }
 }
 
 // ---- Задания + понятная рефералка ----
@@ -224,7 +225,7 @@ function gImg(g,cls){ cls=cls||'gimg';
   var tier=(g.rarity==='nft')?(g.price>=28000?' nft-mythic':(g.price>=8000?' nft-ultra':'')):'';
   var src=(typeof GIFT_IMG!=='undefined'?GIFT_IMG:{})[g.id];
   if(!src) return '<span class="emoji'+tier+'">'+g.emoji+'</span>';
-  return '<img class="'+cls+tier+'" src="'+src+'" alt="" decoding="async" onerror="this.style.display=\'none\';if(this.nextElementSibling)this.nextElementSibling.style.display=\'block\'">'+
+  return '<img class="'+cls+tier+'" src="'+src+'" alt="" decoding="async" loading="lazy" onerror="this.style.display=\'none\';if(this.nextElementSibling)this.nextElementSibling.style.display=\'block\'">'+
          '<span class="emoji'+tier+'" style="display:none">'+g.emoji+'</span>'; }
 
 // ===== v53: баттлы на замке =====
