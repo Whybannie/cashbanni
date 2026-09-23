@@ -293,7 +293,7 @@ function minesCash(){ if(!mines.active||mines.picks<minesMinPicks())return;
 function itemCard(g){ return '<div class="inv-item">'+
   '<div class="rt" style="background:'+RAR[g.rarity].color+'"></div>'+
   gImg(g)+'<div class="name">'+g.name+'</div><div class="price">⭐ '+fmt(g.price)+'</div>'+
-  '<div class="acts"><button class="mini-btn gift" onclick="withdrawItem(\''+g.uid+'\')">🎁 Вывести</button>'+
+  '<div class="acts"><button class="mini-btn gift" onclick="'+(g.rarity==='nft'?'requestNft':'withdrawItem')+'(\''+g.uid+'\')">'+(g.rarity==='nft'?'📨 Заявка':'🎁 Вывести')+'</button>'+
   '<button class="mini-btn sell" onclick="sellItem(\''+g.uid+'\')">Продать ⭐'+g.price+'</button>'+
   '<button class="mini-btn up" onclick="toUpgrade(\''+g.uid+'\')">⚡</button></div></div>'; }
 function renderInventory(){ const items=validInv();
@@ -349,16 +349,20 @@ function renderUpgrade(){ const items=validInv();
 const upBtnEl=$('upBtn'); if(upBtnEl) upBtnEl.onclick=doUpgrade;
 function doUpgrade(){ if(!upFrom||!upTo||upBusy)return;
   upBusy=true; const ub=$('upBtn'); if(ub)ub.disabled=true;
-  const ch=upChanceVal(), win=Math.random()*100<ch;
-  spinWheel($('upWheel'),[{pct:ch,color:'#22c55e'},{pct:100-ch,color:'#2a2a4a'}],win?0:1,()=>{
-    S.stats.upgrades++;
-    const idx=S.inv.findIndex(i=>i.uid===upFrom.uid);
-    if(win){ S.inv[idx]={uid:uid(),gid:upTo.id}; S.stats.upWins++; S.stats.won+=upTo.price;
-      sfx.win(); toast('⚡ Апгрейд успешен: '+upTo.name+'!','good');
-      if(upTo.rarity==='epic'){confetti(150);sfx.legend();} qEvent('upgrade_win'); }
-    else { if(idx>=0)S.inv.splice(idx,1); sfx.crash(); toast('💥 Не повезло...','bad'); }
-    upFrom=null;upTo=null;upBusy=false;
-    save(); renderHeader(); renderUpgrade(); renderInventory(); checkAch(); }); }
+  const ch=upChanceVal();
+  api('/api/upgrade',{method:'POST',body:JSON.stringify({from:upFrom.uid,to:upTo.id})}).then(r=>{
+    if(!r||r.error){ toast('❌ '+(r&&r.error||'ошибка'),'bad'); upBusy=false; if(ub)ub.disabled=false; return; }
+    const win=r.win;
+    spinWheel($('upWheel'),[{pct:ch,color:'#22c55e'},{pct:100-ch,color:'#2a2a4a'}],win?0:1,()=>{
+      S.inv=r.inv; S.stats=Object.assign(DEF().stats,r.stats); if(r.xp!=null)S.xp=r.xp;
+      if(win){ sfx.win(); toast('⚡ Апгрейд успешен: '+upTo.name+'!','good');
+        if(upTo.rarity==='epic'||upTo.rarity==='nft'||upTo.rarity==='legendary'){confetti(150);sfx.legend();} qEvent('upgrade_win'); }
+      else { sfx.crash(); toast('💥 Не повезло...','bad'); }
+      upFrom=null;upTo=null;upBusy=false;
+      saveLocal(); renderHeader(); renderUpgrade(); renderInventory(); checkAch(); });
+  });
+}
+
 
 function renderTasks(){ const fr=freeReady();
   setT('freeCaseState',fr?'Доступен сейчас · 1 спин · подписка':'Следующий через '+Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5)+' ч.');
@@ -559,3 +563,13 @@ function addStars(){ if(S.serverMode&&TG){ openPay(); } else { S.balance+=100; s
     setTimeout(()=>{ if(S.isAdmin) toast('Cash Banni · build '+BUILD+' · '+(S.serverMode?'🟢':'')); },400);
   }catch(e){ console.error('startup',e); }
 })();
+
+async function requestNft(u){
+  const it=S.inv.find(i=>i.uid===u); if(!it)return;
+  const g=gift(it.gid); if(!g)return;
+  if(!confirm('📨 Создать заявку на вывод NFT?\n'+g.name+' ⭐'+g.price+'\nПредмет зарезервируется, админ выплатит вручную.'))return;
+  const r=await api('/api/withdraw_request',{method:'POST',body:JSON.stringify({uid:u})});
+  if(r&&r.ok){ S.inv=r.inv; saveLocal(); renderHeader(); renderInventory();
+    toast('📨 Заявка #'+r.req_id+' создана · ⏳ в обработке','good'); }
+  else toast('❌ '+(r&&r.error||'ошибка'),'bad');
+}
