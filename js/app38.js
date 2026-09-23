@@ -573,3 +573,29 @@ async function requestNft(u){
     toast('📨 Заявка #'+r.req_id+' создана · ⏳ в обработке','good'); }
   else toast('❌ '+(r&&r.error||'ошибка'),'bad');
 }
+
+// ===== v62: апгрейд 3 колонки (слоты + списки + колесо) =====
+(function(){
+  var layout=document.querySelector('#sec-upgrade .up-layout'); if(!layout) return;
+  var mine=$('upMine'), target=$('upTarget');
+  var wheelWrap=layout.querySelector('.wheel-wrap');
+  var btn=$('upBtn');
+  if(!mine||!target||!wheelWrap||!btn) return;
+  layout.classList.add('up-desktop');
+  var colL=document.createElement('div'); colL.className='up-col';
+  colL.innerHTML='<div class="up-slot"><div class="up-slot-label">ТВОЙ ПРЕДМЕТ</div><div class="up-slot-body" id="upFromView"><span class="us-empty">—</span></div></div><div class="up-list-head">Твои предметы</div>';
+  var colR=document.createElement('div'); colR.className='up-col';
+  colR.innerHTML='<div class="up-slot"><div class="up-slot-label">ЦЕЛЬ</div><div class="up-slot-body" id="upToView"><span class="us-empty">—</span></div></div><div class="up-list-head">Возможные предметы</div>';
+  var mid=document.createElement('div'); mid.className='up-mid';
+  mine.className='up-list'; target.className='up-list';
+  colL.appendChild(mine); colR.appendChild(target);
+  mid.appendChild(wheelWrap); mid.appendChild(btn);
+  layout.innerHTML='';
+  layout.appendChild(colL); layout.appendChild(mid); layout.appendChild(colR);
+})();
+function upSlotHtml(g){ return g? gImg(g)+'<div class="us-name">'+g.name+'</div><div class="us-price">⭐'+fmt(g.price)+'</div>' : '<span class="us-empty">—</span>'; }
+function updateUpSlots(){ var f=$('upFromView'), t=$('upToView');
+  if(f) f.innerHTML=upSlotHtml(upFrom?gift(upFrom.gid):null);
+  if(t) t.innerHTML=upSlotHtml(upTo); }
+var _ru62=renderUpgrade;
+renderUpgrade=function(){ _ru62(); updateUpSlots(); };
