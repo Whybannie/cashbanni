@@ -670,11 +670,7 @@ h2,h3{color:#fff}
 }
 
 /* ===== v63: adaptive upgrade (mobile=old, desktop=3col) + fix desktop padding ===== */
-@media (max-width:899px){
-  .up-desktop{display:block!important}
-  .up-col{display:none!important}
-  .up-mid{display:none!important}
-}
+/* mobile upgrade = original layout (v64) */
 @media (min-width:900px){
   .up-layout.up-desktop{display:grid;grid-template-columns:1fr minmax(300px,340px) 1fr;gap:18px;align-items:start}
   .up-layout.up-desktop > .up-list-head,
