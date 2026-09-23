@@ -41,7 +41,14 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   box.appendChild(prev);
   buildStrip(prev.querySelector('.roulette-strip'), gift(pick(curCase.drops)[0]));
   modalOpen('caseModal');
-  var cf=$('cmContents'); if(cf){ cf.style.display='block'; }
+  var cf=$('cmContents');
+  if(cf){
+    cf.style.cssText='display:block;margin:0 0 12px;flex:0 0 auto;min-height:60px;';
+    var grid=cf.querySelector('.contents');
+    if(grid){ grid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:42vh;overflow-y:auto;margin:0;padding:2px;'; }
+    var hero=cf.querySelector('.cf-hero');
+    if(hero){ hero.style.cssText='display:flex;gap:14px;align-items:center;padding:4px 2px 10px;'; }
+  }
 }
 
 // ---- Задания + понятная рефералка ----
