@@ -34,9 +34,10 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
       '<span class="muted">Состав и шансы выпада:</span></div></div>'+
     '<div class="contents">'+curCase.drops.map(d=>{const g=gift(d[0]);return
       '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'55;box-shadow:0 0 16px '+RAR[g.rarity].color+'22 inset">'+
-      '<div class="ch">'+(d[1]*100).toFixed(0)+'%</div>'+gImg(g)+
+      gImg(g)+
       '<div class="cname">'+g.name+'</div><div class="cprice">⭐'+g.price+'</div></div>';}).join('')+'</div>');
-  const box=$('cfStrips'); box.innerHTML='';
+  var cfc=$('cmContents'); if(cfc) cfc.style.display='none';
+const box=$('cfStrips'); box.innerHTML='';
   const prev=document.createElement('div'); prev.className='roulette-container preview';
   prev.innerHTML='<div class="preview-label">ПРЕВЬЮ ПРОКРУТА</div><div class="roulette-pointer"></div><div class="roulette-strip"></div>';
   box.appendChild(prev);
@@ -55,7 +56,6 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   if(modalEl){
     var items=curCase.drops.map(function(dd){ var g=gift(dd[0]); var pct=dd[1]*100; var pc=pct<1?pct.toFixed(2):pct.toFixed(0);
       return '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'55;">'+
-        '<div class="ch">'+pc+'%</div>'+
         gImg(g)+'<div class="cname">'+g.name+'</div>'+
         '<div class="cprice">⭐'+g.price+'</div></div>'; }).join('');
     var act0=modalEl.querySelector('.cf-actions'); (act0||modalEl).insertAdjacentHTML('beforebegin','<div id="caseContentsBlock" style="display:block;margin:0 0 12px;flex:0 0 auto;">'+
