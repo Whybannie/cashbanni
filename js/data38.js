@@ -5,6 +5,7 @@ const RAR = {
   rare:      { name:'Редкий',       color:'#60a5fa', glow:'rgba(96,165,250,.4)' },
   epic:      { name:'Эпический',    color:'#c084fc', glow:'rgba(192,132,252,.45)' },
   legendary: { name:'Легендарный',  color:'#fbbf24', glow:'rgba(251,191,36,.5)' },
+  nft:         { name:'NFT',          color:'#22d3ee', glow:'rgba(34,211,238,.55)' },
   streamer:  { name:'Стримерский',  color:'#f472b6', glow:'rgba(244,114,182,.55)' }
 };
 
