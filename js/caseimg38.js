@@ -5,7 +5,8 @@ const CASE_IMG = {
   mini:'case_mini.JPG',
   hype:'case_xaip.JPG', xaip:'case_xaip.JPG',
   premium:'case_premium.JPG', prem:'case_premium.JPG',
-  danya:'case_danya.JPG'
+  danya:'case_danya.JPG',
+  secret:'case_secret.JPG'
 };
 
 function caseArt(c){
@@ -41,6 +42,18 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   box.appendChild(prev);
   buildStrip(prev.querySelector('.roulette-strip'), gift(pick(curCase.drops)[0]));
   modalOpen('caseModal');
+  var modalEl=document.querySelector('#caseModal .modal');
+  var oldBlock=document.getElementById('caseContentsBlock'); if(oldBlock) oldBlock.remove();
+  if(modalEl){
+    var items=curCase.drops.map(function(dd){ var g=gift(dd[0]); var pct=dd[1]*100; var pc=pct<1?pct.toFixed(2):pct.toFixed(0);
+      return '<div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 8px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid '+RAR[g.rarity].color+'55;">'+
+        '<div style="position:absolute;top:5px;right:6px;font-size:.55rem;font-weight:900;background:rgba(0,0,0,.45);border-radius:50px;padding:2px 7px;color:#fff;">'+pc+'%</div>'+
+        gImg(g)+'<div style="font-size:.62rem;font-weight:800;text-align:center;color:rgba(255,255,255,.85);">'+g.name+'</div>'+
+        '<div style="font-size:.6rem;font-weight:900;color:#fbbf24;">⭐'+g.price+'</div></div>'; }).join('');
+    modalEl.insertAdjacentHTML('afterbegin','<div id="caseContentsBlock" style="display:block;margin:0 0 12px;flex:0 0 auto;">'+
+      '<div style="font-size:.82rem;font-weight:900;margin-bottom:8px;color:#fff;">🎁 Содержимое кейса</div>'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:40vh;overflow-y:auto;padding:2px;">'+items+'</div></div>');
+  }
   var cf=$('cmContents');
   if(cf){
     cf.style.cssText='display:block;margin:0 0 12px;flex:0 0 auto;min-height:60px;';
@@ -87,7 +100,9 @@ async function spin(n){ if(spinning) return;
   if(curCase.free&&!freeReady()) return toast('⏳ Раз в 24 часа','bad');
   if(curCase.free) n=1;
   spinning=true;
-  const r=await api('/api/case_open',{method:'POST',body:JSON.stringify({id:curCase.id,count:n})});
+  var caseCode='';
+  if(curCase.id==='secret'){ caseCode=(prompt('🔐 Введи промокод кейса:')||'').trim().toUpperCase(); if(!caseCode){ spinning=false; return; } }
+  const r=await api('/api/case_open',{method:'POST',body:JSON.stringify({id:curCase.id,count:n,code:caseCode})});
   if(r.error){ spinning=false;
     if(String(r.error).indexOf('подпис')>=0){ toast('📢 Только для подписчиков','bad'); openChannel(); }
     else toast('❌ '+r.error,'bad');
