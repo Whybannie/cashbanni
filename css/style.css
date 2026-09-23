@@ -668,3 +668,21 @@ h2,h3{color:#fff}
  #caseContentsBlock .contents{grid-template-columns:repeat(6,1fr)!important;max-height:280px!important}
  .cf-strips{max-height:46vh}
 }
+
+/* ===== v63: adaptive upgrade (mobile=old, desktop=3col) + fix desktop padding ===== */
+@media (max-width:899px){
+  .up-desktop{display:block!important}
+  .up-col{display:none!important}
+  .up-mid{display:none!important}
+}
+@media (min-width:900px){
+  .up-layout.up-desktop{display:grid;grid-template-columns:1fr minmax(300px,340px) 1fr;gap:18px;align-items:start}
+  .up-layout.up-desktop > .up-list-head,
+  .up-layout.up-desktop > .up-list{display:none}
+  .up-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px;overflow-y:auto;overflow-x:hidden;max-height:330px;padding:2px}
+  .up-list .chip{width:auto}
+  .up-mid .wheel-wrap{width:250px;height:250px;margin:6px auto}
+  .up-mid .btn{width:100%}
+  /* Убираем отступ сверху на десктопе */
+  .container{padding-top:14px!important}
+}

@@ -599,3 +599,39 @@ function updateUpSlots(){ var f=$('upFromView'), t=$('upToView');
   if(t) t.innerHTML=upSlotHtml(upTo); }
 var _ru62=renderUpgrade;
 renderUpgrade=function(){ _ru62(); updateUpSlots(); };
+
+// ===== v63: адаптивный апгрейд (mobile=старый, desktop=3 колонки) =====
+(function(){
+  var layout=document.querySelector('#sec-upgrade .up-layout'); if(!layout) return;
+  var mine=$('upMine'), target=$('upTarget');
+  var wheelWrap=layout.querySelector('.wheel-wrap');
+  var btn=$('upBtn');
+  if(!mine||!target||!wheelWrap||!btn) return;
+  // Только на desktop (>=900px) делаем 3 колонки
+  if(window.innerWidth >= 900){
+    layout.classList.add('up-desktop');
+    var colL=document.createElement('div'); colL.className='up-col';
+    colL.innerHTML='<div class="up-slot"><div class="up-slot-label">ТВОЙ ПРЕДМЕТ</div><div class="up-slot-body" id="upFromView"><span class="us-empty">—</span></div></div><div class="up-list-head">Твои предметы</div>';
+    var colR=document.createElement('div'); colR.className='up-col';
+    colR.innerHTML='<div class="up-slot"><div class="up-slot-label">ЦЕЛЬ</div><div class="up-slot-body" id="upToView"><span class="us-empty">—</span></div></div><div class="up-list-head">Возможные предметы</div>';
+    var mid=document.createElement('div'); mid.className='up-mid';
+    mine.className='up-list'; target.className='up-list';
+    colL.appendChild(mine); colR.appendChild(target);
+    mid.appendChild(wheelWrap); mid.appendChild(btn);
+    layout.innerHTML='';
+    layout.appendChild(colL); layout.appendChild(mid); layout.appendChild(colR);
+  }
+})();
+function upSlotHtml(g){ return g? gImg(g)+'<div class="us-name">'+g.name+'</div><div class="us-price">⭐'+fmt(g.price)+'</div>' : '<span class="us-empty">—</span>'; }
+function updateUpSlots(){ 
+  if(window.innerWidth < 900) return;
+  var f=$('upFromView'), t=$('upToView');
+  if(f) f.innerHTML=upSlotHtml(upFrom?gift(upFrom.gid):null);
+  if(t) t.innerHTML=upSlotHtml(upTo); 
+}
+var _ru63=renderUpgrade;
+renderUpgrade=function(){ _ru63(); updateUpSlots(); };
+window.addEventListener('resize', function(){ 
+  // Перестраиваем layout при ресайзе
+  setTimeout(function(){ var t=activeTab(); if(t==='upgrade') renderUpgrade(); }, 100);
+});
