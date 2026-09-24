@@ -23,8 +23,14 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
     return toast('⏳ Бесплатный кейс раз в 24 часа. Ещё '+h+' ч.','bad'); }
   setT('cmTitle',curCase.name);
   setT('p1',fmt(curCase.price)); setT('p3',fmt(curCase.price*3)); setT('p5',fmt(curCase.price*5));
-  const b3=$('btnX3'),b5=$('btnX5');
-  if(b3)b3.style.display=curCase.free?'none':''; if(b5)b5.style.display=curCase.free?'none':'';
+  const b1=$('btnX1'), b3=$('btnX3'), b5=$('btnX5');
+  if(b1){
+    if(curCase.id==='secret') b1.innerHTML='🔐 ОТКРЫТЬ ПО КОДУ';
+    else if(curCase.free) b1.innerHTML='🎁 ОТКРЫТЬ · 1 раз в 24ч';
+    else if(!b1.querySelector('#p1')) b1.innerHTML='Открыть ×1 ⭐<span id="p1"></span>';
+  }
+  if(b3) b3.style.display=(curCase.free||curCase.id==='secret')?'none':'';
+  if(b5) b5.style.display=(curCase.free||curCase.id==='secret')?'none':'';
   const m=document.querySelector('#caseModal .modal'); if(m) m.classList.remove('compact');
   setH('cmContents',
     '<div class="cf-hero">'+caseArt(curCase)+
@@ -47,7 +53,6 @@ const box=$('cfStrips'); box.innerHTML='';
   if(curCase.id==='secret'){
     var act2=document.querySelector('#caseModal .cf-actions');
     if(act2) act2.insertAdjacentHTML('beforebegin','<div id="secretCodeRow" style="display:flex;gap:8px;margin:10px 0 0;"><input id="secretCodeInput" placeholder="🔐 ВВЕДИ ПРОМОКОД КЕЙСА" style="flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:13px;padding:12px;color:#fff;font-size:.85rem;outline:none;min-height:48px;text-transform:uppercase;"></div>');
-    var b1=$('btnX1'); if(b1) b1.innerHTML='🔐 ОТКРЫТЬ ПО КОДУ';
     if(b3)b3.style.display='none'; if(b5)b5.style.display='none';
   }
 
