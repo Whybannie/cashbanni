@@ -618,3 +618,9 @@ function updateUpSlots(){
 }
 var _ru64=renderUpgrade;
 renderUpgrade=function(){ _ru64(); updateUpSlots(); };
+
+function gateSub(){ modalOpen('subGateModal'); }
+async function recheckSub(){ const ok=await checkSub();
+  if(ok){ S.subDone=true; saveLocal(); modalClose('subGateModal');
+    toast('🎉 Подписка подтверждена! Бесплатный кейс твой','good'); renderTasks(); }
+  else toast('❌ Подписка не найдена — нажми «Подписаться на канал»','bad'); }

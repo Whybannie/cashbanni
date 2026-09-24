@@ -16,10 +16,12 @@
 <link rel="preload" as="image" href="case_xaip.JPG">
 <link rel="preload" as="image" href="case_premium.JPG">
 <link rel="preload" as="image" href="case_danya.JPG">
+<link rel="preconnect" href="https://cashbanni-api-proxy2.vercel.app" crossorigin>
+<link rel="preconnect" href="https://telegram.org" crossorigin>
 </head>
 <body>
 <script>
-window.addEventListener("error",function(e){try{if(e.target&&e.target!==window&&e.target.tagName){return;}var d=document.getElementById("errBanner")||document.createElement("div");d.id="errBanner";d.style.cssText="position:fixed;left:0;right:0;bottom:0;background:#440000;color:#ffdddd;font:11px/1.4 monospace;padding:8px;z-index:999999;white-space:pre-wrap;max-height:40%;overflow:auto";d.textContent="JS ERROR: "+e.message+" | file: "+((e.filename||"").split("/").pop())+" line "+e.lineno;if(!d.parentNode)document.body.appendChild(d);}catch(_){}},true);
+window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin))return; if(e.target&&e.target!==window&&e.target.tagName){return;}var d=document.getElementById("errBanner")||document.createElement("div");d.id="errBanner";d.style.cssText="position:fixed;left:0;right:0;bottom:0;background:#440000;color:#ffdddd;font:11px/1.4 monospace;padding:8px;z-index:999999;white-space:pre-wrap;max-height:40%;overflow:auto";d.textContent="JS ERROR: "+e.message+" | file: "+((e.filename||"").split("/").pop())+" line "+e.lineno;if(!d.parentNode)document.body.appendChild(d);}catch(_){}},true);
 </script>
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
 <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></symbol>
@@ -336,5 +338,19 @@ window.addEventListener("error",function(e){try{if(e.target&&e.target!==window&&
 <script src="js/caseimg38.js"></script>
 <script src="js/plinko38.js"></script>
 <script src="js/crash38.js"></script>
+
+<div class="modal-overlay" id="subGateModal">
+  <div class="modal">
+    <div class="sheet-grab"></div>
+    <div style="text-align:center;padding:6px 0 2px;">
+      <div style="font-size:3.2rem;">🎁</div>
+      <h3 style="font-size:1.15rem;margin:10px 0 6px;">Бесплатный кейс ждёт!</h3>
+      <p class="muted" style="margin:0 0 16px;">Подпишись на наш канал — и кейс твой.<br>Это бесплатно и занимает 5 секунд.</p>
+      <button class="btn btn-primary" onclick="openChannel();toast('📢 Отлично! Теперь нажми «Я подписался»','')">📢 Подписаться на канал</button>
+      <button class="btn btn-secondary" style="margin-top:8px" onclick="recheckSub()">✅ Я подписался</button>
+      <button class="btn btn-secondary" style="margin-top:8px" onclick="modalClose('subGateModal')">Позже</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

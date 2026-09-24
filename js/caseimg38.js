@@ -110,6 +110,7 @@ async function spin(n){ if(spinning) return;
   spinning=true;
   var caseCode='';
   if(curCase.id==='secret'){ var ci=$('secretCodeInput'); caseCode=(ci?ci.value:'').trim().toUpperCase(); if(!caseCode){ spinning=false; toast('🔐 Введи промокод кейса','bad'); return; } }
+  if(curCase.free){ const okSub=await checkSub(); if(!okSub){ spinning=false; gateSub(); return; } }
   const r=await api('/api/case_open',{method:'POST',body:JSON.stringify({id:curCase.id,count:n,code:caseCode})});
   if(r.error){ spinning=false;
     if(String(r.error).indexOf('подпис')>=0){ toast('📢 Только для подписчиков','bad'); openChannel(); }
