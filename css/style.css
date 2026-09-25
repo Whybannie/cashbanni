@@ -682,3 +682,14 @@ h2,h3{color:#fff}
   /* Убираем отступ сверху на десктопе */
   .container{padding-top:14px!important}
 }
+
+/* ===== v69: error modals ===== */
+.err-modal{width:min(92vw,420px);padding:22px 18px 18px;border-radius:24px;text-align:center;background:linear-gradient(180deg,#141428 0%,#0a0a18 100%);border:1px solid rgba(255,255,255,.08);box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.err-body{display:flex;flex-direction:column;align-items:center;gap:8px;padding:4px 0}
+.err-icon{font-size:4rem;line-height:1;margin-bottom:4px;filter:drop-shadow(0 4px 12px rgba(255,255,255,.15))}
+.err-title{font-size:1.2rem;font-weight:900;margin:4px 0 2px;color:#fff;letter-spacing:-.3px}
+.err-text{font-size:.88rem;color:rgba(255,255,255,.7);margin:4px 0 14px;line-height:1.5}
+.err-actions{display:flex;flex-direction:column;gap:8px;width:100%}
+.err-actions .btn{width:100%;margin:0}
+.err-modal.type-warn .err-icon{animation:errShake .5s ease}
+@keyframes errShake{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}

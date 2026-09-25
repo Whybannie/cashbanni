@@ -636,3 +636,58 @@ async function recheckSub(){ const ok=await checkSub();
   if(ok){ S.subDone=true; saveLocal(); modalClose('subGateModal');
     toast('🎉 Подписка подтверждена! Бесплатный кейс твой','good'); renderTasks(); }
   else toast('❌ Подписка не найдена — нажми «Подписаться на канал»','bad'); }
+
+// ===== v69: errModal (красивые окна ошибок) =====
+function errModal(icon,title,text,actions){
+  var ei=$('errIcon'),et=$('errTitle'),ex=$('errText'),ea=$('errActions'),em=$('errModal');
+  if(!em) return toast('❌ '+title,'bad');
+  if(ei) ei.textContent=icon||'⚠️';
+  if(et) et.textContent=title||'Ошибка';
+  if(ex) ex.textContent=text||'';
+  if(ea){ ea.innerHTML='';
+    var acts=actions||[{label:'Понятно',primary:true,action:function(){modalClose('errModal')}}];
+    acts.forEach(function(a){ var b=document.createElement('button');
+      b.className='btn '+(a.primary?'btn-primary':'btn-secondary');
+      b.textContent=a.label;
+      b.onclick=function(){ if(a.action) a.action(); else modalClose('errModal'); };
+      ea.appendChild(b); }); }
+  modalOpen('errModal');
+}
+function errBalance(need){
+  errModal('💸','Не хватает звёзд','Для этой операции нужно ⭐'+fmt(need)+' на балансе.',[
+    {label:'🎯 Пополнить',primary:true,action:function(){modalClose('errModal');openPay();}},
+    {label:'Позже',action:function(){modalClose('errModal');}}
+  ]);
+}
+function errCooldown(hoursLeft){
+  errModal('⏳','Бесплатный кейс','Ты уже открывал бесплатный кейс сегодня. Следующий — через '+hoursLeft+' ч.',[
+    {label:'Хорошо',primary:true,action:function(){modalClose('errModal');}}
+  ]);
+}
+function errSub(){ gateSub(); }
+function errUsedCode(){
+  errModal('🔒','Код уже использован','Ты уже открывал этот промокод. Попроси новый у стримера!',[
+    {label:'Понятно',primary:true,action:function(){modalClose('errModal');}}
+  ]);
+}
+function errBadCode(){
+  errModal('❌','Неверный код','Такого промокода нет или он уже исчерпан.',[
+    {label:'Попробовать снова',primary:true,action:function(){modalClose('errModal');}},
+    {label:'Закрыть',action:function(){modalClose('errModal');}}
+  ]);
+}
+function errGeneric(msg){
+  errModal('⚠️','Ошибка',msg||'Что-то пошло не так. Попробуй ещё раз.',[
+    {label:'Понятно',primary:true,action:function(){modalClose('errModal');}}
+  ]);
+}
+function smartError(msg){
+  if(!msg){ errGeneric(); return; }
+  var m=String(msg);
+  if(/недостаточно|not enough|хватает/i.test(m)) errBalance(0);
+  else if(/24ч|24 ?ч|cooldown|раз в/i.test(m)) errCooldown(24);
+  else if(/подписк|sub/i.test(m)) errSub();
+  else if(/уже открывал|already used|used/i.test(m)) errUsedCode();
+  else if(/неверн|invalid|использован|лимит исчерпан/i.test(m)) errBadCode();
+  else errGeneric(m);
+}
