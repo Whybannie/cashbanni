@@ -1,4 +1,16 @@
 const BUILD = 67;
+
+// ===== v68: aggressive cache-bust reload =====
+(function(){
+  var stored=localStorage.getItem('cashbanni_build');
+  if(stored && stored!==String(BUILD)){
+    localStorage.setItem('cashbanni_build', String(BUILD));
+    location.replace(location.pathname+'?v='+BUILD+'&t='+Date.now());
+    return;
+  }
+  if(!stored) localStorage.setItem('cashbanni_build', String(BUILD));
+})();
+
 const $ = id => document.getElementById(id);
 const setT = (id,v) => { const e=$(id); if(e) e.textContent=v; };
 const setH = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
