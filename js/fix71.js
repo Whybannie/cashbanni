@@ -20,7 +20,7 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
     var items=curCase.drops.map(function(dd){ var g=gift(dd[0]);
       return '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'55;">'+gImg(g)+'<div class="cname">'+g.name+'</div><div class="cprice">⭐'+g.price+'</div></div>'; }).join('');
     var act0=m.querySelector('.cf-actions');
-    (act0||m).insertAdjacentHTML('beforebegin','<div id="caseContentsBlock" style="display:block;margin:12px 0 4px;"><div style="font-size:.82rem;font-weight:900;margin-bottom:8px;color:#fff;">🎁 Содержимое кейса</div><div class="contents" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:34vh;overflow-y:auto;padding:2px;">'+items+'</div></div>');
+    (act0||m).insertAdjacentHTML('beforebegin','<div id="caseContentsBlock" style="display:block;margin:6px 0 2px;"><div style="font-size:.82rem;font-weight:900;margin-bottom:8px;color:#fff;">🎁 Содержимое кейса</div><div class="contents" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:45vh;overflow-y:auto;">'+items+'</div></div>');
   }
   var cfc=$('cmContents'); if(cfc) cfc.style.display='none';
   var box=$('cfStrips'); box.innerHTML='';

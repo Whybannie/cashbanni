@@ -693,3 +693,17 @@ h2,h3{color:#fff}
 .err-actions .btn{width:100%;margin:0}
 .err-modal.type-warn .err-icon{animation:errShake .5s ease}
 @keyframes errShake{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+
+/* ===== v71.2: fix modal layout — кнопки всегда внизу ===== */
+#caseModal .modal.case-full{display:flex!important;flex-direction:column!important;gap:6px!important;max-height:88vh!important;padding:16px 16px 14px!important;overflow:hidden!important}
+#caseModal .cf-head{flex:0 0 auto;margin:0}
+#caseModal .cf-contents{flex:0 0 auto;max-height:45vh;overflow-y:auto}
+#caseModal .cf-strips{flex:1 1 auto;min-height:80px;overflow-y:auto}
+#caseModal .cf-actions{flex:0 0 auto;margin-top:auto!important;display:flex;flex-direction:column;gap:8px;padding-top:10px}
+#caseModal .cf-actions button{width:100%;min-height:48px;font-size:.9rem}
+#caseModal #caseContentsBlock{margin:6px 0 2px!important}
+#caseModal #secretCodeRow{margin-top:6px!important}
+@media (min-width:700px){
+  #caseModal .cf-actions{flex-direction:row}
+  #caseModal .cf-actions button{flex:1}
+}
