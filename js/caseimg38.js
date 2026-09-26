@@ -119,7 +119,7 @@ async function spin(n){ if(spinning) return;
   const r=await api('/api/case_open',{method:'POST',body:JSON.stringify({id:curCase.id,count:n,code:caseCode})});
   if(r.error){ spinning=false;
     if(String(r.error).indexOf('подпис')>=0){ toast('📢 Только для подписчиков','bad'); openChannel(); }
-    else toast('❌ '+r.error,'bad');
+    else smartError(r.error);
     return; }
   S.balance=r.balance; S.inv=r.inv; S.stats=Object.assign(DEF().stats,r.stats); S.xp=r.xp||S.xp;
   if(curCase.free) S.freeLast=Date.now();
