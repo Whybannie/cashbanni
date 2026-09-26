@@ -20,6 +20,8 @@
 <link rel="preconnect" href="https://telegram.org" crossorigin>
 </head>
 <body>
+<div id="vmark" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:#fbbf24;color:#000;text-align:center;font-weight:900;padding:5px;font-size:.8rem;letter-spacing:1px;">VERSION 70.5 · СВЕЖАЯ СБОРКА</div>
+
 <script>
 window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin))return; if(e.target&&e.target!==window&&e.target.tagName){return;}var d=document.getElementById("errBanner")||document.createElement("div");d.id="errBanner";d.style.cssText="position:fixed;left:0;right:0;bottom:0;background:#440000;color:#ffdddd;font:11px/1.4 monospace;padding:8px;z-index:999999;white-space:pre-wrap;max-height:40%;overflow:auto";d.textContent="JS ERROR: "+e.message+" | file: "+((e.filename||"").split("/").pop())+" line "+e.lineno;if(!d.parentNode)document.body.appendChild(d);}catch(_){}},true);
 </script>
