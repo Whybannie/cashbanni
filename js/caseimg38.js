@@ -31,12 +31,18 @@ function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   }
   if(b3) b3.style.display=(curCase.free||curCase.id==='secret')?'none':'';
   if(b5) b5.style.display=(curCase.free||curCase.id==='secret')?'none':'';
+  // v70.7: принудительное скрытие ×3/×5 для бесплатного и секретного
+  if(curCase.free || curCase.id==='secret'){
+    var _b3=$('btnX3'), _b5=$('btnX5');
+    if(_b3){ _b3.style.display='none'; _b3.disabled=true; }
+    if(_b5){ _b5.style.display='none'; _b5.disabled=true; }
+  }
   const m=document.querySelector('#caseModal .modal'); if(m) m.classList.remove('compact');
   setH('cmContents',
     '<div class="cf-hero">'+caseArt(curCase)+
       '<div class="cf-hero-info"><b>'+curCase.name+'</b>'+
       (curCase.streamer?'<div class="cf-hero-streamer">🎥 '+curCase.streamer+'</div>':'')+
-      '<div class="price">'+(curCase.id==='secret'?'🔐 ПО ПРОМОКОДУ':(curCase.price===0?'БЕСПЛАТНО':'⭐ '+fmt(curCase.price)))+'</div>'+
+      '<div class="price">'+(curCase.id==='secret'?'🔐 ПО ПРОМОКОДУ':(curCase.id==='secret'?'🔐 ПО ПРОМОКОДУ':(curCase.free?'БЕСПЛАТНО':'⭐ '+fmt(curCase.price))))+'</div>'+
       '<span class="muted">Состав и шансы выпада:</span></div></div>'+
     '<div class="contents">'+curCase.drops.map(d=>{const g=gift(d[0]);return
       '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'55;box-shadow:0 0 16px '+RAR[g.rarity].color+'22 inset">'+

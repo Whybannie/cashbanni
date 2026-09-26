@@ -686,7 +686,7 @@ function smartError(msg){
   var m=String(msg);
   if(/недостаточно|not enough|хватает/i.test(m)) errBalance(0);
   else if(/24ч|24 ?ч|cooldown|раз в/i.test(m)) errCooldown(24);
-  else if(/подписк|sub/i.test(m)) errSub();
+  else if(/подписк|sub/i.test(m)){ gateSub(); return; }
   else if(/уже открывал|already used|used/i.test(m)) errUsedCode();
   else if(/неверн|invalid|использован|лимит исчерпан/i.test(m)) errBadCode();
   else errGeneric(m);
