@@ -8,7 +8,7 @@
 window.__DEPLOY_V="1790437646";
 (function(){try{
   fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
-    if(j&&j.v&&String(j.v)!==String(window.__DEPLOY_V)){ location.replace(location.pathname+'?v='+j.v+'&t='+Date.now()); }
+    if(j&&j.v&&String(j.v)!==String(window.__DEPLOY_V)){ location.replace(location.pathname+'?v='+j.v+'&force='+Date.now()); }
   }).catch(function(){});
 }catch(e){}})();
 </script>
