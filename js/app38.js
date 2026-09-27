@@ -98,7 +98,6 @@ async function apiR(path, opts, tries) {
   if (r && r.error && tries > 0) { await new Promise(res=>setTimeout(res,1200)); r = await apiR(path, opts, tries-1); }
   return r;
 }
-async /* v71.3: DUPLICATE REMOVED — см. fix71.js */
 function errBalance(need){
   errModal('💸','Не хватает звёзд','Для этой операции нужно ⭐'+fmt(need)+' на балансе.',[
     {label:'🎯 Пополнить',primary:true,action:function(){modalClose('errModal');openPay();}},
