@@ -89,6 +89,7 @@ function crashLoop(){
     var now=Date.now(); var rn=roundNumber(); var t0=roundStart(rn); var el=now-t0;
     if(crash._rnd!==rn){
       crash._rnd=rn; crash.myBet=0; crash.cashed=false; crash.sparks=[]; crash.lastInt=1; crash._lostRnd=0; crash._sparkRnd=0;
+      crash.crashPos=null; // 🔥 Очищаем сохранённую позицию взрыва
       crash.hist=crashHistory(); crashHist();
     }
     crash.cp=crashPoint(rn);
@@ -104,6 +105,19 @@ function crashLoop(){
       if(crash.auto>0 && crash.myBet>0 && !crash.cashed && crash._betRnd===rn && crash.m>=crash.auto && crash.m<crash.cp){ doCashout(crash.m); }
       if(crash.m>=crash.cp){
         crash.m=crash.cp; crash.phase='crash';
+        // 🔥 Сохраняем координаты взрыва чтобы ракета не исчезала
+        if(!crash.crashPos){
+          var cc=$('crashCanvas');
+          if(cc){
+            var W=cc.width, H=cc.height, dpr=window.devicePixelRatio||1;
+            var mMax=Math.max(crash.cp*1.15,2);
+            var t=Date.now()-roundStart(roundNumber())-CR2.BET;
+            var N=70, pts=[];
+            for(var i=0;i<=N;i++){ var tt=t*i/N, m=Math.exp(tt/9000);
+              pts.push([W*0.05+(W*0.88)*(i/N), crashY(Math.min(m,mMax),mMax,H)]); }
+            crash.crashPos={x:pts[N][0],y:pts[N][1],mMax:mMax};
+          }
+        }
       if(!crash.seen)crash.seen={}; crash.seen[rn]=crash.cp;
       var ks=Object.keys(crash.seen); if(ks.length>12){ delete crash.seen[ks[0]]; }
         setT('crashMult', crash.cp.toFixed(2)+'×');
@@ -111,8 +125,16 @@ function crashLoop(){
         setH('crashStatus','💥 КРАШ на '+crash.cp.toFixed(2)+'× · новый раунд скоро');
         setT('heroCrashState','Краш '+crash.cp.toFixed(2)+'×');
         if(crash.myBet>0 && !crash.cashed && crash._betRnd===rn && crash._lostRnd!==rn){ crash._lostRnd=rn; crash.myBet=0; sfx.crash(); toast('💥 Краш! −⭐'+crash.myBet,'bad'); }
-        if(crash._sparkRnd!==rn){ crash._sparkRnd=rn; var cc=$('crashCanvas'); var dpr=window.devicePixelRatio||1;
-          if(cc) for(var i=0;i<26;i++) crash.sparks.push({x:cc.width*0.85,y:cc.height*0.25,vx:rnd(-4,4)*dpr,vy:rnd(-4,4)*dpr,l:1}); }
+        if(crash._sparkRnd!==rn){ 
+          crash._sparkRnd=rn; 
+          var cc=$('crashCanvas'); 
+          var dpr=window.devicePixelRatio||1;
+          // 🔥 Искры летят из позиции взрыва, а не из угла
+          var sx, sy;
+          if(crash.crashPos){ sx=crash.crashPos.x; sy=crash.crashPos.y; }
+          else { sx=cc.width*0.85; sy=cc.height*0.25; }
+          if(cc) for(var i=0;i<26;i++) crash.sparks.push({x:sx,y:sy,vx:rnd(-4,4)*dpr,vy:rnd(-4,4)*dpr,l:1}); 
+        }
       } else {
         crash.phase='fly';
         if(Math.floor(crash.m)>crash.lastInt){ crash.lastInt=Math.floor(crash.m); sfx.tick(); }
@@ -159,7 +181,16 @@ function crashDraw(){ var c=$('crashCanvas'); if(!c||!c.width)return;
     x.save(); x.translate(tip[0],tip[1]); x.rotate(ang);
     x.font=(26*dpr)+'px serif'; x.textAlign='center'; x.textBaseline='middle';
     x.fillText('🚀',6*dpr,0); x.restore();
-  } else { x.font=(38*dpr)+'px serif'; x.textAlign='center'; x.fillText('💥',tip[0],tip[1]); }
+  } else { 
+    // 🔥 Используем сохранённые координаты взрыва если есть
+    var ex, ey;
+    if(crash.crashPos){
+      ex=crash.crashPos.x; ey=crash.crashPos.y;
+    } else {
+      ex=tip[0]; ey=tip[1];
+    }
+    x.font=(38*dpr)+'px serif'; x.textAlign='center'; x.fillText('💥',ex,ey); 
+  }
   crash.sparks=(crash.sparks||[]).filter(function(s){return s.l>0;});
   crash.sparks.forEach(function(s){ s.x+=s.vx;s.y+=s.vy;s.vy+=0.15*dpr;s.l-=0.03;
     x.fillStyle='rgba(239,68,68,'+Math.max(s.l,0)+')';
