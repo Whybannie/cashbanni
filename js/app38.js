@@ -206,28 +206,6 @@ function buildStrip(strip,g){ strip.innerHTML=''; const winIdx=42;
   for(let i=0;i<50;i++){ const it=(i===winIdx)?g:gift(pick(curCase.drops)[0]);
     const d=document.createElement('div'); d.className='roulette-item'; d.style.background=RAR[it.rarity].color+'18';
     d.innerHTML=gImg(it)+'<span class="name">'+it.name+'</span>'; strip.appendChild(d); } }
-function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
-  if(!curCase) return;
-  if(curCase.free&&!freeReady()){ const h=Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5);
-    return toast('⏳ Бесплатный кейс раз в 24 часа. Ещё '+h+' ч.','bad'); }
-  setT('cmTitle',curCase.name);
-  setT('p1',fmt(curCase.price)); setT('p3',fmt(curCase.price*3)); setT('p5',fmt(curCase.price*5));
-  const b3=$('btnX3'),b5=$('btnX5');
-  if(b3)b3.style.display=curCase.free?'none':''; if(b5)b5.style.display=curCase.free?'none':'';
-  const m=document.querySelector('#caseModal .modal'); if(m) m.classList.remove('compact');
-  setH('cmContents','<div class="cf-hero">'+caseArt(curCase)+
-    '<div class="cf-hero-info"><b>'+curCase.name+'</b>'+
-    '<div class="price">'+(curCase.price===0?'БЕСПЛАТНО':'⭐ '+fmt(curCase.price))+'</div>'+
-    '<span class="muted">Состав и шансы выпада:</span></div></div>'+
-    '<div class="contents">'+curCase.drops.map(d=>{const g=gift(d[0]);return
-      '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'55">'+
-      '<div class="ch">'+(d[1]*100).toFixed(0)+'%</div>'+gImg(g)+
-      '<div class="cname">'+g.name+'</div><div class="cprice">⭐'+g.price+'</div></div>';}).join('')+'</div>');
-  const box=$('cfStrips'); box.innerHTML='';
-  const prev=document.createElement('div'); prev.className='roulette-container preview';
-  prev.innerHTML='<div class="preview-label">ПРЕВЬЮ</div><div class="roulette-pointer"></div><div class="roulette-strip"></div>';
-  box.appendChild(prev); buildStrip(prev.querySelector('.roulette-strip'), gift(pick(curCase.drops)[0]));
-  modalOpen('caseModal'); }
 function closeCaseModal(){ if(spinning) return;
   const m=document.querySelector('#caseModal .modal'); if(m) m.classList.remove('compact');
   modalClose('caseModal'); }
@@ -376,13 +354,6 @@ function doUpgrade(){ if(!upFrom||!upTo||upBusy)return;
 }
 
 
-function renderTasks(){ const fr=freeReady();
-  setT('freeCaseState',fr?'Доступен сейчас · 1 спин · подписка':'Следующий через '+Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5)+' ч.');
-  const sb=$('subBtn');
-  if(sb){ if(S.subDone){sb.textContent='✅ Награда получена';sb.disabled=true;sb.classList.add('pressed');}
-    else {sb.textContent='Подписаться';sb.disabled=false;sb.classList.remove('pressed');} }
-  setT('refCount',S.refs);
-  renderQuests(); renderAchs(); }
 async function doSub(){ openChannel();
   setTimeout(async()=>{ const r=await api('/api/check_sub');
     if(r&&r.sub&&!S.subDone){ S.subDone=true; sfx.win();
@@ -390,17 +361,6 @@ async function doSub(){ openChannel();
       saveLocal(); renderHeader(); renderTasks(); renderProfile(); }
     else if(r&&r.sub){ S.subDone=true; toast('Подписка есть ✅','good'); renderProfile(); }
     else toast('Ты не подписан на канал','bad'); },2500); }
-function renderQuests(){ setH('questsList',QUESTS.map(q=>{
-  const p=Math.min(S.qp[q.type]||0,q.target),done=p>=q.target,cl=S.qc.includes(q.id);
-  return '<div class="quests-row"><div class="q-head"><span>'+q.name+'</span><span class="muted">'+p+'/'+q.target+'</span></div>'+
-    '<div class="q-bar"><div class="q-fill" style="width:'+(p/q.target*100)+'%"></div></div>'+
-    '<button class="q-claim" '+(done&&!cl?'':'disabled')+' onclick="claimQuest(\''+q.id+'\')">'+(cl?'✅ Получено':'Забрать +'+(q.reward*10)+' XP')+'</button></div>';}).join('')); }
-function renderAchs(){ setH('achList',ACHS.map(a=>{const d=a.cond(S);return
-    '<div class="ach '+(d?'done':'locked')+'"><span class="emoji">'+a.emoji+'</span><div><b>'+a.name+'</b><div class="muted small">'+(d?'Выполнено ✅':'Не выполнено')+'</div></div></div>';}).join('')); }
-function claimQuest(id){ const q=QUESTS.find(x=>x.id===id);
-  if(S.qc.includes(id)||(S.qp[q.type]||0)<q.target)return;
-  S.qc.push(id); S.xp+=q.reward*10; sfx.win(); toast('📜 Квест выполнен: +'+(q.reward*10)+' XP 🏅','good');
-  saveLocal(); renderHeader(); renderTasks(); }
 function qEvent(t,n){ S.qp[t]=(S.qp[t]||0)+(n||1); saveLocal(); renderHeader(); }
 function checkAch(){ ACHS.forEach(a=>{ if(!S.ac.includes(a.id)&&a.cond(S)){S.ac.push(a.id);toast('🏅 Достижение: '+a.name+'!','good');confetti(60);} }); saveLocal(); }
 
