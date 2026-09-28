@@ -694,3 +694,21 @@ h2,h3{color:#fff}
 .err-modal.type-warn .err-icon{animation:errShake .5s ease}
 @keyframes errShake{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
 
+
+/* 🚀 Performance: lazy render для скрытых секций */
+#sec-cases, #sec-inventory, #sec-market, #sec-quests, #sec-achievements, 
+#sec-upgrade, #sec-battles, #sec-profile, #sec-admin {
+  content-visibility: auto;
+  contain-intrinsic-size: 500px;
+}
+
+/* 🚀 Performance: GPU acceleration для анимаций */
+.roulette-strip, .pl-ball, .mine-tile {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* 🚀 Performance: reduce paint для неактивных элементов */
+.case-card:not(:hover) {
+  contain: layout style;
+}
