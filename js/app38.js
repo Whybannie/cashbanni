@@ -643,6 +643,63 @@ function errGeneric(msg){
 }
 function smartError(msg){
   if(!msg){ errGeneric(); return; }
+  var m=String(msg).toLowerCase();
+  
+  // Подписка
+  if(/подписк|sub|нужна подписка/.test(m)){ gateSub(); return; }
+  
+  // Кулдаун
+  if(/24 ?ч|cooldown|раз в|куoldown/.test(m)){ 
+    errModal('⏳','Подожди немного','Бесплатный кейс можно открывать раз в 24 часа. Возвращайся завтра!',[
+      {label:'Хорошо',primary:true,action:function(){modalClose('errModal');}}
+    ]); 
+    return; 
+  }
+  
+  // Недостаточно средств
+  if(/недостаточно|not enough|хватает|balance/.test(m)){ 
+    errModal('💸','Не хватает звёзд','Для этой операции нужно больше Stars на балансе. Пополни баланс!',[
+      {label:'🎯 Пополнить',primary:true,action:function(){modalClose('errModal');openPay();}},
+      {label:'Позже',action:function(){modalClose('errModal');}}
+    ]); 
+    return; 
+  }
+  
+  // Неверный код
+  if(/неверн|invalid|код не найден/.test(m)){ 
+    errModal('❌','Неверный промокод','Такого промокода не существует или он уже использован.',[
+      {label:'Попробовать снова',primary:true,action:function(){modalClose('errModal');}},
+      {label:'Закрыть',action:function(){modalClose('errModal');}}
+    ]); 
+    return; 
+  }
+  
+  // Код уже использован
+  if(/уже открывал|already used|уже использован/.test(m)){ 
+    errModal('🔒','Код уже использован','Ты уже открывал этот промокод. Попроси новый у стримера!',[
+      {label:'Понятно',primary:true,action:function(){modalClose('errModal');}}
+    ]); 
+    return; 
+  }
+  
+  // Лимит исчерпан
+  if(/лимит|limit|исчерпан/.test(m)){ 
+    errModal('⚠️','Лимит исчерпан','Ты достиг лимита на сегодня. Попробуй завтра!',[
+      {label:'Хорошо',primary:true,action:function(){modalClose('errModal');}}
+    ]); 
+    return; 
+  }
+  
+  // Слишком часто
+  if(/слишком часто|too fast|rate/.test(m)){ 
+    errModal('⏱️','Помедленнее','Не нажимай так часто! Подожди несколько секунд.',[
+      {label:'Окей',primary:true,action:function(){modalClose('errModal');}}
+    ]); 
+    return; 
+  }
+  
+  errGeneric(msg);
+}
   var m=String(msg);
   if(/недостаточно|not enough|хватает/i.test(m)) errBalance(0);
   else if(/24ч|24 ?ч|cooldown|раз в/i.test(m)) errCooldown(24);

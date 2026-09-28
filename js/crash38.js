@@ -89,7 +89,7 @@ function crashLoop(){
     var now=Date.now(); var rn=roundNumber(); var t0=roundStart(rn); var el=now-t0;
     if(crash._rnd!==rn){
       crash._rnd=rn; crash.myBet=0; crash.cashed=false; crash.sparks=[]; crash.lastInt=1; crash._lostRnd=0; crash._sparkRnd=0;
-      crash.crashPos=null; // 🔥 Очищаем сохранённую позицию взрыва
+      crash.crashPos=null; crash.crashTime=0; // 🔥 Очищаем сохранённую позицию взрыва
       crash.hist=crashHistory(); crashHist();
     }
     crash.cp=crashPoint(rn);
@@ -105,6 +105,7 @@ function crashLoop(){
       if(crash.auto>0 && crash.myBet>0 && !crash.cashed && crash._betRnd===rn && crash.m>=crash.auto && crash.m<crash.cp){ doCashout(crash.m); }
       if(crash.m>=crash.cp){
         crash.m=crash.cp; crash.phase='crash';
+        crash.crashTime=Date.now(); // 🔥 Время краша для показа взрыва
         // 🔥 Сохраняем координаты взрыва чтобы ракета не исчезала
         if(!crash.crashPos){
           var cc=$('crashCanvas');

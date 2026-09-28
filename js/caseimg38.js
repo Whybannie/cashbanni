@@ -25,9 +25,8 @@ async function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   if(curCase.free){
     if(!freeReady()){
       const h=Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5);
-      return toast('⏳ Бесплатный кейс раз в 24 часа. Ещё '+h+' ч.','bad');
+      return smartError('бесплатный кейс раз в 24 часа. Ещё '+h+' ч.');
     }
-    // Проверка подписки ПЕРЕД открытием модалки
     const okSub=await checkSub();
     if(!okSub){ gateSub(); return; }
   }
@@ -37,19 +36,16 @@ async function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
   
   const b1=$('btnX1'), b3=$('btnX3'), b5=$('btnX5');
   
-  // Настройка кнопки ×1
   if(b1){
     if(curCase.id==='secret') b1.innerHTML='🔐 ОТКРЫТЬ ПО КОДУ';
     else if(curCase.free) b1.innerHTML='🎁 ОТКРЫТЬ · 1 раз в 24ч';
     else if(!b1.querySelector('#p1')) b1.innerHTML='Открыть ×1 ⭐<span id="p1"></span>';
   }
   
-  // 🔒 СКРЫВАЕМ ×3/×5 ТОЛЬКО для бесплатного и секретного
   if(curCase.free || curCase.id==='secret'){
     if(b3){ b3.style.display='none'; b3.disabled=true; }
     if(b5){ b5.style.display='none'; b5.disabled=true; }
   } else {
-    // Для платных кейсов показываем все кнопки
     if(b3){ b3.style.display=''; b3.disabled=false; }
     if(b5){ b5.style.display=''; b5.disabled=false; }
   }
@@ -72,6 +68,12 @@ const box=$('cfStrips'); box.innerHTML='';
   box.appendChild(prev);
   buildStrip(prev.querySelector('.roulette-strip'), gift(pick(curCase.drops)[0]));
   modalOpen('caseModal');
+  var oldRow=document.getElementById('secretCodeRow'); if(oldRow) oldRow.remove();
+  if(curCase.id==='secret'){
+    var act2=document.querySelector('#caseModal .cf-actions');
+    if(act2) act2.insertAdjacentHTML('beforebegin','<div id="secretCodeRow" style="display:flex;gap:8px;margin:10px 0 0;"><input id="secretCodeInput" placeholder="🔐 ВВЕДИ ПРОМОКОД КЕЙСА" style="flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:13px;padding:12px;color:#fff;font-size:.85rem;outline:none;min-height:48px;text-transform:uppercase;"></div>');
+    if(b3)b3.style.display='none'; if(b5)b5.style.display='none';
+  }
   var oldRow=document.getElementById('secretCodeRow'); if(oldRow) oldRow.remove();
   if(curCase.id==='secret'){
     var act2=document.querySelector('#caseModal .cf-actions');
