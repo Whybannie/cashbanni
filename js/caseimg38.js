@@ -62,31 +62,21 @@ async function openCaseModal(id){ sfx.click(); curCase=CASES.find(c=>c.id===id);
       gImg(g)+
       '<div class="cname">'+g.name+'</div><div class="cprice">⭐'+g.price+'</div></div>';}).join('')+'</div>');
   var cfc=$('cmContents'); if(cfc) cfc.style.display='none';
-const box=$('cfStrips'); box.innerHTML='';
+  const box=$('cfStrips'); box.innerHTML='';
   const prev=document.createElement('div'); prev.className='roulette-container preview';
   prev.innerHTML='<div class="preview-label">ПРЕВЬЮ ПРОКРУТА</div><div class="roulette-pointer"></div><div class="roulette-strip"></div>';
   box.appendChild(prev);
   buildStrip(prev.querySelector('.roulette-strip'), gift(pick(curCase.drops)[0]));
   modalOpen('caseModal');
+  
+  // Секретный кейс - добавляем поле ввода кода
   var oldRow=document.getElementById('secretCodeRow'); if(oldRow) oldRow.remove();
   if(curCase.id==='secret'){
     var act2=document.querySelector('#caseModal .cf-actions');
     if(act2) act2.insertAdjacentHTML('beforebegin','<div id="secretCodeRow" style="display:flex;gap:8px;margin:10px 0 0;"><input id="secretCodeInput" placeholder="🔐 ВВЕДИ ПРОМОКОД КЕЙСА" style="flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:13px;padding:12px;color:#fff;font-size:.85rem;outline:none;min-height:48px;text-transform:uppercase;"></div>');
     if(b3)b3.style.display='none'; if(b5)b5.style.display='none';
   }
-  var oldRow=document.getElementById('secretCodeRow'); if(oldRow) oldRow.remove();
-  if(curCase.id==='secret'){
-    var act2=document.querySelector('#caseModal .cf-actions');
-    if(act2) act2.insertAdjacentHTML('beforebegin','<div id="secretCodeRow" style="display:flex;gap:8px;margin:10px 0 0;"><input id="secretCodeInput" placeholder="🔐 ВВЕДИ ПРОМОКОД КЕЙСА" style="flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:13px;padding:12px;color:#fff;font-size:.85rem;outline:none;min-height:48px;text-transform:uppercase;"></div>');
-    if(b3)b3.style.display='none'; if(b5)b5.style.display='none';
-  }
-  var oldRow=document.getElementById('secretCodeRow'); if(oldRow) oldRow.remove();
-  if(curCase.id==='secret'){
-    var act2=document.querySelector('#caseModal .cf-actions');
-    if(act2) act2.insertAdjacentHTML('beforebegin','<div id="secretCodeRow" style="display:flex;gap:8px;margin:10px 0 0;"><input id="secretCodeInput" placeholder="🔐 ВВЕДИ ПРОМОКОД КЕЙСА" style="flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:13px;padding:12px;color:#fff;font-size:.85rem;outline:none;min-height:48px;text-transform:uppercase;"></div>');
-    if(b3)b3.style.display='none'; if(b5)b5.style.display='none';
-  }
-
+  
   var modalEl=document.querySelector('#caseModal .modal');
   var oldBlock=document.getElementById('caseContentsBlock'); if(oldBlock) oldBlock.remove();
   if(modalEl){
@@ -94,21 +84,11 @@ const box=$('cfStrips'); box.innerHTML='';
       return '<div class="c-item" style="border:1px solid '+RAR[g.rarity].color+'55;">'+
         gImg(g)+'<div class="cname">'+g.name+'</div>'+
         '<div class="cprice">⭐'+g.price+'</div></div>'; }).join('');
-    var act0=modalEl.querySelector('.cf-actions'); (act0||modalEl).insertAdjacentHTML('beforebegin','<div id="caseContentsBlock" style="display:block;margin:0 0 12px;flex:0 0 auto;">'+
-      '<div style="font-size:.82rem;font-weight:900;margin-bottom:8px;color:#fff;">🎁 Содержимое кейса</div>'+
-      '<div class="contents" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:34vh;overflow-y:auto;padding:2px;">'+items+'</div></div>');
-  }
-  var cf=$('cmContents');
-  if(cf){
-    cf.style.cssText='display:block;margin:0 0 12px;flex:0 0 auto;min-height:60px;';
-    var grid=cf.querySelector('.contents');
-    if(grid){ grid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:42vh;overflow-y:auto;margin:0;padding:2px;'; }
-    var hero=cf.querySelector('.cf-hero');
-    if(hero){ hero.style.cssText='display:flex;gap:14px;align-items:center;padding:4px 2px 10px;'; }
+    var blk=document.createElement('div'); blk.id='caseContentsBlock'; blk.className='case-contents-block'; blk.innerHTML='<div class="case-contents-title">🎁 Состав кейса</div>'+items;
+    modalEl.appendChild(blk);
   }
 }
 
-// ---- Задания + понятная рефералка ----
 function renderTasks(){ const fr=freeReady();
   setT('freeCaseState',fr?'Доступен сейчас · 1 спин · подписка':'Следующий через '+Math.ceil((FREE_CASE_COOLDOWN-(Date.now()-S.freeLast))/36e5)+' ч.');
   const sb=$('subBtn');
