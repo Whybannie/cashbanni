@@ -1016,3 +1016,88 @@ h2,h3{color:#fff}
 .result-info.done {
   opacity: 0.5;
 }
+
+/* ===== v72.8: баланс в уголке + фикс кнопок и квадратов ===== */
+
+/* Баланс компактный в уголке модалки */
+#cmBalance {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 16px;
+  padding: 4px 10px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* Заголовок модалки с балансом в ряд */
+#caseModal .cf-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Состав кейса - убираем наложение квадратов */
+#caseContentsBlock {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  padding: 10px !important;
+  overflow-x: hidden !important;
+}
+
+#caseContentsBlock .c-item {
+  aspect-ratio: 1 / 1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  padding: 6px !important;
+  box-sizing: border-box !important;
+}
+
+/* Картинка внутри квадрата - полностью заполняет */
+#caseContentsBlock .c-item .gimg-wrap {
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+#caseContentsBlock .c-item .gimg-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+/* Рулетки - каждая со своими кнопками по центру */
+#cfStrips {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#cfStrips .roulette-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Баннер результата - строго внутри рулетки */
+#cfStrips .roulette-container .result-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 30, 0.94);
+  border-radius: 16px;
+  margin: 0;
+}

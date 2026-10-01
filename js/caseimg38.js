@@ -35,17 +35,17 @@ async function openCaseModal(id){
   
   setT('cmTitle',curCase.name);
   
-  // Баланс в модалке
+  // Баланс компактный в уголке
   var balEl = $('cmBalance');
   if(!balEl){
     var head = document.querySelector('#caseModal .cf-head');
     if(head){
       balEl = document.createElement('div');
       balEl.id = 'cmBalance';
-      head.after(balEl);
+      head.appendChild(balEl);
     }
   }
-  if(balEl) balEl.innerHTML = '⭐ Баланс: <b>' + fmt(S.balance) + '</b>';
+  if(balEl) balEl.innerHTML = '⭐ <b>' + fmt(S.balance) + '</b>';
   setT('p1',fmt(curCase.price)); 
   setT('p3',fmt(curCase.price*3)); 
   setT('p5',fmt(curCase.price*5));
@@ -229,6 +229,9 @@ async function spin(n){
   if(curCase.free) S.freeLast=Date.now();
   saveLocal(); 
   renderHeader();
+  // Обновляем баланс в модалке
+  var balEl=$('cmBalance');
+  if(balEl) balEl.innerHTML='⭐ <b>'+fmt(S.balance)+'</b>';
   
   const wins=r.results.map(gid=>gift(gid));
   const box=$('cfStrips'); 
