@@ -762,14 +762,22 @@ h2,h3{color:#fff}
   height: 56px;
 }
 
+}
 
-/* ===== v72.4: состав кейса - 3 в ряд, компактные квадраты ===== */
+#caseContentsBlock .c-item .cprice {
+  font-size: 0.55rem;
+  margin-top: 2px;
+  color: #fbbf24;
+  font-weight: 700;
+}
+
+/* ===== v72.5: состав кейса - 3 в ряд, картинки без обрезки ===== */
 #caseContentsBlock {
   margin-top: 12px;
   padding: 10px;
   background: rgba(255,255,255,.03);
   border-radius: 14px;
-  max-height: 320px;
+  max-height: 340px;
   overflow-y: auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -797,18 +805,20 @@ h2,h3{color:#fff}
   overflow: hidden;
 }
 
+/* Картинка полностью заполняет квадрат без обрезки */
 #caseContentsBlock .c-item .gimg-wrap {
-  width: 48px;
-  height: 48px;
-  max-width: 48px;
-  max-height: 48px;
+  width: 64px;
+  height: 64px;
+  max-width: 100%;
+  aspect-ratio: 1 / 1;
 }
 
 #caseContentsBlock .c-item .gimg-wrap img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 8px;
+  display: block;
 }
 
 #caseContentsBlock .c-item .gimg-wrap .emoji-fallback {
@@ -816,9 +826,9 @@ h2,h3{color:#fff}
 }
 
 #caseContentsBlock .c-item .emoji {
-  font-size: 1.8rem;
-  width: 48px;
-  height: 48px;
+  font-size: 2.2rem;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -836,4 +846,25 @@ h2,h3{color:#fff}
   margin-top: 2px;
   color: #fbbf24;
   font-weight: 700;
+}
+
+/* Рулетка - картинки без пустого пространства */
+.roulette-item .gimg-wrap {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+}
+
+.roulette-item .gimg-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+  display: block;
+}
+
+.roulette-item .gimg-wrap .emoji-fallback {
+  display: none;
 }
