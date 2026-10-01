@@ -1069,3 +1069,21 @@ h2,h3{color:#fff}
   background: rgba(0,0,0,.4);
   color: rgba(255,255,255,.7);
 }
+
+/* ===== v74.1: цена в составе видна полностью ===== */
+#caseContentsBlock .c-item .cprice {
+  font-size: 0.6rem !important;
+  color: #fbbf24 !important;
+  margin-top: 2px !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+#caseContentsBlock .c-item .cname {
+  font-size: 0.58rem !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  max-height: 2.2em !important;
+}
