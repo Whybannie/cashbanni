@@ -58,7 +58,7 @@ h3{font-size:.82rem;margin-bottom:8px;color:rgba(255,255,255,.75)}
 .case-art .bow::before{left:-46%;transform:rotate(-30deg)}.case-art .bow::after{right:-46%;transform:rotate(30deg)}
 .case-art .lid{position:absolute;top:5%;left:4%;width:92%;height:22%;border-radius:8px;background:linear-gradient(180deg,var(--c2),var(--c1));transition:.35s;transform-origin:8% 100%;z-index:3;box-shadow:0 4px 14px rgba(0,0,0,.35)}
 .case-art .body{position:absolute;top:26%;left:0;width:100%;height:74%;border-radius:6px 6px 16px 16px;background:linear-gradient(180deg,var(--c1),var(--c0));overflow:hidden;z-index:1;box-shadow:inset 0 -12px 24px rgba(0,0,0,.35)}
-.case-art .body::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);animation:shine 3.2s ease-in-out infinite}
+.case-art .body::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);animation:none}
 @keyframes shine{0%{left:-60%}55%{left:120%}100%{left:120%}}
 .case-art .rv{position:absolute;top:26%;left:44%;width:12%;height:74%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent),var(--c2);z-index:2}
 .case-art .rh{position:absolute;top:54%;left:0;width:100%;height:11%;background:linear-gradient(180deg,transparent,rgba(255,255,255,.4),transparent),var(--c2);z-index:2}
@@ -158,7 +158,7 @@ h3{font-size:.82rem;margin-bottom:8px;color:rgba(255,255,255,.75)}
 .contents .emoji{font-size:1.4rem;display:block}
 .contents .ch{color:rgba(255,255,255,.4)}
 
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(3,3,12,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:1000;align-items:center;justify-content:center;padding:14px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(3,3,12,.85);;z-index:1000;align-items:center;justify-content:center;padding:14px}
 .modal-overlay.active{display:flex}
 .modal{background:#0e0e28;border-radius:26px;padding:20px;width:100%;max-width:430px;border:1px solid var(--line);max-height:92vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.6)}
 .modal.wide{max-width:560px}
@@ -417,7 +417,7 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 .up-layout{background:linear-gradient(180deg,rgba(168,85,247,.10),rgba(6,6,26,0));border:1px solid rgba(168,85,247,.25);border-radius:24px;padding:16px}
 .wheel-wrap{width:230px;height:230px;margin:0 auto}
 .wheel-wrap.small{width:150px;height:150px}
-.wheel-wrap .wheel{width:100%;height:100%;box-shadow:0 0 40px rgba(168,85,247,.35), inset 0 0 30px rgba(0,0,0,.5)}
+.wheel-wrap .wheel{width:100%;height:100%;box-shadow:0 0 10px rgba(168,85,247,.15)}
 .wheel-center{font-size:1.5rem;font-weight:900;color:#fff;text-shadow:0 0 12px rgba(168,85,247,.8)}
 .wheel-pointer{filter:drop-shadow(0 0 6px rgba(251,191,36,.8))}
 #upBtn{min-height:58px;font-size:1.05rem;border-radius:16px}
@@ -632,8 +632,8 @@ h2,h3{color:#fff}
 .pl-ball.on::after{display:none}
 
 /* ===== v54: NFT holo frames ===== */
-.gimg.nft-ultra,.emoji.nft-ultra{border-radius:14px;animation:ultraPulse 2.2s ease-in-out infinite}
-.gimg.nft-mythic,.emoji.nft-mythic{border-radius:14px;animation:mythicPulse 1.8s ease-in-out infinite}
+.gimg.nft-ultra,.emoji.nft-ultra{border-radius:14px;animation:none}
+.gimg.nft-mythic,.emoji.nft-mythic{border-radius:14px;animation:none}
 @keyframes ultraPulse{0%,100%{box-shadow:0 0 0 2px rgba(34,211,238,.9),0 0 16px rgba(34,211,238,.6),0 0 34px rgba(34,211,238,.3)}50%{box-shadow:0 0 0 2px rgba(168,85,247,.9),0 0 18px rgba(168,85,247,.65),0 0 40px rgba(168,85,247,.35)}}
 @keyframes mythicPulse{0%,100%{box-shadow:0 0 0 2px #fff,0 0 14px rgba(255,255,255,.8),0 0 30px rgba(168,85,247,.7),0 0 50px rgba(34,211,238,.5)}50%{box-shadow:0 0 0 2px #fbbf24,0 0 16px rgba(251,191,36,.85),0 0 34px rgba(236,72,153,.6),0 0 54px rgba(34,211,238,.45)}}
 
@@ -684,7 +684,7 @@ h2,h3{color:#fff}
 .err-text{font-size:.88rem;color:rgba(255,255,255,.7);margin:4px 0 14px;line-height:1.5}
 .err-actions{display:flex;flex-direction:column;gap:8px;width:100%}
 .err-actions .btn{width:100%;margin:0}
-.err-modal.type-warn .err-icon{animation:errShake .5s ease}
+.err-modal.type-warn .err-icon{animation:none}
 @keyframes errShake{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
 
 
@@ -697,7 +697,7 @@ h2,h3{color:#fff}
 
 /* 🚀 Performance: GPU acceleration для анимаций */
 .roulette-strip, .pl-ball, .mine-tile {
-  will-change: transform;
+  
   transform: translateZ(0);
 }
 

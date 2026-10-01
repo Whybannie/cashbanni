@@ -227,3 +227,19 @@ setTimeout(function(){ try{crashResize();}catch(e){} },200);
 (function(){ var pd=window.plinkoDrop; if(pd){ window.plinkoDrop=function(){
   if(document.querySelectorAll('.pl-ball.on').length>=6){ if(window.toast) toast('⏳ Подожди, пока шары упадут','bad'); return; }
   return pd.apply(this,arguments); }; } })();
+
+
+// ===== v73: оптимизация - остановка Crash при неактивной вкладке =====
+(function(){
+  var crashRunning = false;
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){
+      crashRunning = false;
+    } else {
+      if(!crashRunning){
+        crashRunning = true;
+        try{ crashLoop(); }catch(e){}
+      }
+    }
+  });
+})();
