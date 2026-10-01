@@ -762,81 +762,78 @@ h2,h3{color:#fff}
   height: 56px;
 }
 
-/* ===== v72.3: сетка 3 колонки для состава кейса ===== */
 
-/* Контейнер состава - сетка 3 колонки */
-#caseModal .contents,
-#caseModal .cf-contents .contents {
-  display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important;
-  gap: 8px !important;
-  padding: 8px !important;
-  max-height: 340px !important;
-  overflow-y: auto !important;
+/* ===== v72.4: состав кейса - 3 в ряд, компактные квадраты ===== */
+#caseContentsBlock {
+  margin-top: 12px;
+  padding: 10px;
+  background: rgba(255,255,255,.03);
+  border-radius: 14px;
+  max-height: 320px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
 
-/* Каждая плитка - квадрат */
-#caseModal .c-item {
-  aspect-ratio: 1 / 1 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 8px 4px !important;
-  border-radius: 12px !important;
-  background: rgba(255,255,255,.04) !important;
-  text-align: center !important;
-  overflow: hidden !important;
+#caseContentsBlock .case-contents-title {
+  grid-column: 1 / -1;
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: rgba(255,255,255,.6);
+  text-align: center;
+  margin-bottom: 4px;
 }
 
-/* Картинка внутри плитки - заполняет квадрат */
-#caseModal .c-item .gimg-wrap {
-  width: 100% !important;
-  height: auto !important;
-  aspect-ratio: 1 / 1 !important;
-  max-width: 64px !important;
-  max-height: 64px !important;
+#caseContentsBlock .c-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px 6px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+  text-align: center;
+  overflow: hidden;
 }
 
-#caseModal .c-item .gimg-wrap img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  border-radius: 8px !important;
+#caseContentsBlock .c-item .gimg-wrap {
+  width: 48px;
+  height: 48px;
+  max-width: 48px;
+  max-height: 48px;
 }
 
-/* Эмодзи-подарки тоже в квадрате */
-#caseModal .c-item .emoji {
-  font-size: 2rem !important;
-  width: 100% !important;
-  aspect-ratio: 1 / 1 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+#caseContentsBlock .c-item .gimg-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
-/* Название и цена - компактные */
-#caseModal .c-item .cname {
-  font-size: 0.58rem !important;
-  line-height: 1.1 !important;
-  margin-top: 4px !important;
-  max-height: 2.2em !important;
-  overflow: hidden !important;
+#caseContentsBlock .c-item .gimg-wrap .emoji-fallback {
+  display: none;
 }
 
-#caseModal .c-item .cprice {
-  font-size: 0.55rem !important;
-  color: #fbbf24 !important;
-  margin-top: 2px !important;
+#caseContentsBlock .c-item .emoji {
+  font-size: 1.8rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Шанс выпадения */
-#caseModal .c-item .ch {
-  position: absolute !important;
-  top: 4px !important;
-  right: 4px !important;
-  font-size: 0.5rem !important;
-  padding: 1px 5px !important;
-  border-radius: 6px !important;
-  background: rgba(0,0,0,.5) !important;
+#caseContentsBlock .c-item .cname {
+  font-size: 0.58rem;
+  line-height: 1.1;
+  margin-top: 4px;
+  color: rgba(255,255,255,.85);
+}
+
+#caseContentsBlock .c-item .cprice {
+  font-size: 0.55rem;
+  margin-top: 2px;
+  color: #fbbf24;
+  font-weight: 700;
 }
