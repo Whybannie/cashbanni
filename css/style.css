@@ -938,3 +938,81 @@ h2,h3{color:#fff}
 .result-banner .emoji {
   font-size: 2.4rem;
 }
+
+/* ===== v72.7: баланс в модалке + квадраты + фикс кнопок ===== */
+
+/* Баланс в модалке кейса */
+#cmBalance {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #fbbf24;
+  padding: 6px 12px;
+  background: rgba(251, 191, 36, 0.1);
+  border-radius: 20px;
+  margin: 8px 0;
+}
+
+/* Состав кейса - КВАДРАТНЫЕ плитки */
+#caseContentsBlock .c-item {
+  aspect-ratio: 1 / 1 !important;
+  width: 100% !important;
+  padding: 6px !important;
+  box-sizing: border-box !important;
+}
+
+#caseContentsBlock .c-item .gimg-wrap {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+#caseContentsBlock .c-item .emoji {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  max-width: none !important;
+  max-height: none !important;
+  font-size: clamp(1.5rem, 8vw, 2.5rem) !important;
+}
+
+/* Рулетка - кнопки по центру каждой */
+#cfStrips {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#cfStrips .roulette-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Баннер результата - строго по центру рулетки */
+#cfStrips .result-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 30, 0.94);
+  border-radius: 16px;
+}
+
+/* Кнопки после нажатия - скрыты */
+.result-actions.done {
+  display: none;
+}
+
+.result-info.done {
+  opacity: 0.5;
+}

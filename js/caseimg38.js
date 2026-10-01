@@ -34,6 +34,18 @@ async function openCaseModal(id){
   }
   
   setT('cmTitle',curCase.name);
+  
+  // Баланс в модалке
+  var balEl = $('cmBalance');
+  if(!balEl){
+    var head = document.querySelector('#caseModal .cf-head');
+    if(head){
+      balEl = document.createElement('div');
+      balEl.id = 'cmBalance';
+      head.after(balEl);
+    }
+  }
+  if(balEl) balEl.innerHTML = '⭐ Баланс: <b>' + fmt(S.balance) + '</b>';
   setT('p1',fmt(curCase.price)); 
   setT('p3',fmt(curCase.price*3)); 
   setT('p5',fmt(curCase.price*5));
@@ -268,7 +280,8 @@ function keepWon(u){
   const o=document.querySelector('[data-ow="'+u+'"]'); 
   if(o){ 
     o.innerHTML='📦 В инвентаре'; 
-    setTimeout(()=>o.classList.add('fade'),1000); 
+    o.style.pointerEvents='none';
+    o.style.opacity='0.6';
   } 
 }
 
@@ -287,10 +300,14 @@ function sellWon(u){
   renderHeader(); 
   refreshInv(); 
   checkAch();
+  // Обновляем баланс в модалке
+  var balEl=$('cmBalance');
+  if(balEl) balEl.innerHTML='⭐ Баланс: <b>'+fmt(S.balance)+'</b>';
   const o=document.querySelector('[data-ow="'+u+'"]'); 
   if(o){ 
     o.innerHTML='✅ Продано +⭐'+g.price; 
-    setTimeout(()=>o.classList.add('fade'),1000); 
+    o.style.pointerEvents='none';
+    o.style.opacity='0.6';
   } 
 }
 
