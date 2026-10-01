@@ -707,4 +707,3 @@ function smartError(msg){
   else if(/уже открывал|already used|used/i.test(m)) errUsedCode();
   else if(/неверн|invalid|использован|лимит исчерпан/i.test(m)) errBadCode();
   else errGeneric(m);
-}
