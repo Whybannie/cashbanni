@@ -761,3 +761,82 @@ h2,h3{color:#fff}
   width: 56px;
   height: 56px;
 }
+
+/* ===== v72.3: сетка 3 колонки для состава кейса ===== */
+
+/* Контейнер состава - сетка 3 колонки */
+#caseModal .contents,
+#caseModal .cf-contents .contents {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+  padding: 8px !important;
+  max-height: 340px !important;
+  overflow-y: auto !important;
+}
+
+/* Каждая плитка - квадрат */
+#caseModal .c-item {
+  aspect-ratio: 1 / 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 4px !important;
+  border-radius: 12px !important;
+  background: rgba(255,255,255,.04) !important;
+  text-align: center !important;
+  overflow: hidden !important;
+}
+
+/* Картинка внутри плитки - заполняет квадрат */
+#caseModal .c-item .gimg-wrap {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  max-width: 64px !important;
+  max-height: 64px !important;
+}
+
+#caseModal .c-item .gimg-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 8px !important;
+}
+
+/* Эмодзи-подарки тоже в квадрате */
+#caseModal .c-item .emoji {
+  font-size: 2rem !important;
+  width: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Название и цена - компактные */
+#caseModal .c-item .cname {
+  font-size: 0.58rem !important;
+  line-height: 1.1 !important;
+  margin-top: 4px !important;
+  max-height: 2.2em !important;
+  overflow: hidden !important;
+}
+
+#caseModal .c-item .cprice {
+  font-size: 0.55rem !important;
+  color: #fbbf24 !important;
+  margin-top: 2px !important;
+}
+
+/* Шанс выпадения */
+#caseModal .c-item .ch {
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  font-size: 0.5rem !important;
+  padding: 1px 5px !important;
+  border-radius: 6px !important;
+  background: rgba(0,0,0,.5) !important;
+}
