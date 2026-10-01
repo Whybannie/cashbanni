@@ -47,13 +47,13 @@ h3{font-size:.82rem;margin-bottom:8px;color:rgba(255,255,255,.75)}
 .case-card:nth-child(2n){animation-delay:.7s}.case-card:nth-child(3n){animation-delay:1.4s}
 @keyframes casefloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .case-card:active{transform:scale(.95);animation-play-state:paused}
-.case-card:hover{border-color:rgba(168,85,247,.45);box-shadow:0 14px 44px var(--glow)}
+.case-card:hover{border-color:rgba(168,85,247,.45);}
 .case-card .name{font-weight:900;font-size:.9rem;margin-bottom:4px}
 .case-card .price{display:inline-flex;align-items:center;gap:3px;color:var(--gold);font-weight:900;font-size:.8rem;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:50px;padding:4px 12px;margin-top:6px}
 .case-card .rt{position:absolute;top:10px;right:10px;width:9px;height:9px;border-radius:50%;box-shadow:0 0 10px currentColor}
 .free-badge{position:absolute;top:8px;left:8px;background:rgba(34,197,94,.2);color:#4ade80;border:1px solid rgba(34,197,94,.35);font-size:.58rem;font-weight:900;border-radius:8px;padding:3px 8px;letter-spacing:.5px}
-.case-art{position:relative;width:90px;height:90px;margin:0 auto 10px;filter:drop-shadow(0 12px 26px var(--glow));transition:.3s}
-.case-art .bow{position:absolute;top:-6%;left:50%;transform:translateX(-50%);width:26%;height:13%;background:var(--c2);border-radius:50% 50% 0 0/100% 100% 0 0;box-shadow:0 0 12px var(--glow);z-index:4}
+.case-art{position:relative;width:90px;height:90px;margin:0 auto 10px;transition:.3s}
+.case-art .bow{position:absolute;top:-6%;left:50%;transform:translateX(-50%);width:26%;height:13%;background:var(--c2);border-radius:50% 50% 0 0/100% 100% 0 0;;z-index:4}
 .case-art .bow::before,.case-art .bow::after{content:'';position:absolute;top:25%;width:52%;height:110%;background:var(--c2);border-radius:50% 50% 0 0/100% 100% 0 0}
 .case-art .bow::before{left:-46%;transform:rotate(-30deg)}.case-art .bow::after{right:-46%;transform:rotate(30deg)}
 .case-art .lid{position:absolute;top:5%;left:4%;width:92%;height:22%;border-radius:8px;background:linear-gradient(180deg,var(--c2),var(--c1));transition:.35s;transform-origin:8% 100%;z-index:3;box-shadow:0 4px 14px rgba(0,0,0,.35)}
@@ -385,7 +385,7 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 @keyframes shake2{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 
 /* ===== v22: картинки кейсов ===== */
-.case-img{width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 0 14px var(--glow));margin:0 auto;display:block}
+.case-img{width:72px;height:72px;object-fit:contain;;margin:0 auto;display:block}
 .case-card .case-art{display:flex;align-items:center;justify-content:center;padding:8px}
 .cf-hero .case-art{width:100px;height:100px;flex-shrink:0}
 .cf-hero .case-img{width:100px;height:100px}
@@ -393,14 +393,14 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 /* ===== v22.1: case art на всё поле ===== */
 .case-art:has(img){background:transparent;border:none;padding:0;box-shadow:none;height:auto}
 .case-card .case-art{width:100%;height:120px;display:flex;align-items:center;justify-content:center}
-.case-img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 18px var(--glow))}
+.case-img{width:100%;height:100%;object-fit:contain;}
 .cf-hero .case-art{width:120px;height:120px;flex-shrink:0}
 .cf-hero .case-img{width:120px;height:120px}
 
 /* ===== v23: кейсы как в EasyGift — большой квадратный арт ===== */
 .case-card .case-art{width:100%;aspect-ratio:1/1;height:auto;padding:0;margin:0 0 8px;background:transparent;border:none;box-shadow:none}
 .case-art:has(img){background:transparent;border:none;padding:0;box-shadow:none}
-.case-img{width:100%;height:100%;object-fit:contain;border-radius:16px;filter:drop-shadow(0 0 22px var(--glow))}
+.case-img{width:100%;height:100%;object-fit:contain;border-radius:16px;}
 .case-card{padding:10px}
 .case-card .name{font-size:.8rem;margin-top:2px}
 .cf-hero .case-art{width:140px;height:140px;flex-shrink:0}
@@ -471,14 +471,14 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 .re-step.reward{color:#86efac;font-weight:700}
 
 /* ===== v30: компактный стримерский стиль ===== */
-.case-art.is-streamer{filter:drop-shadow(0 0 18px rgba(244,114,182,.5))}
-.case-card:has(.is-streamer){border:1px solid rgba(244,114,182,.35);box-shadow:0 0 16px rgba(244,114,182,.2)}
+.case-art.is-streamer{}
+.case-card:has(.is-streamer){border:1px solid rgba(244,114,182,.35);}
 .cf-hero-streamer{margin-top:4px;font-size:.72rem;color:#f472b6;font-weight:700}
 .streamer-mini{font-size:.6rem;color:#f472b6;font-weight:800;text-transform:uppercase;letter-spacing:.03em;margin-top:-2px}
 
 /* ===== v30: компактный стримерский стиль ===== */
-.case-art.is-streamer{filter:drop-shadow(0 0 18px rgba(244,114,182,.5))}
-.case-card:has(.is-streamer){border:1px solid rgba(244,114,182,.35);box-shadow:0 0 16px rgba(244,114,182,.2)}
+.case-art.is-streamer{}
+.case-card:has(.is-streamer){border:1px solid rgba(244,114,182,.35);}
 .cf-hero-streamer{margin-top:4px;font-size:.72rem;color:#f472b6;font-weight:700}
 .streamer-mini{font-size:.6rem;color:#f472b6;font-weight:800;text-transform:uppercase;letter-spacing:.03em;margin-top:-2px}
 
@@ -1118,4 +1118,95 @@ h2,h3{color:#fff}
 /* Скрываем индивидуальные кнопки когда есть общая */
 #cfStrips.has-bulk .result-actions {
   display: none;
+}
+
+/* ===== v73.1: ФИКС НАЛОЖЕНИЯ ПЛИТОК В СОСТАВЕ ===== */
+
+/* Плитки в составе - строгие границы без наложения */
+#caseContentsBlock .c-item {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  padding: 6px !important;
+  gap: 2px !important;
+  border-radius: 10px !important;
+  background: rgba(255,255,255,.04) !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Картинка в плитке - фиксированный размер */
+#caseContentsBlock .c-item .gimg-wrap {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  max-width: 56px !important;
+  max-height: 56px !important;
+  aspect-ratio: 1/1 !important;
+  flex-shrink: 0 !important;
+}
+
+#caseContentsBlock .c-item .gimg-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 6px !important;
+}
+
+#caseContentsBlock .c-item .gimg-wrap .emoji-fallback {
+  display: none !important;
+}
+
+/* Эмодзи-подарки */
+#caseContentsBlock .c-item .emoji {
+  width: 56px !important;
+  height: 56px !important;
+  font-size: 2rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+/* Название и цена */
+#caseContentsBlock .c-item .cname {
+  font-size: 0.56rem !important;
+  line-height: 1.1 !important;
+  margin-top: 3px !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+#caseContentsBlock .c-item .cprice {
+  font-size: 0.54rem !important;
+  color: #fbbf24 !important;
+  margin-top: 1px !important;
+}
+
+/* Шанс выпадения - без наложения */
+#caseContentsBlock .c-item .ch {
+  position: static !important;
+  font-size: 0.5rem !important;
+  padding: 1px 5px !important;
+  margin-top: 2px !important;
+  border-radius: 6px !important;
+  background: rgba(0,0,0,.4) !important;
+}
+
+/* Контейнер состава */
+#caseContentsBlock {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  padding: 8px !important;
+  max-height: 320px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
 }
