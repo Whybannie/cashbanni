@@ -185,6 +185,7 @@ function claimQuest(id){
 }
 
 async function spin(n){ 
+  lastSpinCount = n;
   if(spinning) return; 
   spinning=true;
   
@@ -557,3 +558,48 @@ async function syncNftPrices(){
 }
 setTimeout(syncNftPrices,3000);
 setInterval(syncNftPrices,600000);
+
+
+// ===== v72.9: единые кнопки для нескольких рулеток =====
+function sellAllWon(){
+  var total = 0;
+  var items = S.inv.slice(-lastSpinCount);
+  items.forEach(function(item){
+    var g = gift(item.gid);
+    if(g){
+      total += g.price;
+      S.inv = S.inv.filter(i => i.uid !== item.uid);
+    }
+  });
+  if(total > 0){
+    S.balance += total;
+    S.stats.sells = (S.stats.sells||0) + items.length;
+    qEvent('sell');
+    sfx.win();
+    toast('Продано ' + items.length + ' предметов: +⭐' + fmt(total), 'good');
+    save();
+    renderHeader();
+    refreshInv();
+    checkAch();
+    var balEl = $('cmBalance');
+    if(balEl) balEl.innerHTML = '⭐ <b>' + fmt(S.balance) + '</b>';
+  }
+  var bulkEl = $('bulkActions');
+  if(bulkEl) bulkEl.innerHTML = '✅ Все продано';
+  bulkEl.style.pointerEvents = 'none';
+  bulkEl.style.opacity = '0.6';
+}
+
+function keepAllWon(){
+  var bulkEl = $('bulkActions');
+  if(bulkEl){
+    bulkEl.innerHTML = '📦 Все в инвентаре';
+    bulkEl.style.pointerEvents = 'none';
+    bulkEl.style.opacity = '0.6';
+  }
+  sfx.click();
+  refreshInv();
+  toast('Все предметы добавлены в инвентарь', 'good');
+}
+
+var lastSpinCount = 0;

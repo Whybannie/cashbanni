@@ -1101,3 +1101,21 @@ h2,h3{color:#fff}
   border-radius: 16px;
   margin: 0;
 }
+
+
+/* ===== v72.9: единая кнопка для нескольких рулеток ===== */
+#bulkActions {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+#bulkActions .btn {
+  flex: 1;
+  min-height: 48px;
+}
+
+/* Скрываем индивидуальные кнопки когда есть общая */
+#cfStrips.has-bulk .result-actions {
+  display: none;
+}
