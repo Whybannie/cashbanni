@@ -509,6 +509,16 @@ function gImg(g,cls){
     '<span class="emoji-fallback">'+g.emoji+'</span></div>'; 
 }
 
+// ===== v53: баттлы на замке =====
+function renderBattles(){ 
+  setH('battlesList','<div class="empty-battles">🔒 <b>Баттлы временно закрыты</b><br>Режим на обслуживании — скоро вернём с обновлением</div>'); 
+}
+function createBattle(){ 
+  toast('🔒 Баттлы временно закрыты — скоро откроем','bad'); 
+}
+function joinBattle(id){ 
+  toast('🔒 Баттлы временно закрыты','bad'); 
+}
 
 // ===== v55: live NFT prices with server =====
 async function syncNftPrices(){ 
