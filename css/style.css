@@ -713,8 +713,6 @@ h2,h3{color:#fff}
   contain: layout style;
 }
 
-/* ===== v71.6: FIX ОГРОМНЫХ КАРТИНОК ===== */
-
 /* Картинки кейсов - компактные */
 .case-img {
   width: 80px !important;
@@ -792,8 +790,6 @@ h2,h3{color:#fff}
 }
 
 
-/* ===== v71.7: ФИНАЛЬНЫЙ ФИКС КАРТИНОК ===== */
-
 /* Принудительные размеры для всех картинок в кейсах */
 #caseModal .gimg,
 #caseModal .emoji,
@@ -848,4 +844,113 @@ h2,h3{color:#fff}
   max-width: 80px !important;
   max-height: 80px !important;
   object-fit: contain !important;
+}
+
+
+/* ===== v71.8: ФИНАЛЬНЫЕ РАЗМЕРЫ КАРТИНОК ===== */
+
+/* Картинки кейсов в модалке - нормальный размер */
+#caseModal .case-img {
+  width: 100px !important;
+  height: 100px !important;
+  max-width: 100px !important;
+  max-height: 100px !important;
+  object-fit: contain !important;
+}
+
+/* Арт кейса в модалке */
+#caseModal .cf-hero .case-art {
+  width: 120px !important;
+  height: 120px !important;
+  max-width: 120px !important;
+  max-height: 120px !important;
+}
+
+/* Картинки в составе кейса - компактные но читаемые */
+#caseModal .contents .gimg {
+  width: 48px !important;
+  height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+  object-fit: contain !important;
+  margin: 0 auto !important;
+  display: block !important;
+}
+
+#caseModal .contents .emoji {
+  font-size: 2rem !important;
+  display: block !important;
+}
+
+/* Состав кейса - сетка */
+#caseModal .contents {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  padding: 10px !important;
+  margin: 12px 0 !important;
+}
+
+/* Плитки в составе */
+#caseModal .c-item {
+  padding: 10px 6px !important;
+  font-size: 0.64rem !important;
+  border-radius: 12px !important;
+  background: rgba(255,255,255,.04) !important;
+  text-align: center !important;
+}
+
+/* Названия и цены в составе */
+#caseModal .cname {
+  font-size: 0.62rem !important;
+  line-height: 1.2 !important;
+  margin-top: 4px !important;
+  color: rgba(255,255,255,.9) !important;
+}
+
+#caseModal .cprice {
+  font-size: 0.58rem !important;
+  margin-top: 3px !important;
+  color: #fbbf24 !important;
+  font-weight: 700 !important;
+}
+
+/* Шанс в составе */
+#caseModal .ch {
+  font-size: 0.55rem !important;
+  padding: 2px 6px !important;
+  border-radius: 8px !important;
+  background: rgba(0,0,0,.4) !important;
+  color: rgba(255,255,255,.7) !important;
+}
+
+/* Рулетка - правильные размеры */
+.roulette-container {
+  height: 132px !important;
+  margin: 10px 0 !important;
+}
+
+.roulette-item {
+  width: 112px !important;
+  min-width: 112px !important;
+  height: 100% !important;
+}
+
+.roulette-item .gimg {
+  width: 56px !important;
+  height: 56px !important;
+  max-width: 56px !important;
+  max-height: 56px !important;
+  object-fit: contain !important;
+}
+
+.roulette-item .emoji {
+  font-size: 2.2rem !important;
+}
+
+.roulette-item .name {
+  font-size: 0.58rem !important;
+  margin-top: 4px !important;
 }
