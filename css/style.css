@@ -712,3 +712,81 @@ h2,h3{color:#fff}
 .case-card:not(:hover) {
   contain: layout style;
 }
+
+/* ===== v71.6: FIX ОГРОМНЫХ КАРТИНОК ===== */
+
+/* Картинки кейсов - компактные */
+.case-img {
+  width: 80px !important;
+  height: 80px !important;
+  object-fit: contain !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Арт кейса в карточке и модалке */
+.case-card .case-art,
+.cf-hero .case-art {
+  width: 100px !important;
+  height: 100px !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  aspect-ratio: 1/1 !important;
+  padding: 4px !important;
+  margin: 0 auto !important;
+}
+
+/* Состав кейса - компактная сетка */
+.contents {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 6px !important;
+  max-height: 280px !important;
+  overflow-y: auto !important;
+  margin: 8px 0 !important;
+}
+
+/* Плитки в составе */
+.contents .c-item {
+  padding: 6px 4px !important;
+  font-size: 0.6rem !important;
+  border-radius: 10px !important;
+  gap: 2px !important;
+}
+
+/* Картинки в составе */
+.contents .gimg {
+  width: 32px !important;
+  height: 32px !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Эмодзи в составе */
+.contents .emoji {
+  font-size: 1.4rem !important;
+}
+
+/* Цена в составе */
+.contents .cprice {
+  font-size: 0.58rem !important;
+}
+
+/* Название в составе */
+.contents .cname {
+  font-size: 0.6rem !important;
+  line-height: 1.1 !important;
+}
+
+/* Шанс в составе */
+.contents .ch {
+  font-size: 0.55rem !important;
+  padding: 1px 5px !important;
+}
+
+/* Глобальное ограничение для всех картинок в модалке кейса */
+#caseModal .case-img,
+#caseModal .gimg {
+  max-width: 100px !important;
+  max-height: 100px !important;
+}
