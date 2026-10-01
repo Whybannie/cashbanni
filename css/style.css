@@ -485,7 +485,6 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 /* ===== v36 ===== */
 .crash-history{display:none!important}
 
-
 /* ===== v38.2: crash history row (сверху графика) ===== */
 .crash-hist-row{position:absolute;top:8px;left:10px;right:10px;display:flex;gap:5px;overflow-x:auto;z-index:4;scrollbar-width:none}
 .crash-hist-row::-webkit-scrollbar{display:none}
@@ -658,7 +657,6 @@ h2,h3{color:#fff}
  .up-mid .btn{width:100%}
  .modal-overlay{align-items:center;padding:22px}
  .modal.case-full{width:min(96vw,880px);max-width:880px;height:auto;max-height:92vh;border-radius:26px;border-bottom:1px solid var(--line);padding:22px}
- #caseContentsBlock .contents{grid-template-columns:repeat(6,1fr)!important;max-height:280px!important}
  .cf-strips{max-height:46vh}
 }
 
@@ -686,7 +684,6 @@ h2,h3{color:#fff}
 .err-actions .btn{width:100%;margin:0}
 .err-modal.type-warn .err-icon{animation:none}
 @keyframes errShake{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
-
 
 /* 🚀 Performance: lazy render для скрытых секций */
 #sec-cases, #sec-inventory, #sec-market, #sec-quests, #sec-achievements, 
@@ -762,90 +759,6 @@ h2,h3{color:#fff}
   height: 56px;
 }
 
-}
-
-#caseContentsBlock .c-item .cprice {
-  font-size: 0.55rem;
-  margin-top: 2px;
-  color: #fbbf24;
-  font-weight: 700;
-}
-
-/* ===== v72.5: состав кейса - 3 в ряд, картинки без обрезки ===== */
-#caseContentsBlock {
-  margin-top: 12px;
-  padding: 10px;
-  background: rgba(255,255,255,.03);
-  border-radius: 14px;
-  max-height: 340px;
-  overflow-y: auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-#caseContentsBlock .case-contents-title {
-  grid-column: 1 / -1;
-  font-size: 0.72rem;
-  font-weight: 900;
-  color: rgba(255,255,255,.6);
-  text-align: center;
-  margin-bottom: 4px;
-}
-
-#caseContentsBlock .c-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 4px 6px;
-  border-radius: 10px;
-  background: rgba(255,255,255,.04);
-  text-align: center;
-  overflow: hidden;
-}
-
-/* Картинка полностью заполняет квадрат без обрезки */
-#caseContentsBlock .c-item .gimg-wrap {
-  width: 64px;
-  height: 64px;
-  max-width: 100%;
-  aspect-ratio: 1 / 1;
-}
-
-#caseContentsBlock .c-item .gimg-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 8px;
-  display: block;
-}
-
-#caseContentsBlock .c-item .gimg-wrap .emoji-fallback {
-  display: none;
-}
-
-#caseContentsBlock .c-item .emoji {
-  font-size: 2.2rem;
-  width: 64px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#caseContentsBlock .c-item .cname {
-  font-size: 0.58rem;
-  line-height: 1.1;
-  margin-top: 4px;
-  color: rgba(255,255,255,.85);
-}
-
-#caseContentsBlock .c-item .cprice {
-  font-size: 0.55rem;
-  margin-top: 2px;
-  color: #fbbf24;
-  font-weight: 700;
 }
 
 /* Рулетка - картинки без пустого пространства */
@@ -955,31 +868,6 @@ h2,h3{color:#fff}
   margin: 8px 0;
 }
 
-/* Состав кейса - КВАДРАТНЫЕ плитки */
-#caseContentsBlock .c-item {
-  aspect-ratio: 1 / 1 !important;
-  width: 100% !important;
-  padding: 6px !important;
-  box-sizing: border-box !important;
-}
-
-#caseContentsBlock .c-item .gimg-wrap {
-  width: 100% !important;
-  height: auto !important;
-  aspect-ratio: 1 / 1 !important;
-  max-width: none !important;
-  max-height: none !important;
-}
-
-#caseContentsBlock .c-item .emoji {
-  width: 100% !important;
-  height: auto !important;
-  aspect-ratio: 1 / 1 !important;
-  max-width: none !important;
-  max-height: none !important;
-  font-size: clamp(1.5rem, 8vw, 2.5rem) !important;
-}
-
 /* Рулетка - кнопки по центру каждой */
 #cfStrips {
   display: flex;
@@ -1040,39 +928,6 @@ h2,h3{color:#fff}
   gap: 8px;
 }
 
-/* Состав кейса - убираем наложение квадратов */
-#caseContentsBlock {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 8px !important;
-  padding: 10px !important;
-  overflow-x: hidden !important;
-}
-
-#caseContentsBlock .c-item {
-  aspect-ratio: 1 / 1 !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  overflow: hidden !important;
-  padding: 6px !important;
-  box-sizing: border-box !important;
-}
-
-/* Картинка внутри квадрата - полностью заполняет */
-#caseContentsBlock .c-item .gimg-wrap {
-  width: 100% !important;
-  height: 100% !important;
-  aspect-ratio: 1 / 1 !important;
-  max-width: none !important;
-  max-height: none !important;
-}
-
-#caseContentsBlock .c-item .gimg-wrap img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;
-}
-
 /* Рулетки - каждая со своими кнопками по центру */
 #cfStrips {
   display: flex;
@@ -1102,7 +957,6 @@ h2,h3{color:#fff}
   margin: 0;
 }
 
-
 /* ===== v72.9: единая кнопка для нескольких рулеток ===== */
 #bulkActions {
   display: flex;
@@ -1120,93 +974,98 @@ h2,h3{color:#fff}
   display: none;
 }
 
-/* ===== v73.1: ФИКС НАЛОЖЕНИЯ ПЛИТОК В СОСТАВЕ ===== */
 
-/* Плитки в составе - строгие границы без наложения */
-#caseContentsBlock .c-item {
-  position: relative !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  padding: 6px !important;
-  gap: 2px !important;
-  border-radius: 10px !important;
-  background: rgba(255,255,255,.04) !important;
-  overflow: hidden !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
+/* ===== v74: СОСТАВ КЕЙСА - таблица 3 колонки, квадратные ячейки ===== */
+#caseContentsBlock {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 10px;
+  margin-top: 12px;
 }
 
-/* Картинка в плитке - фиксированный размер */
+#caseContentsBlock .case-contents-title {
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: rgba(255,255,255,.6);
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+/* Ячейка - квадрат */
+#caseContentsBlock .c-item {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Картинка полностью заполняет квадрат */
 #caseContentsBlock .c-item .gimg-wrap {
-  width: 56px !important;
-  height: 56px !important;
-  min-width: 56px !important;
-  min-height: 56px !important;
-  max-width: 56px !important;
-  max-height: 56px !important;
-  aspect-ratio: 1/1 !important;
-  flex-shrink: 0 !important;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: 1 / 1;
 }
 
 #caseContentsBlock .c-item .gimg-wrap img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;
-  border-radius: 6px !important;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
 }
 
 #caseContentsBlock .c-item .gimg-wrap .emoji-fallback {
-  display: none !important;
+  display: none;
 }
 
-/* Эмодзи-подарки */
+/* Эмодзи-подарки тоже заполняют квадрат */
 #caseContentsBlock .c-item .emoji {
-  width: 56px !important;
-  height: 56px !important;
-  font-size: 2rem !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex-shrink: 0 !important;
+  width: 100%;
+  height: 100%;
+  font-size: clamp(1.5rem, 10vw, 2.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Название и цена */
+/* Название и цена - компактные под картинкой */
 #caseContentsBlock .c-item .cname {
-  font-size: 0.56rem !important;
-  line-height: 1.1 !important;
-  margin-top: 3px !important;
-  width: 100% !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
+  font-size: 0.55rem;
+  line-height: 1.1;
+  margin-top: 3px;
+  color: rgba(255,255,255,.85);
+  text-align: center;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #caseContentsBlock .c-item .cprice {
-  font-size: 0.54rem !important;
-  color: #fbbf24 !important;
-  margin-top: 1px !important;
+  font-size: 0.52rem;
+  color: #fbbf24;
+  margin-top: 1px;
+  font-weight: 700;
 }
 
-/* Шанс выпадения - без наложения */
+/* Шанс выпадения */
 #caseContentsBlock .c-item .ch {
-  position: static !important;
-  font-size: 0.5rem !important;
-  padding: 1px 5px !important;
-  margin-top: 2px !important;
-  border-radius: 6px !important;
-  background: rgba(0,0,0,.4) !important;
-}
-
-/* Контейнер состава */
-#caseContentsBlock {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 6px !important;
-  padding: 8px !important;
-  max-height: 320px !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
+  position: static;
+  font-size: 0.48rem;
+  padding: 1px 5px;
+  margin-top: 2px;
+  border-radius: 6px;
+  background: rgba(0,0,0,.4);
+  color: rgba(255,255,255,.7);
 }
