@@ -705,3 +705,59 @@ h2,h3{color:#fff}
 .case-card:not(:hover) {
   contain: layout style;
 }
+
+/* ===== v72.2: фикс размеров картинок подарков (.gimg-wrap) ===== */
+
+/* Базовый размер для контейнера картинок */
+.gimg-wrap {
+  width: 52px;
+  height: 52px;
+  max-width: 100%;
+  margin: 0 auto;
+  display: block;
+}
+
+/* Картинка внутри контейнера */
+.gimg-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+}
+
+/* Скрываем эмодзи-запасной когда есть картинка */
+.gimg-wrap .emoji-fallback {
+  display: none;
+}
+
+/* Состав кейса - чуть меньше */
+.c-item .gimg-wrap,
+.contents .gimg-wrap {
+  width: 44px;
+  height: 44px;
+}
+
+/* Инвентарь */
+.inv-item .gimg-wrap {
+  width: 46px;
+  height: 46px;
+}
+
+/* Рулетка */
+.roulette-item .gimg-wrap {
+  width: 56px;
+  height: 56px;
+}
+
+/* Чипы в апгрейде */
+.chip .gimg-wrap {
+  width: 40px;
+  height: 40px;
+}
+
+/* Слоты апгрейда */
+.up-slot-body .gimg-wrap {
+  width: 56px;
+  height: 56px;
+}
