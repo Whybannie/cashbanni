@@ -868,3 +868,73 @@ h2,h3{color:#fff}
 .roulette-item .gimg-wrap .emoji-fallback {
   display: none;
 }
+
+/* ===== v72.6: кнопки Продать/Инвентарь поверх рулетки ===== */
+.result-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 30, 0.92);
+  border-radius: 16px;
+  padding: 8px;
+}
+
+.result-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.result-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  padding: 0 12px;
+}
+
+.result-actions .mini-btn {
+  flex: 1;
+  min-height: 44px;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+}
+
+.mini-btn.sell {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.mini-btn.keep {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+/* Рулетка с результатом - относительное позиционирование */
+.roulette-container.won {
+  position: relative;
+}
+
+/* Картинка результата внутри баннера */
+.result-banner .gimg-wrap {
+  width: 56px;
+  height: 56px;
+}
+
+.result-banner .emoji {
+  font-size: 2.4rem;
+}
