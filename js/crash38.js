@@ -398,7 +398,10 @@ function crashDraw(){
   if(crash.phase === 'fly'){
     var rk = Math.max(22*dpr, Math.min(42*dpr, H*0.22));
     var wobble = Math.sin(now/500) * 0.03;
-    drawRocket(tip[0], tip[1], rk, ang + wobble, true);
+    // Ограничиваем позицию ракеты чтобы не уходила за экран
+    var safeX = Math.max(rk*1.5, Math.min(W - rk*1.5, tip[0]));
+    var safeY = Math.max(rk*1.5, Math.min(H - rk*1.5, tip[1]));
+    drawRocket(safeX, safeY, rk, ang + wobble, true);
   } else if(crash.phase === 'crash') {
     // === ФАЗА CRASH: показываем взрыв и результат ===
     var ex, ey;
@@ -406,8 +409,8 @@ function crashDraw(){
       ex = crash.crashPos.x; 
       ey = crash.crashPos.y;
     } else {
-      ex = tip[0]; 
-      ey = tip[1];
+      ex = Math.max(40, Math.min(W - 40, tip[0]));
+      ey = Math.max(40, Math.min(H - 40, tip[1]));
     }
     
     var tExplode = crash.crashTime ? now - crash.crashTime : 0;
