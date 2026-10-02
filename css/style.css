@@ -1208,3 +1208,81 @@ h2,h3{color:#fff}
   color: rgba(255,255,255,.4);
   z-index: 2;
 }
+
+/* ===== v78: Простая красивая реклама краша ===== */
+.crash-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #0d0221 0%, #150535 40%, #0a0a2e 100%);
+  border: 1px solid rgba(139,92,246,.25);
+  overflow: hidden;
+  cursor: pointer;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 24px rgba(88,28,135,.3);
+}
+
+.crash-hero:active {
+  transform: scale(.98);
+}
+
+.ch-bg {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(139,92,246,.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(236,72,153,.1) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.ch-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 1;
+}
+
+.ch-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .6rem;
+  font-weight: 800;
+  color: #4ade80;
+  background: rgba(74,222,128,.1);
+  padding: 3px 10px;
+  border-radius: 20px;
+  width: fit-content;
+  letter-spacing: .5px;
+}
+
+.ch-dot {
+  width: 5px;
+  height: 5px;
+  background: #4ade80;
+  border-radius: 50%;
+}
+
+.ch-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  background: linear-gradient(90deg, #c084fc, #f472b6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 2px;
+}
+
+.ch-sub {
+  font-size: .75rem;
+  color: rgba(255,255,255,.5);
+}
+
+.ch-rocket {
+  font-size: 32px;
+  z-index: 1;
+  filter: drop-shadow(0 0 12px rgba(251,146,60,.5));
+}

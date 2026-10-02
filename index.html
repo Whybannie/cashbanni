@@ -70,27 +70,13 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
   <section class="section active" id="sec-home">
     <div class="crash-hero" onclick="activateTab('crash')">
-      <div class="crash-hero-bg">
-        <div class="ch-star ch-s1"></div>
-        <div class="ch-star ch-s2"></div>
-        <div class="ch-star ch-s3"></div>
-        <div class="ch-star ch-s4"></div>
-        <div class="ch-star ch-s5"></div>
-        <div class="ch-rocket">🚀</div>
+      <div class="ch-bg"></div>
+      <div class="ch-content">
+        <div class="ch-badge"><span class="ch-dot"></span> LIVE</div>
+        <b class="ch-title">CRASH</b>
+        <span class="ch-sub" id="heroCrashState">Успей забрать до краша</span>
       </div>
-      <div class="crash-hero-content">
-        <div class="crash-hero-badge">
-          <span class="ch-dot"></span> LIVE
-        </div>
-        <b class="crash-hero-title">CRASH</b>
-        <span class="crash-hero-state" id="heroCrashState">Раунд идёт</span>
-        <span class="crash-hero-mult" id="heroCrashMult">1.00×</span>
-      </div>
-      <div class="crash-hero-arrow">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
-      </div>
+      <div class="ch-rocket">🚀</div>
     </div>
     <div class="sec-head"><h2>🎁 Кейсы</h2><span class="muted" id="casesStat"></span></div>
     <div class="cases-grid" id="casesGrid"></div>
