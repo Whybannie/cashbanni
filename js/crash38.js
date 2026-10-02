@@ -16,13 +16,26 @@ var crashLoopOn = false;
 function roundNumber(){ return Math.floor(Date.now()/CR2.ROUND); }
 function roundStart(r){ return r*CR2.ROUND; }
 function crashPoint(r){
+  // Хэш от номера раунда (provably fair)
   var h = 0x811c9dc5;
   var s = CR2.SEED+':'+r;
   for(var i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
-  h = (h>>>0)/0xffffffff;
-  if(h < 0.03) return 1.00;
-  return Math.min(150, Math.floor(0.96/(1-h)*100)/100);
+  var rand = (h>>>0)/0xffffffff;
+  
+  // 1% шанс мгновенного краша на 1.00
+  if(rand < 0.01) return 1.00;
+  
+  // Нормальное распределение как в настоящих казино
+  // Хаус эдж 4% - казино всегда в плюсе
+  var houseEdge = 0.04;
+  var crash = (1 - houseEdge) / (1 - rand);
+  
+  // Минимум 1.01, максимум 500
+  crash = Math.max(1.01, Math.min(500, crash));
+  
+  return Math.floor(crash*100)/100;
 }
+
 function crashHistory(){ var cur=roundNumber(); var a=[]; for(var i=1;i<=10;i++) a.push(crashPoint(cur-i)); return a; }
 function crashHist(){
   var cur=roundNumber(); var arr=[];
