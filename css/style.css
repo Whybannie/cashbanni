@@ -1209,21 +1209,7 @@ h2,h3{color:#fff}
   z-index: 2;
 }
 
-/* ===== v78: Простая красивая реклама краша ===== */
-.crash-hero {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 20px;
-  border-radius: 22px;
-  background: linear-gradient(135deg, #0d0221 0%, #150535 40%, #0a0a2e 100%);
-  border: 1px solid rgba(139,92,246,.25);
-  overflow: hidden;
-  cursor: pointer;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 24px rgba(88,28,135,.3);
-}
+
 
 .crash-hero:active {
   transform: scale(.98);
@@ -1285,4 +1271,96 @@ h2,h3{color:#fff}
   font-size: 32px;
   z-index: 1;
   filter: drop-shadow(0 0 12px rgba(251,146,60,.5));
+}
+
+
+/* ===== v79: Ночное небо + серебристый заголовок ===== */
+.crash-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #000000 0%, #050510 50%, #0a0a18 100%);
+  border: 1px solid rgba(255,255,255,.08);
+  overflow: hidden;
+  cursor: pointer;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.5);
+}
+
+.crash-hero:active {
+  transform: scale(.98);
+}
+
+/* Звёзды на фоне */
+.crash-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(1px 1px at 15% 25%, rgba(255,255,255,.9) 50%, transparent 50%),
+    radial-gradient(1px 1px at 35% 65%, rgba(255,255,255,.7) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 55% 15%, rgba(255,255,255,.8) 50%, transparent 50%),
+    radial-gradient(1px 1px at 75% 45%, rgba(255,255,255,.6) 50%, transparent 50%),
+    radial-gradient(1px 1px at 85% 75%, rgba(255,255,255,.75) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 25% 85%, rgba(255,255,255,.65) 50%, transparent 50%),
+    radial-gradient(1px 1px at 65% 55%, rgba(255,255,255,.85) 50%, transparent 50%),
+    radial-gradient(1px 1px at 45% 35%, rgba(255,255,255,.7) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 90% 20%, rgba(255,255,255,.8) 50%, transparent 50%),
+    radial-gradient(1px 1px at 10% 55%, rgba(255,255,255,.6) 50%, transparent 50%);
+  pointer-events: none;
+}
+
+.ch-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 1;
+}
+
+.ch-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .6rem;
+  font-weight: 800;
+  color: #4ade80;
+  background: rgba(74,222,128,.08);
+  padding: 3px 10px;
+  border-radius: 20px;
+  width: fit-content;
+  letter-spacing: 1px;
+}
+
+.ch-dot {
+  width: 5px;
+  height: 5px;
+  background: #4ade80;
+  border-radius: 50%;
+}
+
+/* Серебристый заголовок */
+.ch-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  background: linear-gradient(180deg, #ffffff 0%, #c0c0c8 40%, #8a8a95 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 3px;
+  text-shadow: 0 0 20px rgba(200,200,220,.3);
+}
+
+.ch-sub {
+  font-size: .72rem;
+  color: rgba(255,255,255,.45);
+  font-weight: 500;
+}
+
+.ch-rocket {
+  font-size: 34px;
+  z-index: 1;
+  filter: drop-shadow(0 0 14px rgba(255,255,255,.25));
 }
