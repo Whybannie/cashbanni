@@ -1364,3 +1364,69 @@ h2,h3{color:#fff}
   z-index: 1;
   filter: drop-shadow(0 0 14px rgba(255,255,255,.25));
 }
+
+/* ===== v82: ДОГИ — собачьи гонки ===== */
+#sec-dogs .crash-box {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+#dogsCanvas {
+  display: block;
+  cursor: pointer;
+}
+
+.dogs-info {
+  margin: 12px 0;
+}
+
+.dogs-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.dog-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.dog-card:active {
+  transform: scale(.95);
+}
+
+.dog-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.2);
+  box-shadow: 0 0 8px currentColor;
+}
+
+.dog-card b {
+  font-size: .68rem;
+  color: #fff;
+}
+
+.dog-card span:last-child {
+  font-size: .62rem;
+  color: var(--gold);
+  font-weight: 800;
+}
+
+/* Подсветка выбранной собаки */
+.dog-card.selected,
+#dogsCanvas .selected {
+  border-color: var(--gold);
+  background: rgba(251,191,36,.1);
+}

@@ -166,6 +166,47 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
     <div class="crash-history" id="plinkoHist"></div>
   </section>
 
+  <section class="section" id="sec-dogs">
+    <div class="crash-head">
+      <h2>🐕 Доги</h2>
+      <div class="crash-hist-row" id="dogsHistRow"><span class="ch-h lo">Гонки</span></div>
+    </div>
+    
+    <div class="crash-box" id="dogsBox" style="height:380px; padding:0;">
+      <canvas id="dogsCanvas" style="width:100%;height:100%;"></canvas>
+    </div>
+    
+    <div class="dogs-info" id="dogsInfo">
+      <div class="dogs-list">
+        <div class="dog-card" onclick="dogsSelect(0)"><span class="dog-dot" style="background:#e63946"></span><b>Рекс</b><span>×2.00</span></div>
+        <div class="dog-card" onclick="dogsSelect(1)"><span class="dog-dot" style="background:#f4a261"></span><b>Белка</b><span>×2.20</span></div>
+        <div class="dog-card" onclick="dogsSelect(2)"><span class="dog-dot" style="background:#264653"></span><b>Гром</b><span>×2.50</span></div>
+        <div class="dog-card" onclick="dogsSelect(3)"><span class="dog-dot" style="background:#a8dadc"></span><b>Луна</b><span>×2.80</span></div>
+        <div class="dog-card" onclick="dogsSelect(4)"><span class="dog-dot" style="background:#e9c46a"></span><b>Чарли</b><span>×3.20</span></div>
+        <div class="dog-card" onclick="dogsSelect(5)"><span class="dog-dot" style="background:#7209b7"></span><b>Никс</b><span>×4.00</span></div>
+        <div class="dog-card" onclick="dogsSelect(6)"><span class="dog-dot" style="background:#f8f9fa"></span><b>Зефир</b><span>×6.00</span></div>
+        <div class="dog-card" onclick="dogsSelect(7)"><span class="dog-dot" style="background:#fbbf24"></span><b>Алмаз</b><span>×12.00</span></div>
+      </div>
+    </div>
+    
+    <div class="crash-panel">
+      <div class="cp-row">
+        <button class="cp-step" onclick="dogsBet(-10)">−</button>
+        <div class="cp-val">⭐<span id="dogsBetVal">20</span></div>
+        <button class="cp-step" onclick="dogsBet(10)">+</button>
+      </div>
+      <div class="cp-chips">
+        <button class="cp-chip" onclick="dogsSet(10)">10</button>
+        <button class="cp-chip" onclick="dogsSet(25)">25</button>
+        <button class="cp-chip" onclick="dogsSet(50)">50</button>
+        <button class="cp-chip" onclick="dogsSet(100)">100</button>
+        <button class="cp-chip" onclick="dogsSet(250)">250</button>
+      </div>
+      <button class="btn crash-main-btn bet" id="dogsBtn" onclick="dogsStart()">ВЫБЕРИ СОБАКУ</button>
+    </div>
+  </section>
+
+
   <section class="section" id="sec-tasks">
     <h2>Задания</h2>
     <div class="task-card" onclick="openCaseModal('free')">
@@ -216,6 +257,11 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
     <div class="task-card" onclick="activateTab('plinko')">
       <div class="ic-box gold"><span class="emoji">🎯</span></div>
       <div class="task-info"><b>Plinko</b><span>Шарик и множители до ×12</span></div>
+      <div class="hero-go">›</div>
+    </div>
+    <div class="task-card" onclick="activateTab('dogs')">
+      <div class="ic-box gold"><span class="emoji">🐕</span></div>
+      <div class="task-info"><b>Доги</b><span>8 собак · гонка · до ×12</span></div>
       <div class="hero-go">›</div>
     </div>
     <div class="task-card" onclick="activateTab('mines')">
@@ -352,7 +398,8 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 <div class="toasts" id="toasts"></div>
 <script src="js/data38.js?v=729" defer></script>
 <script src="js/app38.js?v=729" defer></script>
-<script src="js/caseimg38.js?v=729" defer></script>
+<script src="js/caseimg38.js?v=820"
+  <script src="js/dogs38.js?v=820" defer></script>
 <script src="js/plinko38.js?v=729" defer></script>
 <script src="js/crash38.js?v=729" defer></script>
 
