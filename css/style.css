@@ -1430,3 +1430,54 @@ h2,h3{color:#fff}
   border-color: var(--gold);
   background: rgba(251,191,36,.1);
 }
+
+/* ===== v83: DOGS PRO — стадион, оверлеи, панель ставок ===== */
+.dogs-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.dogs-top h2{font-size:1.15rem;font-weight:900}
+.dogs-hist{display:flex;gap:4px;align-items:center}
+.dogs-hist span{font-size:.6rem;font-weight:900;padding:3px 7px;border-radius:8px}
+
+.dogs-track{position:relative;width:100%;aspect-ratio:16/9;border-radius:18px;overflow:hidden;
+  background:#7a5230 url('../media/dogs-track.png') center/100% 100% no-repeat;
+  box-shadow:0 12px 34px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.14)}
+#dogsCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+.dogs-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:6px;pointer-events:none;z-index:5;
+  background:radial-gradient(circle at 50% 50%, rgba(0,0,0,.5), rgba(0,0,0,.78));
+  opacity:0;transition:opacity .3s}
+.dogs-overlay.show{opacity:1}
+.dogs-overlay .ov-big{font-size:2.8rem;font-weight:900;color:#fff;text-shadow:0 4px 24px rgba(0,0,0,.7);letter-spacing:1px}
+.dogs-overlay .ov-sub{font-size:.95rem;font-weight:800;color:rgba(255,255,255,.85)}
+.dogs-overlay .ov-win{color:#4ade80;font-size:1.1rem}
+.dogs-overlay .ov-lose{color:#f87171}
+
+.dogs-odds{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0}
+.dog-odd{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px;
+  background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.09);border-radius:12px;
+  cursor:pointer;transition:all .15s}
+.dog-odd:active{transform:scale(.94)}
+.dog-odd.sel{border-color:var(--gold);background:rgba(251,191,36,.13);box-shadow:0 0 16px rgba(251,191,36,.28)}
+.do-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,.45)}
+.do-name{font-size:.66rem;font-weight:800;color:#fff}
+.do-mult{font-size:.7rem;font-weight:900;color:var(--gold)}
+
+.dogs-panel{display:flex;gap:12px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);
+  border-radius:18px;padding:14px}
+.dp-col{flex:1;display:flex;flex-direction:column;gap:7px;justify-content:center}
+.dp-label{font-size:.56rem;font-weight:900;letter-spacing:1.2px;color:rgba(255,255,255,.45);text-align:center}
+.dp-amount{display:flex;align-items:center;gap:10px;justify-content:center}
+.dp-step{width:36px;height:36px;border-radius:11px;border:none;background:rgba(255,255,255,.1);
+  color:#fff;font-size:1.15rem;font-weight:900;cursor:pointer}
+.dp-step:active{transform:scale(.92)}
+.dp-val{font-size:1.1rem;font-weight:900;color:#fff}
+.dp-chips{display:flex;gap:4px;justify-content:center}
+.dp-chips button{flex:1;min-height:30px;border:none;border-radius:9px;background:rgba(255,255,255,.08);
+  color:rgba(255,255,255,.85);font-size:.68rem;font-weight:800;cursor:pointer}
+.dp-chips button:active{background:rgba(255,255,255,.18)}
+.dp-potential{font-size:1.25rem;font-weight:900;color:var(--gold);text-align:center;
+  text-shadow:0 0 14px rgba(251,191,36,.35)}
+.dogs-btn{width:100%;min-height:48px;border-radius:13px;font-weight:900;font-size:.85rem}
+.dogs-btn.go{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 6px 20px rgba(34,197,94,.35)}
+.dogs-btn.wait{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
