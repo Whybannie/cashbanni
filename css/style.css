@@ -145,7 +145,7 @@ h3{font-size:.82rem;margin-bottom:8px;color:rgba(255,255,255,.75)}
 .roulette-pointer{position:absolute;top:0;bottom:0;left:50%;width:3px;background:var(--acc2);z-index:10;box-shadow:0 0 16px var(--acc2)}
 .roulette-strip{display:flex;position:absolute;top:0;height:100%}
 .roulette-item{width:88px;min-width:88px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid rgba(255,255,255,.05)}
-.roulette-item .gimg{width:42px;height:42px;object-fit:contain}
+
 .roulette-item .emoji{font-size:1.9rem}
 .roulette-item .name{font-size:.56rem;color:rgba(255,255,255,.5);margin-top:4px}
 .multi-results{display:none;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;margin:12px 0}
@@ -297,7 +297,7 @@ body.tg .header{padding-top:calc(14px + var(--sat,64px))}
 button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .roulette-container{height:152px}
 .roulette-item{width:104px;min-width:104px}
-.roulette-item .gimg{width:56px;height:56px}
+
 .roulette-item .emoji{font-size:2.4rem}
 .roulette-item .name{font-size:.62rem}
 .cf-strips{gap:12px}
@@ -321,7 +321,7 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 .cf-hero-info .price{display:inline-flex;width:fit-content;align-items:center;color:var(--gold);font-weight:900;font-size:.8rem;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:50px;padding:4px 12px}
 .cf-hero-info .muted{font-size:.66rem}
 .modal.case-full.compact .cf-contents{display:none}
-.roulette-container.sm .roulette-item .gimg{width:38px;height:38px}
+
 .roulette-container.sm .roulette-item .emoji{font-size:1.7rem}
 .roulette-container.sm .roulette-item .name{font-size:.54rem}
 .strip-win{flex-direction:column;gap:5px;padding:6px}
@@ -739,12 +739,6 @@ h2,h3{color:#fff}
 .inv-item .gimg-wrap {
   width: 46px;
   height: 46px;
-}
-
-/* Рулетка */
-.roulette-item .gimg-wrap {
-  width: 56px;
-  height: 56px;
 }
 
 /* Чипы в апгрейде */
