@@ -98,12 +98,24 @@ const QUESTS = [
 ];
 
 const ACHS = [
-  { id:'a1', emoji:'🎁', name:'Первый дроп',         cond:s=>s.stats.opened>=1 },
-  { id:'a2', emoji:'📦', name:'100 кейсов',           cond:s=>s.stats.opened>=100 },
-  { id:'a3', emoji:'💎', name:'Поймать эпику (100⭐)', cond:s=>s.stats.best>=100 },
-  { id:'a4', emoji:'💰', name:'Баланс 2 000',         cond:s=>s.balance>=2000 },
-  { id:'a5', emoji:'⚔️', name:'5 побед в баттлах',    cond:s=>s.stats.bWins>=5 },
-  { id:'a6', emoji:'⚡', name:'3 успешных апгрейда',  cond:s=>s.stats.upWins>=3 }
+  { id:'a1',  emoji:'🎁', name:'Первый дроп',         cond:s=>(s.stats.opened||0)>=1 },
+  { id:'a2',  emoji:'📦', name:'10 кейсов',           cond:s=>(s.stats.opened||0)>=10 },
+  { id:'a3',  emoji:'🎰', name:'50 кейсов',           cond:s=>(s.stats.opened||0)>=50 },
+  { id:'a4',  emoji:'💼', name:'100 кейсов',          cond:s=>(s.stats.opened||0)>=100 },
+  { id:'a5',  emoji:'👑', name:'250 кейсов',          cond:s=>(s.stats.opened||0)>=250 },
+  { id:'a6',  emoji:'💎', name:'Эпика (100⭐)',       cond:s=>(s.stats.best||0)>=100 },
+  { id:'a7',  emoji:'💠', name:'Легенда (500⭐)',     cond:s=>(s.stats.best||0)>=500 },
+  { id:'a8',  emoji:'⭐', name:'Мифика (2000⭐)',     cond:s=>(s.stats.best||0)>=2000 },
+  { id:'a9',  emoji:'💰', name:'Баланс 1 000⭐',      cond:s=>(s.balance||0)>=1000 },
+  { id:'a10', emoji:'💵', name:'Баланс 5 000⭐',      cond:s=>(s.balance||0)>=5000 },
+  { id:'a11', emoji:'💸', name:'Баланс 15 000⭐',     cond:s=>(s.balance||0)>=15000 },
+  { id:'a12', emoji:'🛒', name:'5 продаж',            cond:s=>(s.stats.sells||0)>=5 },
+  { id:'a13', emoji:'🏪', name:'25 продаж',           cond:s=>(s.stats.sells||0)>=25 },
+  { id:'a14', emoji:'🚀', name:'Крах-мастер (10×)',   cond:s=>(s.stats.crashWins||0)>=1 },
+  { id:'a15', emoji:'⚡', name:'Апгрейдер',           cond:s=>(s.stats.upWins||0)>=3 },
+  { id:'a16', emoji:'🔱', name:'Коллекционер',        cond:s=>(s.inv||[]).length>=10 },
+  { id:'a17', emoji:'🏛️', name:'Музей (50 предметов)',cond:s=>(s.inv||[]).length>=50 },
+  { id:'a18', emoji:'📢', name:'Подписчик',           cond:s=>s.subDone===true }
 ];
 
 const PROMOS = { 'START':50, 'CASH':75, 'BANNI2026':150, 'MELLSTROY':250 };
