@@ -1,5 +1,5 @@
-// ===== DOGS v5 — непрерывные раунды, премиум =====
-console.log('[DOGS] v5 loaded');
+// ===== DOGS v6 — таймер ставок, полноэкранный победитель, фикс границ =====
+console.log('[DOGS] v6 loaded');
 var DOGS = [
   {id:0,name:'Рекс',color:'#ef4444',mult:2.0,chance:0.24},
   {id:1,name:'Белка',color:'#f97316',mult:2.3,chance:0.20},
@@ -12,10 +12,10 @@ var DOGS = [
 ];
 var LANE_CENTERS=[0.206,0.289,0.372,0.456,0.539,0.622,0.706,0.789];
 var ZOOM=4;
-var T_BET=6000, T_COUNT=2700, T_RESULT=4200;
+var T_BET=7000, T_COUNT=2700, T_RESULT=4200;
 var dogs={phase:'bet',phaseStart:Date.now(),bet:20,selected:null,myDog:null,myBet:0,
   winner:null,pos:[0,0,0,0,0,0,0,0],finT:[],t0:0,hist:[],cam:0,round:1,active:false,
-  _settled:false,_lastCount:99};
+  _settled:false,_lastCount:99,_lastTenth:-1};
 
 function dogsDpr(){return Math.min(window.devicePixelRatio||1,2);}
 function dogsTrackEl(){var c=$('dogsCanvas');return c?c.parentElement:null;}
@@ -36,13 +36,53 @@ function dogsSetActive(){
 function dogsCamTarget(){
   var c=$('dogsCanvas');if(!c||!c.width)return 0;
   var vw=c.width/dogsDpr(),worldW=vw*ZOOM;
-  if(dogs.phase==='bet')return 0;
+  if(dogs.phase==='bet'||dogs.phase==='count')return 0;
   if(dogs.phase==='result')return worldW-vw;
   var lead=0;
   for(var i=0;i<8;i++)lead=Math.max(lead,dogs.pos[i]);
   var leadX=worldW*0.08+(worldW*0.84)*lead;
   return Math.max(0,Math.min(worldW-vw,leadX-vw*0.5));
 }
+// ===== ТАЙМЕР СТАВОК (пилюля сверху трека) =====
+function dogsTimerUpdate(sec){
+  var t=$('dogsTimer');
+  if(!t){
+    var tr=dogsTrackEl();if(!tr)return;
+    t=document.createElement('div');t.id='dogsTimer';t.className='dogs-timer';
+    tr.appendChild(t);
+  }
+  if(dogs.phase==='bet'){
+    t.classList.add('show');
+    var tenth=Math.ceil(sec*10);
+    if(tenth!==dogs._lastTenth){
+      dogs._lastTenth=tenth;
+      t.innerHTML='🎰 СТАВКИ ОТКРЫТЫ · <b>'+sec.toFixed(1)+' с</b>';
+    }
+  }else{
+    t.classList.remove('show');
+  }
+}
+// ===== ПОЛНОЭКРАННЫЙ МОДАЛ ПОБЕДИТЕЛЯ =====
+function showWinModal(w,lineHtml){
+  var m=$('dwModal');
+  if(!m){
+    m=document.createElement('div');m.id='dwModal';m.className='dw-modal';
+    m.onclick=function(){hideWinModal();};
+    document.body.appendChild(m);
+  }
+  var d=DOGS[w];
+  m.innerHTML='<div class="dwm-card">'+
+    '<div class="dwm-crown">👑</div>'+
+    '<div class="dwm-title">ПОБЕДИТЕЛЬ РАУНДА #'+dogs.round+'</div>'+
+    '<div class="dwm-dog"><span class="dwm-num" style="background:'+d.color+';color:'+(w===6?'#333':'#fff')+'">'+(w+1)+'</span>'+
+    '<span class="dwm-name">'+d.name+'</span></div>'+
+    '<div class="dwm-mult">×'+d.mult.toFixed(1)+'</div>'+
+    lineHtml+
+    '<div class="dwm-hint">нажми, чтобы продолжить</div></div>';
+  m.classList.add('show');
+}
+function hideWinModal(){var m=$('dwModal');if(m)m.classList.remove('show');}
+
 function dogsBet(d){if(dogs.phase!=='bet'||dogs.myDog!==null)return;dogs.bet=Math.max(5,dogs.bet+d);syncDogsUI();sfx.click();}
 function dogsSet(v){if(dogs.phase!=='bet'||dogs.myDog!==null)return;dogs.bet=Math.max(5,v);syncDogsUI();sfx.click();}
 function dogsSelect(i){
@@ -107,9 +147,9 @@ function dogsStart(){
 }
 function prepareRace(){
   dogs.winner=pickWinner();
-  var T=6.5+Math.random()*1.5;
+  var T=7.5+Math.random()*1.5;
   dogs.finT=[];
-  for(var i=0;i<8;i++)dogs.finT.push(i===dogs.winner?T:T+0.25+Math.random()*2.4);
+  for(var i=0;i<8;i++)dogs.finT.push(i===dogs.winner?T:T+0.3+Math.random()*2.6);
   dogs.pos=[0,0,0,0,0,0,0,0];
   dogs._settled=false;
 }
@@ -123,31 +163,30 @@ function settleBets(){
   if(dogs.myDog!==null){
     if(dogs.myDog===w){
       var win=Math.floor(dogs.myBet*DOGS[w].mult);
-      S.balance+=win;save();renderHeader();sfx.win();confetti(80);
-      line='<div class="dw-line win">Твоя ставка сыграла: +⭐'+fmt(win)+'</div>';
+      S.balance+=win;save();renderHeader();sfx.win();confetti(100);
+      line='<div class="dwm-line win">ТВОЯ СТАВКА СЫГРАЛА: +⭐'+fmt(win)+'</div>';
       toast('🏆 '+DOGS[w].name+' первый! +⭐'+fmt(win),'good');
     }else{
       sfx.crash();
-      line='<div class="dw-line lose">Ставка ⭐'+dogs.myBet+' сгорела</div>';
+      line='<div class="dwm-line lose">СТАВКА ⭐'+dogs.myBet+' СГОРЕЛА</div>';
       toast(DOGS[w].name+' победил. Не повезло','bad');
     }
   }else{
-    line='<div class="dw-line none">В этом раунде ты не ставил</div>';
+    line='<div class="dwm-line none">В этом раунде ты не ставил</div>';
   }
-  dogsOverlay('<div class="dw-card"><div class="dw-top">ПОБЕДИТЕЛЬ РАУНДА #'+dogs.round+'</div>'+
-    '<div class="dw-dog"><span class="dw-num" style="background:'+DOGS[w].color+';color:'+(w===6?'#333':'#fff')+'">'+(w+1)+'</span>'+
-    '<span class="dw-name">'+DOGS[w].name+'</span></div>'+
-    '<div class="dw-mult">×'+DOGS[w].mult.toFixed(1)+'</div>'+line+'</div>');
+  showWinModal(w,line);
 }
 function resetForBet(){
   dogs.round++;
   dogs.phase='bet';dogs.phaseStart=Date.now();
   dogs.selected=null;dogs.myDog=null;dogs.myBet=0;
   dogs.pos=[0,0,0,0,0,0,0,0];
+  dogs._lastTenth=-1;
+  hideWinModal();
   dogsOverlay(null);
   renderDogsOdds();syncDogsUI();
 }
-// ===== ГЛАВНЫЙ ЦИКЛ (непрерывный, как краш) =====
+// ===== ГЛАВНЫЙ ЦИКЛ =====
 function dogsLoopAll(){
   requestAnimationFrame(dogsLoopAll);
   dogsSetActive();
@@ -155,12 +194,15 @@ function dogsLoopAll(){
   try{
     var now=Date.now(),el=now-dogs.phaseStart;
     if(dogs.phase==='bet'){
+      dogsTimerUpdate(Math.max(0,(T_BET-el)/1000));
       if(el>=T_BET){prepareRace();dogs.phase='count';dogs.phaseStart=now;dogs._lastCount=99;syncDogsUI();renderDogsOdds();}
     }else if(dogs.phase==='count'){
+      dogsTimerUpdate(0);
       var n=3-Math.floor(el/900);
       if(n!==dogs._lastCount&&n>=1){dogs._lastCount=n;dogsOverlay('<div class="ov-big">'+n+'</div><div class="ov-sub">Ставки закрыты</div>');sfx.tick();}
       if(el>=T_COUNT){dogsOverlay(null);dogs.phase='race';dogs.phaseStart=now;dogs.t0=now;syncDogsUI();}
     }else if(dogs.phase==='race'){
+      dogsTimerUpdate(0);
       var t=(now-dogs.t0)/1000;
       for(var i=0;i<8;i++){
         var p=Math.min(1,t/dogs.finT[i]);
@@ -169,6 +211,7 @@ function dogsLoopAll(){
       }
       if(dogs.pos[dogs.winner]>=1){dogs.phase='finish';dogs.phaseStart=now;sfx.tick();}
     }else if(dogs.phase==='finish'){
+      dogsTimerUpdate(0);
       var t2=(now-dogs.t0)/1000;
       for(var j=0;j<8;j++){
         var p2=Math.min(1,t2/dogs.finT[j]);
@@ -176,6 +219,7 @@ function dogsLoopAll(){
       }
       if(el>=1500){dogs.phase='result';dogs.phaseStart=now;settleBets();syncDogsUI();}
     }else if(dogs.phase==='result'){
+      dogsTimerUpdate(0);
       if(el>=T_RESULT)resetForBet();
     }
     dogs.cam+=(dogsCamTarget()-dogs.cam)*0.08;
@@ -221,10 +265,6 @@ function dogsDraw(){
       x.setLineDash([4*dpr,3*dpr]);
       x.beginPath();x.ellipse(sx,sy+8*dpr,30*dpr,10*dpr,0,0,7);x.stroke();
       x.setLineDash([]);
-    }
-    if((dogs.phase==='finish'||dogs.phase==='result')&&dogs.winner===i){
-      x.font=(16*dpr)+'px serif';x.textAlign='center';
-      x.fillText('',sx,sy-24*dpr);
     }
     drawDog(x,sx,sy,H*0.055,DOGS[i],i,running,now);
   }
