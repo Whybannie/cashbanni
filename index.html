@@ -32,6 +32,45 @@
 <link rel="preconnect" href="https://telegram.org" crossorigin>
 </head>
 <body>
+<!-- ===== PRELOADER v85 ===== -->
+<div id="preloader">
+  <div class="pl-glow pl-g1"></div>
+  <div class="pl-glow pl-g2"></div>
+  <div class="pl-stars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="pl-center">
+    <div class="pl-ring">
+      <div class="pl-orbit"><span class="pl-rocket">🚀</span></div>
+      <div class="pl-core">⭐</div>
+    </div>
+    <div class="pl-logo">CASHBANNI</div>
+    <div class="pl-tag">STARS · CASES · CRASH</div>
+    <div class="pl-bar"><div class="pl-fill" id="plFill"></div></div>
+    <div class="pl-pct" id="plPct">0%</div>
+  </div>
+</div>
+<script>
+(function(){
+  var pct=0, done=false, t0=Date.now();
+  var elP=document.getElementById('plPct');
+  var elF=document.getElementById('plFill');
+  var iv=setInterval(function(){
+    var target=done?100:Math.min(92,(Date.now()-t0)/22);
+    pct+=(target-pct)*0.12+0.4;
+    if(!done&&pct>92)pct=92;
+    if(done&&pct>100)pct=100;
+    if(elP)elP.textContent=Math.floor(pct)+'%';
+    if(elF)elF.style.width=pct+'%';
+    if(done&&pct>=99.5){
+      clearInterval(iv);
+      var pl=document.getElementById('preloader');
+      if(pl){pl.classList.add('hide');setTimeout(function(){if(pl.parentNode)pl.parentNode.removeChild(pl);},650);}
+    }
+  },50);
+  window.addEventListener('load',function(){setTimeout(function(){done=true;},800);});
+  setTimeout(function(){done=true;},7000);
+})();
+</script>
+
 
 <script>
 window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin))return; if(e.target&&e.target!==window&&e.target.tagName){return;}var d=document.getElementById("errBanner")||document.createElement("div");d.id="errBanner";d.style.cssText="position:fixed;left:0;right:0;bottom:0;background:#440000;color:#ffdddd;font:11px/1.4 monospace;padding:8px;z-index:999999;white-space:pre-wrap;max-height:40%;overflow:auto";d.textContent="JS ERROR: "+e.message+" | file: "+((e.filename||"").split("/").pop())+" line "+e.lineno;if(!d.parentNode)document.body.appendChild(d);}catch(_){}},true);

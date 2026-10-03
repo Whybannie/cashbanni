@@ -1481,3 +1481,73 @@ h2,h3{color:#fff}
 .dogs-btn{width:100%;min-height:48px;border-radius:13px;font-weight:900;font-size:.85rem}
 .dogs-btn.go{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 6px 20px rgba(34,197,94,.35)}
 .dogs-btn.wait{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
+
+
+/* ===== v85: PRELOADER — космос, серебро, орбита ===== */
+#preloader{position:fixed;inset:0;z-index:99999;background:#000;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .6s ease,visibility .6s}
+#preloader.hide{opacity:0;visibility:hidden}
+
+/* Туманности */
+#preloader .pl-glow{position:absolute;border-radius:50%;filter:blur(70px);opacity:.32;pointer-events:none}
+#preloader .pl-g1{width:70vw;height:70vw;top:-25vw;left:-25vw;
+  background:radial-gradient(circle,#7c3aed 0%,transparent 70%);
+  animation:plFloat 6s ease-in-out infinite}
+#preloader .pl-g2{width:60vw;height:60vw;bottom:-20vw;right:-20vw;
+  background:radial-gradient(circle,#ec4899 0%,transparent 70%);
+  animation:plFloat 7s ease-in-out infinite reverse}
+@keyframes plFloat{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(4vw,3vw) scale(1.15)}}
+
+/* Падающие звёзды */
+#preloader .pl-stars i{position:absolute;top:-5%;width:2px;height:2px;background:#fff;border-radius:50%;
+  opacity:0;box-shadow:0 0 6px rgba(255,255,255,.8);animation:plFall linear infinite}
+#preloader .pl-stars i:nth-child(1){left:10%;animation-duration:1.5s;animation-delay:.0s}
+#preloader .pl-stars i:nth-child(2){left:25%;animation-duration:2.1s;animation-delay:.4s}
+#preloader .pl-stars i:nth-child(3){left:40%;animation-duration:1.7s;animation-delay:.9s}
+#preloader .pl-stars i:nth-child(4){left:55%;animation-duration:2.4s;animation-delay:.2s}
+#preloader .pl-stars i:nth-child(5){left:68%;animation-duration:1.6s;animation-delay:1.1s}
+#preloader .pl-stars i:nth-child(6){left:80%;animation-duration:2.0s;animation-delay:.6s}
+#preloader .pl-stars i:nth-child(7){left:90%;animation-duration:1.8s;animation-delay:1.4s}
+#preloader .pl-stars i:nth-child(8){left:33%;animation-duration:2.3s;animation-delay:1.8s}
+@keyframes plFall{0%{top:-5%;opacity:0}12%{opacity:.95}85%{opacity:.95}100%{top:105%;opacity:0}}
+
+#preloader .pl-center{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px}
+
+/* Орбита с ракетой */
+#preloader .pl-ring{position:relative;width:116px;height:116px}
+#preloader .pl-ring::before{content:'';position:absolute;inset:0;border-radius:50%;
+  border:2.5px solid rgba(255,255,255,.08);
+  border-top-color:#a855f7;border-right-color:#ec4899;
+  box-shadow:0 0 26px rgba(168,85,247,.35);
+  animation:plSpin 1.3s linear infinite}
+#preloader .pl-ring::after{content:'';position:absolute;inset:12px;border-radius:50%;
+  border:1px dashed rgba(255,255,255,.14);
+  animation:plSpin 9s linear infinite reverse}
+@keyframes plSpin{to{transform:rotate(360deg)}}
+#preloader .pl-orbit{position:absolute;inset:0;animation:plSpin 2.6s linear infinite}
+#preloader .pl-rocket{position:absolute;top:-15px;left:50%;margin-left:-14px;font-size:27px;
+  transform:rotate(90deg);filter:drop-shadow(0 0 12px rgba(255,150,50,.85))}
+#preloader .pl-core{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:36px;animation:plPulse 1.6s ease-in-out infinite;
+  filter:drop-shadow(0 0 16px rgba(251,191,36,.75))}
+@keyframes plPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+
+/* Серебряный логотип с бликом */
+#preloader .pl-logo{font-size:1.9rem;font-weight:900;letter-spacing:6px;
+  background:linear-gradient(110deg,#8a8a98 0%,#ffffff 18%,#c8c8d4 38%,#8a8a98 55%,#ffffff 75%,#c8c8d4 100%);
+  background-size:220% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:plShine 2.4s linear infinite}
+@keyframes plShine{0%{background-position:220% 0}100%{background-position:-220% 0}}
+
+#preloader .pl-tag{font-size:.6rem;letter-spacing:4px;color:rgba(255,255,255,.42);font-weight:700;margin-top:-6px}
+
+/* Полоса загрузки */
+#preloader .pl-bar{width:210px;height:5px;border-radius:6px;background:rgba(255,255,255,.08);
+  overflow:hidden;box-shadow:inset 0 0 8px rgba(0,0,0,.7)}
+#preloader .pl-fill{height:100%;width:0;border-radius:6px;
+  background:linear-gradient(90deg,#a855f7,#ec4899,#fbbf24);
+  box-shadow:0 0 14px rgba(236,72,153,.65);
+  transition:width .12s linear}
+#preloader .pl-pct{font-size:.68rem;font-weight:800;color:rgba(255,255,255,.55);letter-spacing:2px}
