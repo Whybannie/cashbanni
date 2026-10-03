@@ -1551,3 +1551,27 @@ h2,h3{color:#fff}
   box-shadow:0 0 14px rgba(236,72,153,.65);
   transition:width .12s linear}
 #preloader .pl-pct{font-size:.68rem;font-weight:800;color:rgba(255,255,255,.55);letter-spacing:2px}
+
+/* ===== v87: КВЕСТЫ И ДОСТИЖЕНИЯ — восстановленные стили ===== */
+.quests-row{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);
+  border-radius:16px;padding:12px 14px;margin-bottom:8px}
+.q-head{display:flex;justify-content:space-between;align-items:center;
+  font-size:.8rem;font-weight:800;color:#fff;margin-bottom:7px}
+.q-head .muted{font-size:.68rem;font-weight:700;color:rgba(255,255,255,.45)}
+.q-bar{height:6px;background:rgba(255,255,255,.08);border-radius:6px;overflow:hidden;margin-bottom:9px}
+.q-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:6px;
+  box-shadow:0 0 10px rgba(168,85,247,.4);transition:width .4s}
+.q-claim{width:100%;min-height:38px;border:none;border-radius:11px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;
+  font-weight:800;font-size:.74rem;cursor:pointer;box-shadow:0 4px 14px rgba(168,85,247,.3)}
+.q-claim:active{transform:scale(.97)}
+.q-claim:disabled{background:rgba(255,255,255,.07);color:rgba(255,255,255,.32);box-shadow:none}
+
+.ach{display:flex;gap:11px;align-items:center;background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:11px 13px;margin-bottom:8px}
+.ach .emoji{font-size:1.7rem;filter:grayscale(1);opacity:.5}
+.ach b{font-size:.8rem;color:#fff;display:block}
+.ach.done{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.07)}
+.ach.done .emoji{filter:none;opacity:1}
+.ach.locked{opacity:.6}
+.muted.small{font-size:.66rem;color:rgba(255,255,255,.45);margin-top:1px}

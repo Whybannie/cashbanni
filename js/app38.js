@@ -700,3 +700,18 @@ function smartError(msg){
   
   errGeneric(msg);
 }
+
+function renderAchs(){ var el=$('achList'); if(!el)return;
+  el.innerHTML=ACHS.map(function(a){ var d=false; try{ d=a.cond(S); }catch(e){}
+    return '<div class="ach '+(d?'done':'locked')+'"><span class="emoji">'+a.emoji+'</span><div><b>'+a.name+'</b><div class="muted small">'+(d?'Выполнено ✅':'Не выполнено')+'</div></div></div>'; }).join(''); }
+
+function renderQuests(){ var el=$('questsList'); if(!el)return;
+  el.innerHTML=QUESTS.map(function(q){ var p=Math.min(S.qp[q.type]||0,q.target),done=p>=q.target,cl=(S.qc||[]).includes(q.id);
+    return '<div class="quests-row"><div class="q-head"><span>'+q.name+'</span><span class="muted">'+p+'/'+q.target+'</span></div>'+
+    '<div class="q-bar"><div class="q-fill" style="width:'+(p/q.target*100)+'%"></div></div>'+
+    '<button class="q-claim" '+(done&&!cl?'':'disabled')+' onclick="claimQuest(\''+q.id+'\')">'+(cl?'✅ Получено':'Забрать +'+(q.reward*10)+' XP')+'</button></div>'; }).join(''); }
+
+function claimQuest(id){ var q=QUESTS.find(function(x){return x.id===id;});
+  if(!q)return; if((S.qc||[]).includes(id)||(S.qp[q.type]||0)<q.target)return;
+  S.qc.push(id); S.xp+=q.reward*10; sfx.win(); toast('📜 Квест выполнен: +'+(q.reward*10)+' XP 🏅','good');
+  saveLocal(); renderHeader(); renderTasks(); }
