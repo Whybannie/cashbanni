@@ -1642,3 +1642,25 @@ h2,h3{color:#fff}
 .dwm-line.lose{color:#f87171;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.35)}
 .dwm-line.none{color:rgba(255,255,255,.4);background:rgba(255,255,255,.05)}
 .dwm-hint{margin-top:14px;font-size:.58rem;color:rgba(255,255,255,.3);letter-spacing:1px}
+
+/* ===== v92: КРАСИВЫЕ ЗАГОЛОВКИ БЕЗ ЭМОДЗИ ===== */
+.sec-title{margin:2px 0 14px}
+.sec-title h2{
+  font-size:1.3rem;font-weight:900;letter-spacing:3px;text-transform:uppercase;
+  background:linear-gradient(180deg,#ffffff 0%,#d0d0da 45%,#8a8a98 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  display:inline-block}
+.sec-title h2::after{
+  content:'';display:block;height:3px;width:52px;border-radius:3px;margin-top:5px;
+  background:linear-gradient(90deg,var(--acc),var(--acc2));
+  box-shadow:0 0 12px rgba(168,85,247,.55)}
+
+/* Заголовок Кейсы на главной — тоже серебро */
+#sec-home .sec-head h2{
+  font-size:1.3rem;font-weight:900;letter-spacing:3px;text-transform:uppercase;
+  background:linear-gradient(180deg,#ffffff 0%,#d0d0da 45%,#8a8a98 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+#sec-home .sec-head h2::after{
+  content:'';display:block;height:3px;width:52px;border-radius:3px;margin-top:5px;
+  background:linear-gradient(90deg,var(--acc),var(--acc2));
+  box-shadow:0 0 12px rgba(168,85,247,.55)}
