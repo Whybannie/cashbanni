@@ -1575,3 +1575,31 @@ h2,h3{color:#fff}
 .ach.done .emoji{filter:none;opacity:1}
 .ach.locked{opacity:.6}
 .muted.small{font-size:.66rem;color:rgba(255,255,255,.45);margin-top:1px}
+
+/* ===== v90: ПРЕМИУМ КАРТОЧКА ПОБЕДИТЕЛЯ ===== */
+.dw-card{min-width:230px;max-width:82%;background:rgba(8,8,22,.88);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(251,191,36,.4);border-radius:22px;padding:18px 26px;text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 40px rgba(251,191,36,.18),inset 0 1px 0 rgba(255,255,255,.12);
+  animation:dwPop .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes dwPop{0%{transform:scale(.55);opacity:0}100%{transform:scale(1);opacity:1}}
+.dw-top{font-size:.56rem;letter-spacing:3px;font-weight:900;color:rgba(255,255,255,.5);margin-bottom:10px}
+.dw-dog{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:2px}
+.dw-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:.85rem;box-shadow:0 3px 12px rgba(0,0,0,.5)}
+.dw-name{font-size:1.2rem;font-weight:900;color:#fff;letter-spacing:1px}
+.dw-mult{font-size:1.7rem;font-weight:900;color:var(--gold);
+  text-shadow:0 0 20px rgba(251,191,36,.55);margin-bottom:10px}
+.dw-line{font-size:.78rem;font-weight:800;padding:7px 16px;border-radius:11px;display:inline-block}
+.dw-line.win{color:#4ade80;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.35);
+  box-shadow:0 0 16px rgba(74,222,128,.2)}
+.dw-line.lose{color:#f87171;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3)}
+.dw-line.none{color:rgba(255,255,255,.4);background:rgba(255,255,255,.05)}
+
+/* Премиум рамка трека */
+.dogs-track{border:1px solid rgba(251,191,36,.28) !important;
+  box-shadow:0 14px 44px rgba(0,0,0,.6),0 0 28px rgba(251,191,36,.1),inset 0 0 0 1px rgba(255,255,255,.08) !important}
+
+/* Зелёное свечение когда ставки открыты */
+.dogs-odds.open .dog-odd{border-color:rgba(74,222,128,.35);
+  box-shadow:0 0 10px rgba(74,222,128,.12)}

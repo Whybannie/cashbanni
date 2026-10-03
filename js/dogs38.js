@@ -1,5 +1,5 @@
-// ===== DOGS v4 — self-healing =====
-console.log('[DOGS] v4 loaded');
+// ===== DOGS v5 — непрерывные раунды, премиум =====
+console.log('[DOGS] v5 loaded');
 var DOGS = [
   {id:0,name:'Рекс',color:'#ef4444',mult:2.0,chance:0.24},
   {id:1,name:'Белка',color:'#f97316',mult:2.3,chance:0.20},
@@ -11,46 +11,52 @@ var DOGS = [
   {id:7,name:'Алмаз',color:'#22d3ee',mult:15.0,chance:0.03}
 ];
 var LANE_CENTERS=[0.206,0.289,0.372,0.456,0.539,0.622,0.706,0.789];
-var ZOOM=3;
-var dogs={phase:'idle',bet:20,selected:null,winner:null,
-  pos:[0,0,0,0,0,0,0,0],finT:[],t0:0,hist:[],cam:0,finishAt:0,loopOn:false};
+var ZOOM=4;
+var T_BET=6000, T_COUNT=2700, T_RESULT=4200;
+var dogs={phase:'bet',phaseStart:Date.now(),bet:20,selected:null,myDog:null,myBet:0,
+  winner:null,pos:[0,0,0,0,0,0,0,0],finT:[],t0:0,hist:[],cam:0,round:1,active:false,
+  _settled:false,_lastCount:99};
 
-function dogsTrackEl(){
-  var c=$('dogsCanvas');
-  return c?c.parentElement:null;
-}
+function dogsDpr(){return Math.min(window.devicePixelRatio||1,2);}
+function dogsTrackEl(){var c=$('dogsCanvas');return c?c.parentElement:null;}
 function dogsResize(){
   var t=dogsTrackEl(),c=$('dogsCanvas');
   if(!t||!c)return false;
   var r=t.getBoundingClientRect();
   if(r.width<10||r.height<10)return false;
-  var dpr=window.devicePixelRatio||1;
+  var dpr=dogsDpr();
   var w=Math.round(r.width*dpr),h=Math.round(r.height*dpr);
   if(c.width!==w||c.height!==h){c.width=w;c.height=h;}
   return true;
 }
+function dogsSetActive(){
+  var sec=$('sec-dogs');
+  dogs.active=!!(sec&&sec.classList.contains('active'));
+}
 function dogsCamTarget(){
   var c=$('dogsCanvas');if(!c||!c.width)return 0;
-  var dpr=window.devicePixelRatio||1,vw=c.width/dpr,worldW=vw*ZOOM;
-  if(dogs.phase==='idle'||dogs.phase==='count')return 0;
+  var vw=c.width/dogsDpr(),worldW=vw*ZOOM;
+  if(dogs.phase==='bet')return 0;
   if(dogs.phase==='result')return worldW-vw;
   var lead=0;
   for(var i=0;i<8;i++)lead=Math.max(lead,dogs.pos[i]);
   var leadX=worldW*0.08+(worldW*0.84)*lead;
-  return Math.max(0,Math.min(worldW-vw,leadX-vw*0.45));
+  return Math.max(0,Math.min(worldW-vw,leadX-vw*0.5));
 }
-function dogsBet(d){if(dogs.phase!=='idle')return;dogs.bet=Math.max(5,dogs.bet+d);syncDogsUI();sfx.click();}
-function dogsSet(v){if(dogs.phase!=='idle')return;dogs.bet=v;syncDogsUI();sfx.click();}
+function dogsBet(d){if(dogs.phase!=='bet'||dogs.myDog!==null)return;dogs.bet=Math.max(5,dogs.bet+d);syncDogsUI();sfx.click();}
+function dogsSet(v){if(dogs.phase!=='bet'||dogs.myDog!==null)return;dogs.bet=Math.max(5,v);syncDogsUI();sfx.click();}
 function dogsSelect(i){
-  if(dogs.phase!=='idle')return;
+  if(dogs.phase!=='bet'||dogs.myDog!==null)return;
   dogs.selected=(dogs.selected===i)?null:i;
   sfx.click();renderDogsOdds();syncDogsUI();
 }
 function renderDogsOdds(){
   var el=$('dogsOdds');if(!el)return;
+  el.className='dogs-odds'+(dogs.phase==='bet'&&dogs.myDog===null?' open':'');
   el.innerHTML=DOGS.map(function(d){
     var txt=(d.id===6)?'#333':'#fff';
-    return '<div class="dog-odd'+(dogs.selected===d.id?' sel':'')+'" onclick="dogsSelect('+d.id+')">'+
+    var sel=(dogs.selected===d.id)||(dogs.myDog===d.id);
+    return '<div class="dog-odd'+(sel?' sel':'')+'" onclick="dogsSelect('+d.id+')">'+
       '<span class="do-num" style="background:'+d.color+';color:'+txt+'">'+(d.id+1)+'</span>'+
       '<span class="do-name">'+d.name+'</span>'+
       '<span class="do-mult">×'+d.mult.toFixed(1)+'</span></div>';
@@ -67,14 +73,16 @@ function renderDogsHist(){
 function syncDogsUI(){
   setT('dogsBetVal',dogs.bet);
   var pot=$('dogsPotential');
-  if(pot)pot.textContent=dogs.selected!==null?fmt(Math.floor(dogs.bet*DOGS[dogs.selected].mult)):'0';
+  var showDog=(dogs.myDog!==null)?dogs.myDog:dogs.selected;
+  if(pot)pot.textContent=showDog!==null?fmt(Math.floor(dogs.bet*DOGS[showDog].mult)):'0';
   var btn=$('dogsBtn');if(!btn)return;
-  if(dogs.phase==='idle'){
-    if(dogs.selected===null){btn.textContent='ВЫБЕРИ СОБАКУ';btn.className='btn dogs-btn wait';}
-    else{btn.textContent='СТАРТ · '+DOGS[dogs.selected].name+' ×'+DOGS[dogs.selected].mult.toFixed(1);btn.className='btn dogs-btn go';}
-  }else if(dogs.phase==='count'){btn.textContent='ПРИГОТОВЬСЯ...';btn.className='btn dogs-btn wait';}
+  if(dogs.phase==='bet'){
+    if(dogs.myDog!==null){btn.textContent='✅ СТАВКА ПРИНЯТА · '+DOGS[dogs.myDog].name;btn.className='btn dogs-btn wait';}
+    else if(dogs.selected===null){btn.textContent='ВЫБЕРИ СОБАКУ';btn.className='btn dogs-btn wait';}
+    else{btn.textContent='ПОСТАВИТЬ ⭐'+dogs.bet+' · '+DOGS[dogs.selected].name;btn.className='btn dogs-btn go';}
+  }else if(dogs.phase==='count'){btn.textContent='🔒 СТАВКИ ЗАКРЫТЫ';btn.className='btn dogs-btn wait';}
   else if(dogs.phase==='race'||dogs.phase==='finish'){btn.textContent='🏁 ГОНКА ИДЁТ';btn.className='btn dogs-btn wait';}
-  else{btn.textContent='СЛЕДУЮЩИЙ РАУНД...';btn.className='btn dogs-btn wait';}
+  else{btn.textContent='⏳ СЛЕДУЮЩИЙ РАУНД';btn.className='btn dogs-btn wait';}
 }
 function dogsOverlay(html){
   var o=$('dogsOverlay');if(!o)return;
@@ -87,76 +95,98 @@ function pickWinner(){
   return 0;
 }
 function dogsStart(){
-  if(dogs.phase!=='idle')return;
+  if(dogs.phase!=='bet')return toast('Подожди окно ставок','bad');
+  if(dogs.myDog!==null)return toast('Ставка уже принята','bad');
   if(dogs.selected===null)return toast('Сначала выбери собаку','bad');
+  if(dogs.bet<5)dogs.bet=5;
   if(S.balance<dogs.bet)return toast('Недостаточно Stars ⭐','bad');
   S.balance-=dogs.bet;save();renderHeader();
+  dogs.myDog=dogs.selected;dogs.myBet=dogs.bet;
+  sfx.win();
+  renderDogsOdds();syncDogsUI();
+}
+function prepareRace(){
   dogs.winner=pickWinner();
   var T=6.5+Math.random()*1.5;
   dogs.finT=[];
   for(var i=0;i<8;i++)dogs.finT.push(i===dogs.winner?T:T+0.25+Math.random()*2.4);
   dogs.pos=[0,0,0,0,0,0,0,0];
-  dogs.phase='count';
-  syncDogsUI();
-  dogsCount(3);
+  dogs._settled=false;
 }
-function dogsCount(n){
-  if(n>0){
-    dogsOverlay('<div class="ov-big">'+n+'</div><div class="ov-sub">Ставки приняты</div>');
-    sfx.tick();
-    setTimeout(function(){dogsCount(n-1);},900);
+function settleBets(){
+  if(dogs._settled)return;
+  dogs._settled=true;
+  var w=dogs.winner;
+  dogs.hist.push({id:w,mult:DOGS[w].mult});
+  renderDogsHist();
+  var line;
+  if(dogs.myDog!==null){
+    if(dogs.myDog===w){
+      var win=Math.floor(dogs.myBet*DOGS[w].mult);
+      S.balance+=win;save();renderHeader();sfx.win();confetti(80);
+      line='<div class="dw-line win">Твоя ставка сыграла: +⭐'+fmt(win)+'</div>';
+      toast('🏆 '+DOGS[w].name+' первый! +⭐'+fmt(win),'good');
+    }else{
+      sfx.crash();
+      line='<div class="dw-line lose">Ставка ⭐'+dogs.myBet+' сгорела</div>';
+      toast(DOGS[w].name+' победил. Не повезло','bad');
+    }
   }else{
-    dogsOverlay('<div class="ov-big" style="color:#4ade80">GO!</div>');
-    sfx.win();
-    setTimeout(function(){dogsOverlay(null);},600);
-    dogs.phase='race';dogs.t0=Date.now();syncDogsUI();
+    line='<div class="dw-line none">В этом раунде ты не ставил</div>';
   }
+  dogsOverlay('<div class="dw-card"><div class="dw-top">ПОБЕДИТЕЛЬ РАУНДА #'+dogs.round+'</div>'+
+    '<div class="dw-dog"><span class="dw-num" style="background:'+DOGS[w].color+';color:'+(w===6?'#333':'#fff')+'">'+(w+1)+'</span>'+
+    '<span class="dw-name">'+DOGS[w].name+'</span></div>'+
+    '<div class="dw-mult">×'+DOGS[w].mult.toFixed(1)+'</div>'+line+'</div>');
 }
+function resetForBet(){
+  dogs.round++;
+  dogs.phase='bet';dogs.phaseStart=Date.now();
+  dogs.selected=null;dogs.myDog=null;dogs.myBet=0;
+  dogs.pos=[0,0,0,0,0,0,0,0];
+  dogsOverlay(null);
+  renderDogsOdds();syncDogsUI();
+}
+// ===== ГЛАВНЫЙ ЦИКЛ (непрерывный, как краш) =====
 function dogsLoopAll(){
   requestAnimationFrame(dogsLoopAll);
+  dogsSetActive();
+  if(!dogs.active)return;
   try{
-    if(dogs.phase==='race'||dogs.phase==='finish'){
-      var t=(Date.now()-dogs.t0)/1000;
+    var now=Date.now(),el=now-dogs.phaseStart;
+    if(dogs.phase==='bet'){
+      if(el>=T_BET){prepareRace();dogs.phase='count';dogs.phaseStart=now;dogs._lastCount=99;syncDogsUI();renderDogsOdds();}
+    }else if(dogs.phase==='count'){
+      var n=3-Math.floor(el/900);
+      if(n!==dogs._lastCount&&n>=1){dogs._lastCount=n;dogsOverlay('<div class="ov-big">'+n+'</div><div class="ov-sub">Ставки закрыты</div>');sfx.tick();}
+      if(el>=T_COUNT){dogsOverlay(null);dogs.phase='race';dogs.phaseStart=now;dogs.t0=now;syncDogsUI();}
+    }else if(dogs.phase==='race'){
+      var t=(now-dogs.t0)/1000;
       for(var i=0;i<8;i++){
         var p=Math.min(1,t/dogs.finT[i]);
         var w=(p>0.04&&p<0.96)?0.02*Math.sin(t*2.3+i*1.7)*(1-p):0;
         dogs.pos[i]=Math.max(0,Math.min(1,p+w));
       }
-      if(dogs.phase==='race'&&dogs.pos[dogs.winner]>=1){
-        dogs.phase='finish';dogs.finishAt=Date.now();sfx.tick();
+      if(dogs.pos[dogs.winner]>=1){dogs.phase='finish';dogs.phaseStart=now;sfx.tick();}
+    }else if(dogs.phase==='finish'){
+      var t2=(now-dogs.t0)/1000;
+      for(var j=0;j<8;j++){
+        var p2=Math.min(1,t2/dogs.finT[j]);
+        dogs.pos[j]=Math.max(dogs.pos[j],Math.min(1,p2));
       }
-      if(dogs.phase==='finish'&&Date.now()-dogs.finishAt>1500)dogsFinish();
+      if(el>=1500){dogs.phase='result';dogs.phaseStart=now;settleBets();syncDogsUI();}
+    }else if(dogs.phase==='result'){
+      if(el>=T_RESULT)resetForBet();
     }
     dogs.cam+=(dogsCamTarget()-dogs.cam)*0.08;
     dogsDraw();
   }catch(e){}
 }
-function dogsFinish(){
-  var w=dogs.winner,won=dogs.selected===w;
-  dogs.phase='result';
-  dogs.hist.push({id:w,mult:DOGS[w].mult});
-  renderDogsHist();
-  if(won){
-    var win=Math.floor(dogs.bet*DOGS[w].mult);
-    S.balance+=win;sfx.win();confetti(90);
-    dogsOverlay('<div class="ov-big">🏆 '+DOGS[w].name+'</div><div class="ov-sub ov-win">ПОБЕДА! +⭐'+fmt(win)+'</div>');
-    toast('🏆 '+DOGS[w].name+' первый! +⭐'+fmt(win),'good');
-  }else{
-    sfx.crash();
-    dogsOverlay('<div class="ov-big">🏆 '+DOGS[w].name+'</div><div class="ov-sub ov-lose">Твоя ставка не сыграла</div>');
-    toast(DOGS[w].name+' победил. В следующий раз повезёт!','bad');
-  }
-  save();renderHeader();syncDogsUI();
-  setTimeout(function(){
-    dogsOverlay(null);
-    dogs.phase='idle';dogs.selected=null;dogs.pos=[0,0,0,0,0,0,0,0];dogs.cam=0;
-    renderDogsOdds();syncDogsUI();
-  },4000);
-}
+// ===== ОТРИСОВКА =====
 function dogsDraw(){
   var c=$('dogsCanvas');if(!c)return;
   if(!c.width){if(!dogsResize())return;}
-  var x=c.getContext('2d'),W=c.width,H=c.height,dpr=window.devicePixelRatio||1,vw=W/dpr;
+  var x=c.getContext('2d'),W=c.width,H=c.height,dpr=dogsDpr(),vw=W/dpr;
   var now=Date.now();
   x.clearRect(0,0,W,H);
   var worldW=vw*ZOOM,startWX=worldW*0.08,finWX=worldW*0.92;
@@ -181,7 +211,12 @@ function dogsDraw(){
     if(sx<-90*dpr||sx>W+90*dpr)continue;
     var sy=LANE_CENTERS[i]*H;
     var running=(dogs.phase==='race'||dogs.phase==='finish')&&dogs.pos[i]<1;
-    if(dogs.selected===i&&dogs.phase==='idle'){
+    if(dogs.myDog===i){
+      x.strokeStyle='rgba(74,222,128,.9)';x.lineWidth=2*dpr;
+      x.setLineDash([4*dpr,3*dpr]);
+      x.beginPath();x.ellipse(sx,sy+8*dpr,30*dpr,10*dpr,0,0,7);x.stroke();
+      x.setLineDash([]);
+    }else if(dogs.selected===i&&dogs.phase==='bet'){
       x.strokeStyle='rgba(251,191,36,.9)';x.lineWidth=2*dpr;
       x.setLineDash([4*dpr,3*dpr]);
       x.beginPath();x.ellipse(sx,sy+8*dpr,30*dpr,10*dpr,0,0,7);x.stroke();
@@ -189,7 +224,7 @@ function dogsDraw(){
     }
     if((dogs.phase==='finish'||dogs.phase==='result')&&dogs.winner===i){
       x.font=(16*dpr)+'px serif';x.textAlign='center';
-      x.fillText('🏆',sx,sy-24*dpr);
+      x.fillText('',sx,sy-24*dpr);
     }
     drawDog(x,sx,sy,H*0.055,DOGS[i],i,running,now);
   }
@@ -197,15 +232,15 @@ function dogsDraw(){
 function drawDog(x,cx,cy,s,dog,idx,running,now){
   if(s<4)return;
   var ph=running?now/85+idx*1.1:0;
-  var bob=running?Math.sin(ph*2)*s*0.06:Math.sin(now/600+idx)*s*0.03;
+  var bob=running?Math.sin(ph*2)*s*0.06:0;
   x.save();x.translate(cx,cy+bob);
   x.fillStyle='rgba(0,0,0,.35)';
   x.beginPath();x.ellipse(0,s*0.62,s*0.62,s*0.1,0,0,7);x.fill();
   if(running){
-    for(var p=0;p<4;p++){
-      x.fillStyle='rgba(210,180,140,'+(0.35-p*0.08).toFixed(2)+')';
+    for(var p=0;p<3;p++){
+      x.fillStyle='rgba(210,180,140,'+(0.3-p*0.08).toFixed(2)+')';
       x.beginPath();
-      x.arc(-s*0.55-p*s*0.22-Math.random()*s*0.1,s*0.5+Math.sin(now/50+p)*s*0.08,s*(0.07+p*0.03),0,7);
+      x.arc(-s*0.55-p*s*0.22,s*0.5+Math.sin(now/50+p)*s*0.08,s*(0.07+p*0.03),0,7);
       x.fill();
     }
   }
@@ -264,7 +299,7 @@ function drawDog(x,cx,cy,s,dog,idx,running,now){
 document.addEventListener('click',function(e){
   var c=$('dogsCanvas');
   if(!c||e.target!==c)return;
-  if(dogs.phase!=='idle')return;
+  if(dogs.phase!=='bet'||dogs.myDog!==null)return;
   var rect=c.getBoundingClientRect();
   var fy=(e.clientY-rect.top)/rect.height;
   var best=0,bd=9;
@@ -274,16 +309,13 @@ document.addEventListener('click',function(e){
   }
   dogsSelect(best);
 });
-// SELF-HEAL: каждые 500ms проверяем размер канваса и наличие карточек
 setInterval(function(){
   try{
-    var sec=$('sec-dogs');
-    if(!sec||!sec.classList.contains('active'))return;
+    dogsSetActive();
+    if(!dogs.active)return;
     dogsResize();
     var o=$('dogsOdds');
     if(o&&!o.innerHTML.trim())renderDogsOdds();
-    renderDogsHist();
-    syncDogsUI();
   }catch(e){}
 },500);
 (function(){
@@ -292,42 +324,14 @@ setInterval(function(){
     window.activateTab=function(t){
       var r=a0(t);
       if(t==='dogs'){
+        dogsSetActive();
         setTimeout(function(){dogsResize();renderDogsOdds();renderDogsHist();syncDogsUI();},60);
         setTimeout(function(){dogsResize();},300);
       }
       return r;
     };
   }
-  if(!dogs.loopOn){dogs.loopOn=true;requestAnimationFrame(dogsLoopAll);}
+  requestAnimationFrame(dogsLoopAll);
 })();
 addEventListener('resize',function(){try{dogsResize();}catch(e){}});
 setTimeout(function(){try{dogsResize();renderDogsOdds();renderDogsHist();syncDogsUI();}catch(e){}},600);
-
-
-// ===== ЖЕЛЕЗОБЕТОННАЯ ИНИЦИАЛИЗАЦИЯ =====
-function dogsHardInit(){
-  console.log('[DOGS] hard init');
-  try{
-    var c=document.getElementById('dogsCanvas');
-    if(!c){console.log('[DOGS] canvas не найден');return;}
-    var t=c.parentElement;
-    if(!t){console.log('[DOGS] parent не найден');return;}
-    var r=t.getBoundingClientRect();
-    console.log('[DOGS] track rect:', r.width, 'x', r.height);
-    if(r.width<10||r.height<10){
-      console.log('[DOGS] retry in 300ms');
-      setTimeout(dogsHardInit, 300);
-      return;
-    }
-    dogsResize();
-    renderDogsOdds();
-    renderDogsHist();
-    syncDogsUI();
-    dogsDraw();
-    console.log('[DOGS] init OK, canvas:', c.width, 'x', c.height);
-  }catch(e){console.error('[DOGS] init error:', e);}
-}
-window.addEventListener('DOMContentLoaded', function(){ setTimeout(dogsHardInit, 500); });
-// Backup: через 2 сек если всё ещё не инициализировалось
-setTimeout(dogsHardInit, 2000);
-setTimeout(dogsHardInit, 5000);
