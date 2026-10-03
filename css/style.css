@@ -1726,3 +1726,37 @@ h2,h3{color:#fff}
   --gcT1:#fecaca;--gcT2:#fed7aa;--gcB1:#ef4444;--gcB2:#f97316;--gcShadow:rgba(239,68,68,.3);--gcGlow:rgba(239,68,68,.45)}
 .gc-market{--gcA:rgba(59,130,246,.16);--gcB:rgba(34,211,238,.10);--gcLine:rgba(59,130,246,.32);
   --gcT1:#bfdbfe;--gcT2:#a5f3fc;--gcB1:#3b82f6;--gcB2:#22d3ee;--gcShadow:rgba(59,130,246,.32);--gcGlow:rgba(59,130,246,.5)}
+
+/* ===== v94: МОДАЛКА ОФЕРТЫ ===== */
+.offer-modal{max-height:82vh;display:flex;flex-direction:column;
+  border:1px solid rgba(168,85,247,.35);
+  box-shadow:0 30px 80px rgba(0,0,0,.8),0 0 40px rgba(168,85,247,.15)}
+.of-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.of-head b{font-size:1rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(180deg,#fff 0%,#c8c8d4 50%,#8a8a98 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.of-body{overflow-y:auto;max-height:44vh;font-size:.72rem;line-height:1.6;
+  color:rgba(255,255,255,.62);padding-right:8px;
+  scrollbar-width:thin;scrollbar-color:rgba(168,85,247,.4) transparent}
+.of-body::-webkit-scrollbar{width:4px}
+.of-body::-webkit-scrollbar-thumb{background:rgba(168,85,247,.4);border-radius:4px}
+.of-body p{margin:0 0 11px}
+.of-body b{color:rgba(255,255,255,.92)}
+
+.of-check{display:flex;gap:11px;align-items:flex-start;margin:14px 0 12px;cursor:pointer;
+  font-size:.74rem;font-weight:700;color:rgba(255,255,255,.8);line-height:1.4}
+.of-check input{display:none}
+.of-box{flex:0 0 22px;width:22px;height:22px;border-radius:7px;position:relative;
+  border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.05);transition:.2s}
+.of-check input:checked + .of-box{
+  background:linear-gradient(135deg,var(--acc),var(--acc2));border-color:transparent;
+  box-shadow:0 0 16px rgba(168,85,247,.55)}
+.of-box::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;color:#fff;font-weight:900;font-size:.8rem;
+  opacity:0;transform:scale(.4);transition:.2s}
+.of-check input:checked + .of-box::after{opacity:1;transform:scale(1)}
+
+.of-accept{width:100%;min-height:48px;border-radius:14px;font-weight:900;font-size:.8rem;letter-spacing:1.5px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;
+  box-shadow:0 6px 22px rgba(168,85,247,.4)}
+.of-accept:active{transform:scale(.97)}

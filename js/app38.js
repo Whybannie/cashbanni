@@ -715,3 +715,28 @@ function claimQuest(id){ var q=QUESTS.find(function(x){return x.id===id;});
   if(!q)return; if((S.qc||[]).includes(id)||(S.qp[q.type]||0)<q.target)return;
   S.qc.push(id); S.xp+=q.reward*10; sfx.win(); toast('📜 Квест выполнен: +'+(q.reward*10)+' XP 🏅','good');
   saveLocal(); renderHeader(); renderTasks(); }
+
+
+// ===== v94: ДОГОВОР ОФЕРТЫ =====
+function offerGate(action){
+  if(S && S.terms === true){
+    try{ new Function(action)(); }catch(e){ console.error('offerGate', e); }
+    return;
+  }
+  window.__offerAction = action;
+  var m = $('offerModal');
+  if(m) m.classList.add('show');
+}
+function offerHide(){
+  var m = $('offerModal');
+  if(m) m.classList.remove('show');
+  window.__offerAction = null;
+}
+function offerAccept(){
+  var cb = $('offerCheck');
+  if(!cb || !cb.checked){ toast('Сначала поставь галочку ✅','bad'); return; }
+  S.terms = true; save();
+  offerHide();
+  var a = window.__offerAction; window.__offerAction = null;
+  if(a){ try{ new Function(a)(); }catch(e){ console.error('offerGate run', e); } }
+}
