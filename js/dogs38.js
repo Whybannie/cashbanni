@@ -302,3 +302,32 @@ setInterval(function(){
 })();
 addEventListener('resize',function(){try{dogsResize();}catch(e){}});
 setTimeout(function(){try{dogsResize();renderDogsOdds();renderDogsHist();syncDogsUI();}catch(e){}},600);
+
+
+// ===== ЖЕЛЕЗОБЕТОННАЯ ИНИЦИАЛИЗАЦИЯ =====
+function dogsHardInit(){
+  console.log('[DOGS] hard init');
+  try{
+    var c=document.getElementById('dogsCanvas');
+    if(!c){console.log('[DOGS] canvas не найден');return;}
+    var t=c.parentElement;
+    if(!t){console.log('[DOGS] parent не найден');return;}
+    var r=t.getBoundingClientRect();
+    console.log('[DOGS] track rect:', r.width, 'x', r.height);
+    if(r.width<10||r.height<10){
+      console.log('[DOGS] retry in 300ms');
+      setTimeout(dogsHardInit, 300);
+      return;
+    }
+    dogsResize();
+    renderDogsOdds();
+    renderDogsHist();
+    syncDogsUI();
+    dogsDraw();
+    console.log('[DOGS] init OK, canvas:', c.width, 'x', c.height);
+  }catch(e){console.error('[DOGS] init error:', e);}
+}
+window.addEventListener('DOMContentLoaded', function(){ setTimeout(dogsHardInit, 500); });
+// Backup: через 2 сек если всё ещё не инициализировалось
+setTimeout(dogsHardInit, 2000);
+setTimeout(dogsHardInit, 5000);
