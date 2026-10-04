@@ -10,9 +10,9 @@
   
   <!-- 🚀 Performance: prefetch критичных ресурсов -->
   <link rel="prefetch" href="js/data38.js?v=940" as="script">
-  <link rel="prefetch" href="js/app38.js?v=990" as="script">
+  <link rel="prefetch" href="js/app38.js?v=940" as="script">
   <link rel="prefetch" href="js/caseimg38.js?v=940" as="script">
-  <link rel="preload" href="css/style.css?v=990" as="style">
+  <link rel="preload" href="css/style.css?v=950" as="style">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
@@ -20,7 +20,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=990">
+<link rel="stylesheet" href="css/style.css?v=950">
 <script src="https://telegram.org/js/telegram-web-app.js?v=715" defer></script>
 <link rel="preload" as="image" href="case_fri.JPG">
 <link rel="preload" as="image" href="case_mini.JPG">
@@ -349,141 +349,50 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 
   <section class="section" id="sec-profile">
-    <!-- HERO: Аватар + имя + уровень -->
-    <div class="pf-hero">
-      <div class="pf-ava-wrap">
-        <div class="pf-ava" id="pAva">😎</div>
-        <div class="pf-lvl-badge" id="pLvlBadge">1</div>
+    <div class="pcard">
+      <div class="pava" id="pAva">😎</div>
+      <div class="pinfo">
+        <b id="pName">Игрок</b>
+        <span>ID #<span id="myId">—</span> · с <span id="pReg">—</span></span>
+        <div class="pbads" id="pBadges"></div>
       </div>
-      <div class="pf-info">
-        <b class="pf-name" id="pName">Игрок</b>
-        <span class="pf-meta">ID #<span id="myId">—</span> · с <span id="pReg">—</span></span>
-        <div class="pf-rank" id="pRank">Новичок</div>
-      </div>
-      <button class="pf-copy-btn" onclick="copyId()">📋 ID</button>
+      <button class="btn btn-secondary task-btn" onclick="copyId()">ID</button>
     </div>
-
-    <!-- Баланс -->
-    <div class="pf-balance">
-      <div class="pf-bal-label">БАЛАНС</div>
-      <div class="pf-bal-value">⭐<span id="pBalance">0</span></div>
-      <button class="btn pf-topup-btn" onclick="offerGate('openPay()')">ПОПОЛНИТЬ</button>
+    <div class="rank-card mt" id="rankCard"></div>
+    <div class="stats-grid mt" id="statsGrid"></div>
+    <div class="task-card mt" onclick="offerGate('openPay()')"">
+      <div class="ic-box gold"><svg class="ic"><use href="#i-star"/></svg></div>
+      <div class="task-info"><b>Пополнить баланс</b><span>От ⭐1 · оплата через Telegram Stars</span></div>
+      <div class="hero-go">›</div>
     </div>
-
-    <!-- Быстрые действия -->
-    <div class="pf-actions">
-      <button class="pf-action" onclick="activateTab('tasks')">
-        <span class="pf-act-icon">🏆</span>
-        <span class="pf-act-text">Достижения</span>
-      </button>
-      <button class="pf-action" onclick="copyRef()">
-        <span class="pf-act-icon">👥</span>
-        <span class="pf-act-text">Рефералы</span>
-      </button>
-      <button class="pf-action" onclick="toast('Скоро будет 👀','info')">
-        <span class="pf-act-icon">💬</span>
-        <span class="pf-act-text">Поддержка</span>
-      </button>
+    <div class="task-card">
+      <div class="ic-box green"><svg class="ic"><use href="#i-mega"/></svg></div>
+      <div class="task-info"><b>Подписка на канал</b><span id="subState">Награда ⭐10</span></div>
+      <button class="btn btn-secondary task-btn" id="subBtn2" onclick="doSub()">Получить</button>
     </div>
-
-    <!-- Статистика -->
-    <h3 class="pf-section-title">📊 Статистика</h3>
-    <div class="pf-stats" id="pStats"></div>
-
-    <!-- Активность (GitHub-style) -->
-    <h3 class="pf-section-title">📅 Активность</h3>
-    <div class="pf-activity" id="pActivity"></div>
-
-    <!-- Достижения -->
-    <h3 class="pf-section-title">🏅 Достижения</h3>
-    <div class="pf-achs" id="pAchs"></div>
-
-    <!-- Реферальная программа -->
-    <h3 class="pf-section-title">👥 Реферальная программа</h3>
-    <div class="pf-ref" id="pRef">
-      <p class="pf-ref-desc">Приглашай друзей и получай ⭐5 за каждого кто внесёт депозит</p>
-      <div class="pf-ref-code">
-        <span id="pRefCode">—</span>
-        <button onclick="copyRef()">📋</button>
-      </div>
-      <div class="pf-ref-stats">
-        <div><b id="pRefCount">0</b><span>Приглашено</span></div>
-        <div><b id="pRefEarned">0</b><span>Заработано ⭐</span></div>
-      </div>
-    </div>
-
-    <!-- История транзакций -->
-    <h3 class="pf-section-title">💸 История</h3>
-    <div class="pf-history" id="pHistory"></div>
-
-    <!-- Подписка -->
-    <h3 class="pf-section-title">📢 Подписка</h3>
-    <div class="pf-sub" onclick="doSub()">
-      <span class="pf-sub-icon">🎁</span>
-      <div class="pf-sub-info">
-        <b>Подписка на канал</b>
-        <span id="subState">Награда ⭐10</span>
-      </div>
-      <button class="btn pf-sub-btn" id="subBtn2">Получить</button>
-    </div>
-
-    <!-- Топ лидеров -->
-    <h3 class="pf-section-title">👑 Топ-50 лидеров</h3>
-    <div class="pf-top" id="topList"></div>
-
-    <!-- Мои предметы -->
-    <h3 class="pf-section-title">🎁 Мои предметы</h3>
-    <div class="pf-inv-head">
-      <span id="invValue">—</span>
-      <button class="btn pf-sell-btn" onclick="sellAll()">Продать всё</button>
-    </div>
-    <div class="pf-inv" id="inventoryGrid"></div>
-
-    <!-- Промокод -->
-    <h3 class="pf-section-title">🎟️ Промокод</h3>
-    <div class="pf-promo">
-      <input id="promoInput" placeholder="ВВЕДИ КОД">
-      <button class="btn" onclick="applyPromo()">OK</button>
-    </div>
-
-    <!-- Настройки -->
-    <h3 class="pf-section-title">⚙️ Настройки</h3>
-    <div class="pf-settings">
-      <label class="pf-switch">
-        <input type="checkbox" id="soundToggle" onchange="toggleSound()">
-        <span>🔊 Звуки и вибрация</span>
-      </label>
-      <label class="pf-switch">
-        <input type="checkbox" id="fairToggle" onchange="toggleFair()">
-        <span>🎲 Provably Fair</span>
-      </label>
-      <div class="pf-fair-info" id="fairInfo"></div>
-    </div>
-
-    <!-- Админка (скрыта по умолчанию) -->
+    <h2 class="mt">Топ-50 лидеров</h2>
+    <div id="topList"></div>
+    <h2 class="mt">Мои предметы</h2>
+    <div class="sec-head mb"><span class="muted" id="invValue"></span><button class="btn btn-sell" onclick="sellAll()">Продать всё</button></div>
+    <div class="inventory-grid" id="inventoryGrid"></div>
+    <h3 class="mt">Промокод</h3>
+    <div class="row"><input id="promoInput" placeholder="ВВЕДИ КОД"><button class="btn btn-primary" onclick="applyPromo()">OK</button></div>
+    <h3 class="mt">Настройки</h3>
+    <label class="switch-row"><input type="checkbox" id="soundToggle" onchange="toggleSound()"> Звуки и вибрация</label>
+    <label class="switch-row"><input type="checkbox" id="fairToggle" onchange="toggleFair()"> Provably Fair</label>
+    <div class="muted small" id="fairInfo"></div>
     <div id="adminBlock" style="display:none">
-      <h3 class="pf-section-title">🛡 Админ-панель</h3>
-      <div class="pf-admin-stats" id="adminStats"></div>
-      <div class="pf-admin-info" id="adminCaseOpens"></div>
-      <h4>Начислить Stars по ID</h4>
-      <div class="pf-admin-row">
-        <input id="admId" placeholder="ID">
-        <input id="admSum" placeholder="Сумма">
-        <button class="btn" onclick="admGrant()">OK</button>
-      </div>
-      <h4>Рассылка всем игрокам</h4>
-      <div class="pf-admin-row">
-        <input id="admMsg" placeholder="Текст">
-        <button class="btn" onclick="admBroadcast()">Отправить</button>
-      </div>
-      <h4>Промокоды</h4>
+      <h2 class="mt">🛡 Админ-панель</h2>
+      <div class="stats-grid" id="adminStats"></div>
+      <div class="muted small" id="adminCaseOpens" style="margin:6px 0"></div>
+      <h3 class="mt">Начислить Stars по ID</h3>
+      <div class="row"><input id="admId" placeholder="ID"><input id="admSum" placeholder="Сумма"><button class="btn btn-primary" onclick="admGrant()">OK</button></div>
+      <h3 class="mt">Рассылка всем игрокам</h3>
+      <div class="row"><input id="admMsg" placeholder="Текст"><button class="btn btn-primary" onclick="admBroadcast()">Отправить</button></div>
+      <h3 class="mt">Промокоды</h3>
       <div id="adminPromos"></div>
-      <div class="pf-admin-row">
-        <input id="admPromoCode" placeholder="КОД">
-        <input id="admPromoSum" placeholder="Сумма">
-        <button class="btn" onclick="admPromoCreate()">Создать</button>
-      </div>
-      <h4>Игроки</h4>
+      <div class="row"><input id="admPromoCode" placeholder="КОД"><input id="admPromoSum" placeholder="Сумма"><button class="btn btn-primary" onclick="admPromoCreate()">Создать</button></div>
+      <h3 class="mt">Игроки</h3>
       <div id="adminUsers"></div>
     </div>
   </section>
@@ -537,7 +446,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 <div class="toasts" id="toasts"></div>
 <script src="js/data38.js?v=940" defer></script>
-<script src="js/app38.js?v=990" defer></script>
+<script src="js/app38.js?v=940" defer></script>
 <script src="js/caseimg38.js?v=940" defer></script>
   <script src="js/dogs38.js?v=940"></script>
   <!-- dogs отключены -->

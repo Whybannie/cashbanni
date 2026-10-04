@@ -424,79 +424,43 @@ function ensureBanner(){ let b=$('connBanner');
     const sec=$('sec-profile'); if(sec) sec.insertBefore(b, sec.firstChild); }
   return b; }
 function renderProfile(){
-  // Баланс
-  setT('pBalance', fmt(S.balance));
-  
-  // Аватар и имя
-  setT('pAva', S.ava || '😎');
-  setT('pName', S.name || 'Игрок');
-  setT('myId', S.id || '—');
-  setT('pReg', S.reg ? new Date(S.reg).toLocaleDateString('ru') : '—');
-  
-  // Уровень и ранг
-  var lvl = Math.floor((S.xp||0) / 100) + 1;
-  setT('pLvlBadge', lvl);
-  var ranks = ['Новичок','Игрок','Про','Мастер','Эксперт','Легенда','Мифика','Бог'];
-  var rankIdx = Math.min(Math.floor(lvl/10), ranks.length-1);
-  setT('pRank', ranks[rankIdx]);
-  
-  // Статистика
-  var stats = [
-    {icon:'📦', val:S.stats.opened||0, label:'Кейсов'},
-    {icon:'🎰', val:S.stats.best||0, label:'Лучший дроп'},
-    {icon:'🚀', val:S.stats.crashWins||0, label:'Краш-побед'},
-    {icon:'⚡', val:S.stats.upWins||0, label:'Апгрейдов'},
-    {icon:'💎', val:(S.inv||[]).length, label:'Предметов'},
-    {icon:'⭐', val:S.balance||0, label:'Баланс'}
-  ];
-  setH('pStats', stats.map(s=>'<div class="pf-stat"><span class="pf-stat-icon">'+s.icon+'</span><b class="pf-stat-val">'+fmt(s.val)+'</b><span class="pf-stat-label">'+s.label+'</span></div>').join(''));
-  
-  // Активность (последние 28 дней)
-  var today = new Date(); today.setHours(0,0,0,0);
-  var actHtml = '';
-  for(var i=27;i>=0;i--){
-    var d = new Date(today); d.setDate(d.getDate()-i);
-    var key = d.toISOString().split('T')[0];
-    var lvl = (S.activity&&S.activity[key]) || 0;
-    var cls = lvl===0 ? '' : ' lvl'+Math.min(lvl,4);
-    actHtml += '<div class="pf-act-day'+cls+'" title="'+key+': '+lvl+' действий"></div>';
-  }
-  setH('pActivity', actHtml);
-  
-  // Достижения (полученные)
-  var achsHtml = ACHS.map(a=>{
-    var done = (S.ac||[]).includes(a.id);
-    return '<div class="pf-ach'+(done?' done':'')+'"><span class="emoji">'+a.emoji+'</span><span class="name">'+a.name+'</span></div>';
-  }).join('');
-  setH('pAchs', achsHtml);
-  
-  // Рефералы
-  setT('pRefCode', 'https://t.me/'+TG.me+'?start='+S.id);
-  setT('pRefCount', (S.ref&&S.ref.invited)||0);
-  setT('pRefEarned', fmt((S.ref&&S.ref.earned)||0));
-  
-  // История (последние 10)
-  var hist = (S.history||[]).slice(-10).reverse();
-  if(!hist.length){
-    setH('pHistory', '<div class="pf-hist-item"><span class="pf-hist-icon">📭</span><div class="pf-hist-info"><span class="pf-hist-title">История пуста</span></div></div>');
-  } else {
-    setH('pHistory', hist.map(h=>'<div class="pf-hist-item"><span class="pf-hist-icon">'+(h.icon||'💸')+'</span><div class="pf-hist-info"><span class="pf-hist-title">'+h.title+'</span><span class="pf-hist-time">'+new Date(h.time).toLocaleString('ru')+'</span></div><span class="pf-hist-sum '+(h.sum>0?'plus':'minus')+'">'+(h.sum>0?'+':'')+fmt(h.sum)+' ⭐</span></div>').join(''));
-  }
-  
-  // Подписка
-  var subBtn = $('subBtn2');
-  var subState = $('subState');
-  if(S.subDone){ if(subBtn){subBtn.disabled=true;subBtn.textContent='✅';} if(subState)subState.textContent='Получено'; }
-  
-  // Настройки
-  var snd = $('soundToggle'); if(snd) snd.checked = S.sound !== false;
-  var fair = $('fairToggle'); if(fair) fair.checked = S.fair === true;
-  if(S.fair && S.seed) setT('fairInfo', 'Seed: '+S.seed);
-  
-  // Ранг (старый)
-  renderRank();
-}
-
+  const st=Object.assign(DEF().stats, S.stats||{}); S.stats=st;
+  const li=levelInfo();
+  const b=ensureBanner();
+  if(b){ if(S.serverMode) b.style.display='none';
+    else { b.style.display='flex'; b.innerHTML='<span>⚠️ Нет соединения — кабинет в локальном режиме</span><button class="btn btn-secondary" onclick="retryConnect()">Повторить</button>'; } }
+  setT('pName',S.tgName||'Игрок');
+  const el=$('pName');
+  if(el&&el.parentNode){ let bd=document.getElementById('ptitleBadge');
+    if(!bd){ bd=document.createElement('span'); bd.id='ptitleBadge'; el.parentNode.insertBefore(bd, el.nextSibling); }
+    const ti=playerTitle(); bd.className='ptitle '+ti.c; bd.textContent=ti.t; }
+  setT('pAva',(S.tgName||'😎').charAt(0).toUpperCase());
+  setT('myId',S.tgId||'—');
+  setT('pReg',S.createdAt?new Date(S.createdAt).toLocaleDateString('ru-RU'):'—');
+  let bad='';
+  if(S.isAdmin)bad+='<span class="pbad gold">🛡 АДМИН</span>';
+  if(S.subDone)bad+='<span class="pbad green">📢 Подписчик</span>';
+  if(S.refs>0)bad+='<span class="pbad">🤝 '+S.refs+' рефов</span>';
+  if(st.opened>=100)bad+='<span class="pbad gold">📦 100+ кейсов</span>';
+  setH('pBadges',bad||'<span class="pbad">🌱 Новичок</span>');
+  setT('subState',S.subDone?'Активна ✅':'Награда ⭐'+SUB_REWARD);
+  setH('statsGrid',[['Уровень',li.lvl+' ур.'],['Кейсов',st.opened],['Потрачено','⭐'+fmt(st.spent)],['Выиграно','⭐'+fmt(st.won)],
+    ['Лучший дроп','⭐'+fmt(st.best)],['Апгрейдов',st.upWins+'/'+st.upgrades],['Баттлов',st.bWins+'/'+st.battles],
+    ['Crash побед',st.crashWins||0],['Mines',(st.minesW||0)+'/'+(st.mines||0)],['Plinko',(st.plinkoW||0)+'/'+(st.plinko||0)],
+    ['Режим',S.serverMode?'🟢 онлайн':'⚪ локально'],['Сборка','build '+BUILD]].map(x=>'<div class="stat-card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join(''));
+  const st1=$('soundToggle'); if(st1)st1.checked=S.sound;
+  const st2=$('fairToggle'); if(st2)st2.checked=S.fair;
+  setH('fairInfo',(S.isAdmin&&S.fair)?'Seed: '+S.seed+'<br>Hash: '+hash(S.seed):'');
+  const ab=$('adminBlock');
+  if(ab){ if(S.isAdmin){ ab.style.display='block'; renderAdmin(); } else ab.style.display='none'; } }
+async function retryConnect(){ const b=$('connBanner');
+  if(b) b.innerHTML='<span>⏳ Подключение…</span>';
+  const me=await apiR('/api/me');
+  if(me&&me.tg_id){ S.tgId=me.tg_id; S.balance=Number(me.balance)||0; S.inv=Array.isArray(me.inv)?me.inv:[];
+    S.stats=Object.assign(DEF().stats, me.stats||{}); S.xp=Number(me.xp)||0;
+    S.refs=me.ref_count||0; S.isAdmin=!!me.admin; S.serverMode=true; S.migrated=true;
+    saveLocal(); renderHeader(); renderSection('profile'); toast('🟢 Подключено','good'); }
+  else if(b) b.innerHTML='<span>⚠️ Нет соединения</span><button class="btn btn-secondary" onclick="retryConnect()">Повторить</button>'; }
 function renderRank(){ const rc=$('rankCard'); if(!rc)return;
   if(!S.serverMode){ rc.innerHTML='<div class="ic-box gold"><svg class="ic"><use href="#i-trophy"/></svg></div><div><b>Твоё место: #1</b><span>Лидерборд живых — в Telegram</span></div>'; return; }
   apiR('/api/rank').then(r=>{ if(r.error)return;
