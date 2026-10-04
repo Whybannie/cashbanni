@@ -863,3 +863,112 @@ window.addEventListener('load', function(){
   console.log('[v107] free-case gate + 403 catcher ready');
 });
 
+
+// ===== v114: SUPPORT SYSTEM =====
+const SUPPORT_FAQ = [
+  {q:'Как пополнить баланс?', a:'Открой «Кабинет» → «Пополнить баланс», выбери сумму и оплати через Telegram Stars. Звёзды зачисляются мгновенно.', kw:['пополн','баланс','оплат','звезд','звёзд','stars','деньг','депозит','купить','закинуть']},
+  {q:'Где мой предмет из кейса?', a:'Все выпавшие предметы находятся в «Кабинет» → «Мои предметы». Оттуда их можно продать за звёзды.', kw:['предмет','кейс','выпал','дроп','инвентар','где','пропал','не пришёл','не пришел']},
+  {q:'Как работает бесплатный кейс?', a:'Бесплатный кейс можно крутить раз в 24 часа. Для доступа нужна подписка на наш канал — это бесплатно.', kw:['бесплатн','фри','подписк','канал','24','раз в день','каждый день','без подписки']},
+  {q:'Как вывести подарок?', a:'Вывод подарков находится в разработке и скоро появится. Следи за анонсами в нашем канале.', kw:['вывод','вывести','подарок','забрать','получить','withdraw','обналичить']},
+  {q:'Промокод не работает', a:'Проверь, что код введён без пробелов и в правильном регистре. Каждый промокод имеет лимит активаций и срок действия.', kw:['промокод','промо','код','активир','не работает','ошибка']},
+  {q:'Что такое Апгрейд?', a:'Апгрейд позволяет обменять предмет на более дорогой с шансом. Чем выше множитель, тем ниже шанс успеха.', kw:['апгрейд','улучш','обмен','множит','шанс','прокач']}
+];
+let supOperatorMode=false, supTicket=null;
+
+function openSupport(){
+  const ov=$('supOverlay'); if(!ov)return;
+  ov.classList.add('show');
+  const body=$('supBody');
+  if(body && !body.children.length){
+    supAddMsg('bot','Привет! Я помощник поддержки. Выбери вопрос ниже или напиши свой — постараюсь помочь сразу.');
+    renderSupChips();
+  }
+  setTimeout(supScroll,60);
+}
+function closeSupport(){ const ov=$('supOverlay'); if(ov)ov.classList.remove('show'); }
+
+function renderSupChips(){
+  const el=$('supChips'); if(!el)return;
+  let h=SUPPORT_FAQ.map((f,i)=>'<button class="sup-chip" onclick="supQuick('+i+')">'+f.q+'</button>').join('');
+  h+='<button class="sup-chip sup-chip-op" onclick="supCallOperator()">Позвать оператора</button>';
+  el.innerHTML=h;
+}
+
+function supAddMsg(who,text){
+  const body=$('supBody'); if(!body)return;
+  const d=document.createElement('div');
+  d.className='sup-msg '+who;
+  d.innerHTML='<div class="bubble">'+text+'</div>';
+  body.appendChild(d);
+  supScroll();
+}
+function supScroll(){ const b=$('supBody'); if(b)b.scrollTop=b.scrollHeight; }
+
+function supQuick(i){
+  const f=SUPPORT_FAQ[i]; if(!f)return;
+  supAddMsg('user',f.q);
+  const chips=$('supChips'); if(chips)chips.innerHTML='';
+  setTimeout(()=>{ supAddMsg('bot',f.a); renderSupChips(); },450);
+}
+
+function supMatch(text){
+  text=text.toLowerCase();
+  let best=null,bestScore=0;
+  SUPPORT_FAQ.forEach(f=>{
+    let s=0; f.kw.forEach(k=>{ if(text.indexOf(k)!==-1)s++; });
+    if(s>bestScore){bestScore=s;best=f;}
+  });
+  return bestScore>0?best:null;
+}
+
+function supSend(){
+  const inp=$('supInput'); if(!inp)return;
+  const t=(inp.value||'').trim(); if(!t)return;
+  inp.value='';
+  supAddMsg('user',t);
+  if(supOperatorMode){
+    setTimeout(()=>supAddMsg('bot','Сообщение передано оператору. Он ответит в этом чате, как только освободится.'),400);
+    return;
+  }
+  setTimeout(()=>{
+    const m=supMatch(t);
+    if(m){ supAddMsg('bot',m.a); }
+    else{ supAddMsg('bot','Я пока не понял вопрос. Выбери тему из кнопок ниже или позови оператора — он поможет лично.'); renderSupChips(); }
+    supScroll();
+  },500);
+}
+
+function supCallOperator(){
+  supOperatorMode=true;
+  supTicket={ id:'t'+Date.now(), user:(S&&(S.id||S.tgId))||'?', time:Date.now(), status:'open' };
+  try{ api('/api/support_ticket',{method:'POST',body:JSON.stringify(supTicket)}); }catch(e){}
+  const chips=$('supChips'); if(chips)chips.innerHTML='';
+  supAddMsg('bot','Соединяем с оператором поддержки…');
+  setTimeout(()=>{
+    setT('supStatus','оператор подключается…');
+    supAddMsg('bot','Оператор скоро ответит в этом чате. Пока можешь подробно описать проблему — это ускорит решение.');
+  },900);
+}
+
+// ===== Назначение операторов (админка) =====
+function admAddOperator(){
+  const el=$('admOpId'); if(!el)return;
+  const id=(el.value||'').trim();
+  if(!id)return toast('Введи ID оператора','bad');
+  if(!S.operators)S.operators=[];
+  if(S.operators.indexOf(id)===-1){S.operators.push(id);saveLocal();}
+  el.value='';
+  renderOperators();
+  toast('Оператор назначен','good');
+}
+function admRemoveOperator(id){
+  S.operators=(S.operators||[]).filter(x=>x!==id);
+  saveLocal();renderOperators();
+}
+function renderOperators(){
+  const el=$('adminOperators');if(!el)return;
+  const ops=S.operators||[];
+  el.innerHTML=ops.length?ops.map(id=>'<div class="task-card"><div class="task-info"><b>ID '+id+'</b><span>Оператор поддержки</span></div><button class="btn btn-secondary task-btn" onclick="admRemoveOperator(\''+id+'\')">Убрать</button></div>').join(''):'<div class="muted small">Операторы не назначены</div>';
+}
+function supIsOperator(){ return (S&&S.isAdmin) || (S&&S.operators&&S.operators.indexOf(String(S.id||S.tgId))!==-1); }
+window.addEventListener('load',function(){ try{renderOperators();}catch(e){} });
