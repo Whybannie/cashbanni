@@ -284,36 +284,66 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
   </section>
 
   <section class="section" id="sec-modes">
-    <h2>Режимы</h2>
-    <div class="task-card" onclick="activateTab('crash')">
-      <div class="ic-box gold"><svg class="ic"><use href="#i-rocket"/></svg></div>
-      <div class="task-info"><b>Crash Live</b><span>Общий эфир для всех игроков</span></div>
-      <div class="hero-go">›</div>
+    <div class="sec-title"><h2>Режимы</h2></div>
+
+    <div class="game-card gc-crash" onclick="activateTab('crash')">
+      <div class="gc-body">
+        <div class="gc-badge live"><span class="gc-dot"></span>LIVE</div>
+        <b class="gc-title">Crash</b>
+        <span class="gc-desc">Ракета · общий эфир · до ×150</span>
+        <div class="gc-go">ИГРАТЬ <span class="gc-arrow">→</span></div>
+      </div>
+      <div class="gc-art">🚀</div>
     </div>
-    <div class="task-card" onclick="activateTab('plinko')">
-      <div class="ic-box gold"><span class="emoji">🎯</span></div>
-      <div class="task-info"><b>Plinko</b><span>Шарик и множители до ×12</span></div>
-      <div class="hero-go">›</div>
+
+    <div class="game-card gc-plinko" onclick="activateTab('plinko')">
+      <div class="gc-body">
+        <div class="gc-badge">CLASSIC</div>
+        <b class="gc-title">Plinko</b>
+        <span class="gc-desc">Шарик и множители до ×12</span>
+        <div class="gc-go">ИГРАТЬ <span class="gc-arrow">→</span></div>
+      </div>
+      <div class="gc-art">🎯</div>
     </div>
-    <div class="task-card" onclick="activateTab('dogs')">
-      <div class="ic-box gold"><span class="emoji">🐕</span></div>
-      <div class="task-info"><b>Доги</b><span>8 собак · гонка · до ×12</span></div>
-      <div class="hero-go">›</div>
+
+    <div class="game-card gc-mines" onclick="activateTab('mines')">
+      <div class="gc-body">
+        <div class="gc-badge">CLASSIC</div>
+        <b class="gc-title">Mines</b>
+        <span class="gc-desc">Поле 5×5 · множитель до ×100</span>
+        <div class="gc-go">ИГРАТЬ <span class="gc-arrow">→</span></div>
+      </div>
+      <div class="gc-art">💎</div>
     </div>
-    <div class="task-card" onclick="activateTab('mines')">
-      <div class="ic-box green"><svg class="ic"><use href="#i-bolt"/></svg></div>
-      <div class="task-info"><b>Mines</b><span>Поле 5×5 · множитель до x100+</span></div>
-      <div class="hero-go">›</div>
+
+    <div class="game-card gc-dogs" onclick="activateTab('dogs')">
+      <div class="gc-body">
+        <div class="gc-badge live"><span class="gc-dot"></span>ГОНКИ</div>
+        <b class="gc-title">Доги</b>
+        <span class="gc-desc">8 собак · камера · до ×15</span>
+        <div class="gc-go">ИГРАТЬ <span class="gc-arrow">→</span></div>
+      </div>
+      <div class="gc-art">🐕</div>
     </div>
-    <div class="task-card" onclick="activateTab('battles')">
-      <div class="ic-box red"><svg class="ic"><use href="#i-swords"/></svg></div>
-      <div class="task-info"><b>Баттлы 1×1</b><span>🔒 Временно закрыто · скоро</span></div>
-      <div class="hero-go">›</div>
+
+    <div class="game-card gc-battles gc-locked">
+      <div class="gc-body">
+        <div class="gc-badge soon">СКОРО</div>
+        <b class="gc-title">Баттлы 1×1</b>
+        <span class="gc-desc">Дуэли с игроками · временно закрыто</span>
+        <div class="gc-go gc-go-lock">🔒 ЗАКРЫТО</div>
+      </div>
+      <div class="gc-art">⚔️</div>
     </div>
-    <div class="task-card" onclick="activateTab('market')">
-      <div class="ic-box blue"><svg class="ic"><use href="#i-cart"/></svg></div>
-      <div class="task-info"><b>Маркет</b><span>Покупка и продажа по цене TG</span></div>
-      <div class="hero-go">›</div>
+
+    <div class="game-card gc-market" onclick="activateTab('market')">
+      <div class="gc-body">
+        <div class="gc-badge">TG MARKET</div>
+        <b class="gc-title">Маркет</b>
+        <span class="gc-desc">Покупка и продажа подарков TG</span>
+        <div class="gc-go">ОТКРЫТЬ <span class="gc-arrow">→</span></div>
+      </div>
+      <div class="gc-art">🛒</div>
     </div>
   </section>
 
