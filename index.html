@@ -10,9 +10,9 @@
   
   <!-- 🚀 Performance: prefetch критичных ресурсов -->
   <link rel="prefetch" href="js/data38.js?v=940" as="script">
-  <link rel="prefetch" href="js/app38.js?v=940" as="script">
+  <link rel="prefetch" href="js/app38.js?v=1030" as="script">
   <link rel="prefetch" href="js/caseimg38.js?v=1020" as="script">
-  <link rel="preload" href="css/style.css?v=1020" as="style">
+  <link rel="preload" href="css/style.css?v=1030" as="style">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
@@ -20,7 +20,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=1020">
+<link rel="stylesheet" href="css/style.css?v=1030">
 <script src="https://telegram.org/js/telegram-web-app.js?v=715" defer></script>
 <link rel="preload" as="image" href="case_fri.JPG">
 <link rel="preload" as="image" href="case_mini.JPG">
@@ -118,6 +118,22 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
       <div class="ch-rocket">🚀</div>
     </div>
     <div class="sec-head"><h2>Кейсы</h2><span class="muted" id="casesStat"></span></div>
+    <div class="csf-bar">
+      <div class="csf-cats" id="csfCats">
+        <button class="csf-chip active" data-cat="all">🔥 Все</button>
+        <button class="csf-chip" data-cat="free">🎁 Бесплатные</button>
+        <button class="csf-chip" data-cat="budget">⭐ Бюджет</button>
+        <button class="csf-chip" data-cat="mid">💎 Средние</button>
+        <button class="csf-chip" data-cat="rich">👑 Дорогие</button>
+        <button class="csf-chip" data-cat="nft">🖼 NFT</button>
+        <button class="csf-chip" data-cat="streamer">🎥 Стримерские</button>
+      </div>
+      <div class="csf-tools">
+        <input class="csf-search" id="csfSearch" placeholder="🔍 Найти кейс...">
+        <button class="csf-sort" id="csfSort" onclick="csfToggleSort()">Цена ↑</button>
+      </div>
+      <div class="csf-count" id="csfCount"></div>
+    </div>
     <div class="cases-grid" id="casesGrid"></div>
   </section>
 
@@ -446,7 +462,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 <div class="toasts" id="toasts"></div>
 <script src="js/data38.js?v=940" defer></script>
-<script src="js/app38.js?v=940" defer></script>
+<script src="js/app38.js?v=1030" defer></script>
 <script src="js/caseimg38.js?v=1020" defer></script>
   <script src="js/dogs38.js?v=940"></script>
   <!-- dogs отключены -->

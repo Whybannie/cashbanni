@@ -1764,3 +1764,28 @@ h2,h3{color:#fff}
   background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;
   box-shadow:0 6px 22px rgba(168,85,247,.4)}
 .of-accept:active{transform:scale(.97)}
+
+/* ===== v103: ФИЛЬТРЫ КЕЙСОВ (Easy Gift style) ===== */
+.csf-bar{margin:10px 0 12px}
+.csf-cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.csf-cats::-webkit-scrollbar{display:none}
+.csf-chip{flex:0 0 auto;padding:8px 14px;border-radius:20px;
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);
+  color:rgba(255,255,255,.7);font-size:.7rem;font-weight:800;cursor:pointer;transition:.2s}
+.csf-chip:active{transform:scale(.94)}
+.csf-chip.active{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;
+  border-color:transparent;box-shadow:0 4px 14px rgba(168,85,247,.4)}
+.csf-tools{display:flex;gap:6px;margin-top:8px}
+.csf-search{flex:1;padding:9px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);color:#fff;font-size:.75rem;outline:none;transition:.2s}
+.csf-search:focus{border-color:var(--acc);box-shadow:0 0 12px rgba(168,85,247,.2)}
+.csf-search::placeholder{color:rgba(255,255,255,.35)}
+.csf-sort{padding:9px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);color:#fff;font-size:.7rem;font-weight:800;cursor:pointer}
+.csf-sort:active{transform:scale(.94)}
+.csf-count{margin-top:6px;font-size:.62rem;color:rgba(255,255,255,.4);font-weight:700}
+
+/* Плавное появление карточек при фильтрации */
+.cases-grid .case-card{animation:csfIn .3s ease both}
+@keyframes csfIn{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}

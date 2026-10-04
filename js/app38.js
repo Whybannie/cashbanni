@@ -196,7 +196,8 @@ function caseArt(c){ const col=CASE_COLORS[c.rarity]||CASE_COLORS.common;
     '<div class="bow"></div><div class="lid"></div><div class="body"></div><div class="rv"></div><div class="rh"></div><div class="em">'+c.em+'</div></div>'; }
 function freeReady(){ return Date.now()-(S.freeLast||0)>=FREE_CASE_COOLDOWN; }
 function renderCases(){ setT('casesStat','Открыто: '+S.stats.opened);
-  setH('casesGrid',CASES.map(c=>
+  setT('csfCount','Найдено: '+csfList().length);
+  setH('casesGrid',csfList().map(c=>
     '<div class="case-card" style="--glow:'+RAR[c.rarity].glow+'" onclick="openCaseModal(\''+c.id+'\')">'+
     (c.free?'<div class="free-badge">'+(freeReady()?'ДОСТУПНО':'1/24Ч')+'</div>':'')+
     '<div class="rt" style="background:'+RAR[c.rarity].color+';color:'+RAR[c.rarity].color+'"></div>'+
@@ -740,3 +741,58 @@ function offerAccept(){
   var a = window.__offerAction; window.__offerAction = null;
   if(a){ try{ new Function(a)(); }catch(e){ console.error('offerGate run', e); } }
 }
+
+
+// ===== v103: ФИЛЬТРЫ КЕЙСОВ =====
+var csfState = {cat:'all', q:'', sort:'asc'};
+
+function caseCats(c){
+  var cats = [];
+  if(c.price === 0) cats.push('free');
+  if(c.price >= 1 && c.price <= 25) cats.push('budget');
+  if(c.price >= 26 && c.price <= 75) cats.push('mid');
+  if(c.price > 75) cats.push('rich');
+  if(c.rarity === 'streamer') cats.push('streamer');
+  var nftShare = 0;
+  (c.drops||[]).forEach(function(d){ if(String(d[0]).indexOf('nft_')===0) nftShare += d[1]; });
+  if(nftShare > 0.002) cats.push('nft');
+  return cats;
+}
+
+function csfList(){
+  var list = CASES.slice();
+  if(csfState.cat !== 'all'){
+    list = list.filter(function(c){ return caseCats(c).indexOf(csfState.cat) !== -1; });
+  }
+  if(csfState.q){
+    var q = csfState.q.toLowerCase();
+    list = list.filter(function(c){ return c.name.toLowerCase().indexOf(q) !== -1; });
+  }
+  if(csfState.sort === 'asc') list.sort(function(a,b){ return a.price - b.price; });
+  else if(csfState.sort === 'desc') list.sort(function(a,b){ return b.price - a.price; });
+  return list;
+}
+
+function csfToggleSort(){
+  csfState.sort = csfState.sort === 'asc' ? 'desc' : 'asc';
+  var b = $('csfSort');
+  if(b) b.textContent = csfState.sort === 'asc' ? 'Цена ↑' : 'Цена ↓';
+  renderCases();
+}
+
+document.addEventListener('click', function(e){
+  var t = e.target;
+  var chip = t.closest ? t.closest('.csf-chip') : null;
+  if(!chip) return;
+  csfState.cat = chip.getAttribute('data-cat');
+  var all = document.querySelectorAll('.csf-chip');
+  for(var i=0;i<all.length;i++) all[i].classList.toggle('active', all[i] === chip);
+  renderCases();
+});
+
+document.addEventListener('input', function(e){
+  if(e.target && e.target.id === 'csfSearch'){
+    csfState.q = e.target.value;
+    renderCases();
+  }
+});
