@@ -144,7 +144,8 @@ h3{font-size:.82rem;margin-bottom:8px;color:rgba(255,255,255,.75)}
 .roulette-container{position:relative;width:100%;height:112px;overflow:hidden;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line);margin:12px 0}
 .roulette-pointer{position:absolute;top:0;bottom:0;left:50%;width:3px;background:var(--acc2);z-index:10;box-shadow:0 0 16px var(--acc2)}
 .roulette-strip{display:flex;position:absolute;top:0;height:100%}
-.roulette-item{width:88px;min-width:88px;height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid rgba(255,255,255,.05);position:relative}
+.roulette-item{width:88px;min-width:88px;height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:none;position:relative}
+.roulette-item:nth-child(even){background:rgba(255,255,255,.02)}
 
 .roulette-item .emoji{font-size:1.9rem}
 .roulette-item .name{font-size:.56rem;color:rgba(255,255,255,.5);margin-top:4px}
@@ -303,7 +304,7 @@ button,.cp-step,.cp-chip,.pay-chip,.case-card{-webkit-user-select:none;user-sele
 .roulette-item .name{position:absolute;bottom:4px;left:0;right:0;font-size:.5rem;text-align:center;color:rgba(255,255,255,.6);background:rgba(0,0,0,.4);padding:2px 0;backdrop-filter:blur(4px)}
 .cf-strips{gap:12px}
 .cf-contents .contents{max-height:172px;grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}
-.contents .c-item{padding:6px;font-size:.6rem;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.contents .c-item{padding:6px;font-size:.6rem;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,.03);border-radius:10px}
 .contents .gimg{width:70%;height:70%;object-fit:contain;display:block;margin:0 auto}
 .contents .emoji{font-size:1.7rem;display:block;margin-bottom:2px}
 .inv-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--card);border:1px dashed var(--line);border-radius:20px;padding:26px;text-align:center}
