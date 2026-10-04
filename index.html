@@ -386,6 +386,11 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
       <div class="task-info"><b>Подписка на канал</b><span id="subState">Не активна</span></div>
       <button class="btn btn-secondary task-btn" id="subBtn2" onclick="doSub()">Получить</button>
     </div>
+    <div class="task-card mt" id="supProfileBtn" onclick="openSupport()">
+      <div class="ic-box silver"><svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M3 18v-6a9 9 0 0 1 18 0v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5ZM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5Z" fill="currentColor"/></svg></div>
+      <div class="task-info"><b>Поддержка</b><span>Быстрые ответы и помощь</span></div>
+      <div class="hero-go">›</div>
+    </div>
     <h2 class="mt">Топ-50 лидеров</h2>
     <div id="topList"></div>
     <h2 class="mt">Мои предметы</h2>
@@ -411,6 +416,8 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
       <h3 class="mt">Операторы поддержки</h3>
     <div id="adminOperators"></div>
     <div class="row"><input id="admOpId" placeholder="ID оператора"><button class="btn btn-primary" onclick="admAddOperator()">Назначить</button></div>
+    <h3 class="mt">Тикеты поддержки</h3>
+    <div id="adminTickets"></div>
     <h3 class="mt">Игроки</h3>
       <div id="adminUsers"></div>
     </div>
@@ -541,18 +548,15 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 </div>
 
 <!-- ===== v114 SUPPORT ===== -->
-<button class="sup-fab" id="supFab" onclick="openSupport()" aria-label="Поддержка">
-  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-</button>
-
 <div class="sup-overlay" id="supOverlay">
   <div class="sup-sheet">
     <div class="sup-head">
+      <button class="sup-back" onclick="supShowMenu()" aria-label="Назад">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
       <div class="sup-head-info">
         <div class="sup-ava">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M3 18v-6a9 9 0 0 1 18 0v6" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5ZM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5Z" fill="#fff"/></svg>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 18v-6a9 9 0 0 1 18 0v6" stroke="#2a2a3e" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5ZM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5Z" fill="#2a2a3e"/></svg>
         </div>
         <div class="sup-head-text">
           <b>Поддержка</b>
@@ -562,7 +566,6 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
       <button class="x" onclick="closeSupport()"><svg class="ic s"><use href="#i-x"/></svg></button>
     </div>
     <div class="sup-body" id="supBody"></div>
-    <div class="sup-chips" id="supChips"></div>
     <div class="sup-input-row">
       <input class="sup-input" id="supInput" type="text" placeholder="Напиши сообщение…" onkeydown="if(event.key==='Enter')supSend()">
       <button class="sup-send" onclick="supSend()" aria-label="Отправить">

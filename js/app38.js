@@ -864,7 +864,7 @@ window.addEventListener('load', function(){
 });
 
 
-// ===== v114: SUPPORT SYSTEM =====
+// ===== v115: SUPPORT (silver, menu grid, tickets, 24h cleanup) =====
 const SUPPORT_FAQ = [
   {q:'Как пополнить баланс?', a:'Открой «Кабинет» → «Пополнить баланс», выбери сумму и оплати через Telegram Stars. Звёзды зачисляются мгновенно.', kw:['пополн','баланс','оплат','звезд','звёзд','stars','деньг','депозит','купить','закинуть']},
   {q:'Где мой предмет из кейса?', a:'Все выпавшие предметы находятся в «Кабинет» → «Мои предметы». Оттуда их можно продать за звёзды.', kw:['предмет','кейс','выпал','дроп','инвентар','где','пропал','не пришёл','не пришел']},
@@ -873,25 +873,29 @@ const SUPPORT_FAQ = [
   {q:'Промокод не работает', a:'Проверь, что код введён без пробелов и в правильном регистре. Каждый промокод имеет лимит активаций и срок действия.', kw:['промокод','промо','код','активир','не работает','ошибка']},
   {q:'Что такое Апгрейд?', a:'Апгрейд позволяет обменять предмет на более дорогой с шансом. Чем выше множитель, тем ниже шанс успеха.', kw:['апгрейд','улучш','обмен','множит','шанс','прокач']}
 ];
-let supOperatorMode=false, supTicket=null;
+let supOperatorMode=false;
 
 function openSupport(){
   const ov=$('supOverlay'); if(!ov)return;
   ov.classList.add('show');
-  const body=$('supBody');
-  if(body && !body.children.length){
-    supAddMsg('bot','Привет! Я помощник поддержки. Выбери вопрос ниже или напиши свой — постараюсь помочь сразу.');
-    renderSupChips();
-  }
-  setTimeout(supScroll,60);
+  try{cleanupSupTickets();}catch(e){}
+  supShowMenu();
 }
 function closeSupport(){ const ov=$('supOverlay'); if(ov)ov.classList.remove('show'); }
 
-function renderSupChips(){
-  const el=$('supChips'); if(!el)return;
-  let h=SUPPORT_FAQ.map((f,i)=>'<button class="sup-chip" onclick="supQuick('+i+')">'+f.q+'</button>').join('');
-  h+='<button class="sup-chip sup-chip-op" onclick="supCallOperator()">Позвать оператора</button>';
-  el.innerHTML=h;
+function supShowMenu(){
+  const body=$('supBody'); if(!body)return;
+  body.innerHTML='';
+  supOperatorMode=false;
+  const st=$('supStatus'); if(st)st.textContent='онлайн';
+  supAddMsg('bot','Привет! Я помощник поддержки. Выбери тему — отвечу сразу, или напиши свой вопрос.');
+  const grid=document.createElement('div');
+  grid.className='sup-menu';
+  let h=SUPPORT_FAQ.map((f,i)=>'<button class="sup-menu-item" onclick="supQuick('+i+')">'+f.q+'</button>').join('');
+  h+='<button class="sup-menu-item sup-menu-op" onclick="supCallOperator()">Позвать оператора</button>';
+  grid.innerHTML=h;
+  body.appendChild(grid);
+  supScroll();
 }
 
 function supAddMsg(who,text){
@@ -906,9 +910,17 @@ function supScroll(){ const b=$('supBody'); if(b)b.scrollTop=b.scrollHeight; }
 
 function supQuick(i){
   const f=SUPPORT_FAQ[i]; if(!f)return;
+  const body=$('supBody'); if(!body)return;
+  body.innerHTML='';
   supAddMsg('user',f.q);
-  const chips=$('supChips'); if(chips)chips.innerHTML='';
-  setTimeout(()=>{ supAddMsg('bot',f.a); renderSupChips(); },450);
+  setTimeout(()=>{
+    supAddMsg('bot',f.a);
+    const w=document.createElement('div');
+    w.className='sup-back-wrap';
+    w.innerHTML='<button class="sup-back-btn" onclick="supShowMenu()">← Все вопросы</button>';
+    body.appendChild(w);
+    supScroll();
+  },350);
 }
 
 function supMatch(text){
@@ -925,32 +937,65 @@ function supSend(){
   const inp=$('supInput'); if(!inp)return;
   const t=(inp.value||'').trim(); if(!t)return;
   inp.value='';
+  const body=$('supBody');
+  const menu=body.querySelector('.sup-menu'); if(menu)menu.remove();
+  const bw=body.querySelector('.sup-back-wrap'); if(bw)bw.remove();
   supAddMsg('user',t);
   if(supOperatorMode){
-    setTimeout(()=>supAddMsg('bot','Сообщение передано оператору. Он ответит в этом чате, как только освободится.'),400);
+    saveSupTicket('operator',t);
+    setTimeout(()=>supAddMsg('bot','Сообщение передано оператору. Он ответит, как только освободится.'),400);
     return;
   }
   setTimeout(()=>{
     const m=supMatch(t);
-    if(m){ supAddMsg('bot',m.a); }
-    else{ supAddMsg('bot','Я пока не понял вопрос. Выбери тему из кнопок ниже или позови оператора — он поможет лично.'); renderSupChips(); }
+    if(m){
+      supAddMsg('bot',m.a);
+      const w=document.createElement('div');
+      w.className='sup-back-wrap';
+      w.innerHTML='<button class="sup-back-btn" onclick="supShowMenu()">← Все вопросы</button>';
+      body.appendChild(w);
+    }else{
+      supAddMsg('bot','Я пока не понял вопрос. Уточни его или позови оператора — он поможет лично.');
+      const w=document.createElement('div');
+      w.className='sup-back-wrap';
+      w.innerHTML='<button class="sup-chip-op" onclick="supCallOperator()">Позвать оператора</button><button class="sup-back-btn" onclick="supShowMenu()">← Все вопросы</button>';
+      body.appendChild(w);
+      saveSupTicket('question',t);
+    }
     supScroll();
-  },500);
+  },450);
 }
 
 function supCallOperator(){
   supOperatorMode=true;
-  supTicket={ id:'t'+Date.now(), user:(S&&(S.id||S.tgId))||'?', time:Date.now(), status:'open' };
-  try{ api('/api/support_ticket',{method:'POST',body:JSON.stringify(supTicket)}); }catch(e){}
-  const chips=$('supChips'); if(chips)chips.innerHTML='';
+  const st=$('supStatus'); if(st)st.textContent='оператор подключается…';
+  const body=$('supBody'); if(!body)return;
+  const menu=body.querySelector('.sup-menu'); if(menu)menu.remove();
   supAddMsg('bot','Соединяем с оператором поддержки…');
   setTimeout(()=>{
-    setT('supStatus','оператор подключается…');
-    supAddMsg('bot','Оператор скоро ответит в этом чате. Пока можешь подробно описать проблему — это ускорит решение.');
-  },900);
+    supAddMsg('bot','Оператор скоро ответит в этом чате. Опиши проблему подробно — это ускорит решение.');
+    saveSupTicket('operator','');
+  },800);
 }
 
-// ===== Назначение операторов (админка) =====
+// ===== Тикеты: хранение + автоочистка через 24 часа =====
+function saveSupTicket(status,summary){
+  if(!S.supTickets)S.supTickets=[];
+  S.supTickets.push({id:'t'+Date.now(),user:(S&&(S.id||S.tgId))||'?',time:Date.now(),status:status||'operator',q:summary||''});
+  if(S.supTickets.length>200)S.supTickets=S.supTickets.slice(-200);
+  saveLocal();
+  try{ api('/api/support_ticket',{method:'POST',body:JSON.stringify({id:'t'+Date.now(),user:(S&&(S.id||S.tgId))||'?',status:status,q:summary||''})}); }catch(e){}
+}
+function cleanupSupTickets(){
+  if(!S||!S.supTickets||!S.supTickets.length)return;
+  const dayAgo=Date.now()-24*60*60*1000;
+  const before=S.supTickets.length;
+  S.supTickets=S.supTickets.filter(t=>(t.time||0)>dayAgo);
+  if(S.supTickets.length!==before)saveLocal();
+}
+window.addEventListener('load',function(){ try{cleanupSupTickets();renderOperators();renderTickets();}catch(e){} });
+
+// ===== Операторы (админка) =====
 function admAddOperator(){
   const el=$('admOpId'); if(!el)return;
   const id=(el.value||'').trim();
@@ -970,5 +1015,13 @@ function renderOperators(){
   const ops=S.operators||[];
   el.innerHTML=ops.length?ops.map(id=>'<div class="task-card"><div class="task-info"><b>ID '+id+'</b><span>Оператор поддержки</span></div><button class="btn btn-secondary task-btn" onclick="admRemoveOperator(\''+id+'\')">Убрать</button></div>').join(''):'<div class="muted small">Операторы не назначены</div>';
 }
+function renderTickets(){
+  const el=$('adminTickets');if(!el)return;
+  const tk=(S.supTickets||[]).slice(-20).reverse();
+  el.innerHTML=tk.length?tk.map(t=>{
+    const when=new Date(t.time).toLocaleString('ru');
+    const type=t.status==='operator'?'Оператор':'Вопрос';
+    return '<div class="task-card"><div class="task-info"><b>'+(t.q||type)+'</b><span>ID '+t.user+' · '+when+'</span></div></div>';
+  }).join(''):'<div class="muted small">Тикетов нет</div>';
+}
 function supIsOperator(){ return (S&&S.isAdmin) || (S&&S.operators&&S.operators.indexOf(String(S.id||S.tgId))!==-1); }
-window.addEventListener('load',function(){ try{renderOperators();}catch(e){} });
