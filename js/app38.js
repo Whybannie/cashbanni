@@ -444,7 +444,7 @@ function renderProfile(){
   if(S.refs>0)bad+='<span class="pbad">🤝 '+S.refs+' рефов</span>';
   if(st.opened>=100)bad+='<span class="pbad gold">📦 100+ кейсов</span>';
   setH('pBadges',bad||'<span class="pbad">🌱 Новичок</span>');
-  setT('subState',S.subDone?'Активна ✅':'Награда ⭐'+SUB_REWARD);
+  setT('subState',S.subDone?'Активна':'Не активна');
   setH('statsGrid',[['Уровень',li.lvl+' ур.'],['Кейсов',st.opened],['Потрачено','⭐'+fmt(st.spent)],['Выиграно','⭐'+fmt(st.won)],
     ['Лучший дроп','⭐'+fmt(st.best)],['Апгрейдов',st.upWins+'/'+st.upgrades],['Баттлов',st.bWins+'/'+st.battles],
     ['Crash побед',st.crashWins||0],['Mines',(st.minesW||0)+'/'+(st.mines||0)],['Plinko',(st.plinkoW||0)+'/'+(st.plinko||0)],
