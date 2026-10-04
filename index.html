@@ -12,7 +12,7 @@
   <link rel="prefetch" href="js/data38.js?v=940" as="script">
   <link rel="prefetch" href="js/app38.js?v=1110" as="script">
   <link rel="prefetch" href="js/caseimg38.js?v=1090" as="script">
-  <link rel="preload" href="css/style.css?v=1110" as="style">
+  <link rel="preload" href="css/style.css?v=1120" as="style">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
@@ -20,7 +20,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=1110">
+<link rel="stylesheet" href="css/style.css?v=1120">
 <script src="https://telegram.org/js/telegram-web-app.js?v=715" defer></script>
 <link rel="preload" as="image" href="case_fri.JPG">
 <link rel="preload" as="image" href="case_mini.JPG">
@@ -495,11 +495,21 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 <div class="modal-overlay" id="subGateModal">
   <div class="modal sg-modal">
     <div class="sg-icon-wrap">
-      <div class="sg-icon-ring"></div>
-      <svg class="sg-icon-svg" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <div class="sg-ring sg-ring1"></div>
+      <div class="sg-ring sg-ring2"></div>
+      <div class="sg-ring sg-ring3"></div>
+      <svg class="sg-icon-svg" viewBox="0 0 64 64" fill="none">
+        <defs>
+          <linearGradient id="sgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:var(--acc)"/>
+            <stop offset="100%" style="stop-color:var(--acc2)"/>
+          </linearGradient>
+        </defs>
+        <circle cx="32" cy="32" r="30" fill="url(#sgGrad)" opacity="0.15"/>
+        <path d="M18 26 L18 38 L26 38 L42 48 L42 16 L26 26 Z" fill="url(#sgGrad)"/>
+        <path d="M48 26 Q52 32 48 38" stroke="url(#sgGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.8"/>
+        <path d="M52 22 Q58 32 52 42" stroke="url(#sgGrad)" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
+        <circle cx="14" cy="32" r="3" fill="url(#sgGrad)"/>
       </svg>
     </div>
     <h3 class="sg-title">НУЖНА ПОДПИСКА</h3>
@@ -510,6 +520,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
     </button>
     <button class="btn sg-check-btn" onclick="recheckSub()">Я ПОДПИСАЛСЯ</button>
   </div>
+</div>
 </div>
     <h3 class="sg-title">НУЖНА ПОДПИСКА</h3>
     <p class="sg-desc">Бесплатный кейс доступен только подписчикам нашего канала.<br>Подпишись и крути бесплатно каждый день!</p>

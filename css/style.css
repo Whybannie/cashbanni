@@ -1875,3 +1875,27 @@ h2,h3{color:#fff}
 .sg-close-btn{width:100%;padding:11px;border-radius:12px;background:transparent;
   color:rgba(255,255,255,.4);font-weight:700;font-size:.68rem;letter-spacing:1px}
 .sg-close-btn:active{transform:scale(.97)}
+
+/* ===== v112: ИКОНКА КАНАЛА (мегафон с волнами) ===== */
+.sg-icon-wrap{position:relative;width:80px;height:80px;margin:0 auto 20px;
+  display:flex;align-items:center;justify-content:center}
+
+/* Анимированные кольца */
+.sg-ring{position:absolute;inset:0;border-radius:50%;
+  border:1.5px solid rgba(168,85,247,.3);
+  animation:sgWave 2.4s ease-out infinite}
+.sg-ring2{animation-delay:.8s}
+.sg-ring3{animation-delay:1.6s}
+@keyframes sgWave{
+  0%{transform:scale(.7);opacity:.8}
+  100%{transform:scale(1.3);opacity:0}
+}
+
+/* Иконка мегафона */
+.sg-icon-svg{width:64px;height:64px;z-index:2;
+  filter:drop-shadow(0 0 14px rgba(168,85,247,.5));
+  animation:sgFloat 3s ease-in-out infinite}
+@keyframes sgFloat{
+  0%,100%{transform:translateY(0) rotate(-2deg)}
+  50%{transform:translateY(-5px) rotate(2deg)}
+}
