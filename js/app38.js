@@ -796,3 +796,47 @@ document.addEventListener('input', function(e){
     renderCases();
   }
 });
+
+// ===== v106: БЕСПЛАТНЫЙ КЕЙС — одна кнопка + гейт подписки при крутке =====
+window.addEventListener('load', function(){
+  var ocm = window.openCaseModal;
+  if(ocm){
+    window.openCaseModal = function(id){
+      window.__curCaseId = id;
+      var r = ocm(id);
+      setTimeout(function(){
+        var c = null;
+        try{ c = CASES.find(function(x){return x.id===id;}); }catch(e){}
+        var b1=$('btnX1'), b3=$('btnX3'), b5=$('btnX5');
+        if(!b1) return;
+        if(c && c.price===0 && c.id!=='secret'){
+          if(b3) b3.style.display='none';
+          if(b5) b5.style.display='none';
+          b1.style.flex='1';
+          b1.className='btn btn-primary';
+          b1.innerHTML='🎁 КРУТИТЬ БЕСПЛАТНО';
+        }else{
+          if(b3) b3.style.display='';
+          if(b5) b5.style.display='';
+          b1.style.flex='';
+          b1.className='btn btn-secondary';
+        }
+      }, 60);
+      return r;
+    };
+  }
+  var sp = window.spin;
+  if(sp){
+    window.spin = function(n){
+      var id = window.__curCaseId;
+      var c = null;
+      try{ c = CASES.find(function(x){return x.id===id;}); }catch(e){}
+      if(c && c.price===0 && c.id!=='secret' && !(S && S.subDone)){
+        gateSub();
+        return;
+      }
+      return sp(n);
+    };
+  }
+  console.log('[v106] free-case gate + single button ready');
+});
