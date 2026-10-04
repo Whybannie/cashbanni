@@ -1760,3 +1760,138 @@ h2,h3{color:#fff}
   background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;
   box-shadow:0 6px 22px rgba(168,85,247,.4)}
 .of-accept:active{transform:scale(.97)}
+
+/* ===== v99: ПРЕМИАЛЬНЫЙ ПРОФИЛЬ ===== */
+
+/* HERO: Аватар + имя */
+.pf-hero{display:flex;gap:16px;align-items:center;padding:20px;background:rgba(255,255,255,.04);
+  border-radius:20px;border:1px solid rgba(255,255,255,.08);margin-bottom:16px}
+.pf-ava-wrap{position:relative;flex:0 0 80px}
+.pf-ava{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));
+  display:flex;align-items:center;justify-content:center;font-size:2.5rem;
+  border:3px solid rgba(255,255,255,.15);box-shadow:0 8px 24px rgba(168,85,247,.3)}
+.pf-lvl-badge{position:absolute;bottom:-4px;right:-4px;width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-weight:900;font-size:.7rem;
+  display:flex;align-items:center;justify-content:center;border:3px solid #0a0a1e;
+  box-shadow:0 2px 8px rgba(251,191,36,.5)}
+.pf-info{flex:1;min-width:0}
+.pf-name{font-size:1.2rem;font-weight:900;color:#fff;display:block;margin-bottom:2px}
+.pf-meta{font-size:.7rem;color:rgba(255,255,255,.45);display:block;margin-bottom:6px}
+.pf-rank{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.65rem;font-weight:800;
+  background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(236,72,153,.15));
+  border:1px solid rgba(168,85,247,.3);color:var(--acc);letter-spacing:.5px}
+.pf-copy-btn{padding:8px 14px;border-radius:10px;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);color:#fff;font-size:.7rem;font-weight:700;cursor:pointer}
+.pf-copy-btn:active{transform:scale(.95)}
+
+/* Баланс */
+.pf-balance{padding:16px;background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(236,72,153,.08));
+  border-radius:16px;border:1px solid rgba(168,85,247,.25);margin-bottom:16px;text-align:center}
+.pf-bal-label{font-size:.6rem;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:2px;margin-bottom:4px}
+.pf-bal-value{font-size:1.8rem;font-weight:900;color:#fff;margin-bottom:12px}
+.pf-topup-btn{width:100%;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;
+  font-weight:800;letter-spacing:1px}
+
+/* Быстрые действия */
+.pf-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+.pf-action{padding:12px 8px;border-radius:14px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.pf-action:active{transform:scale(.95)}
+.pf-act-icon{font-size:1.5rem}
+.pf-act-text{font-size:.65rem;font-weight:700;color:rgba(255,255,255,.7)}
+
+/* Заголовки секций */
+.pf-section-title{font-size:.85rem;font-weight:900;color:#fff;margin:20px 0 10px;letter-spacing:.5px}
+
+/* Статистика */
+.pf-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.pf-stat{padding:12px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  display:flex;flex-direction:column;gap:4px}
+.pf-stat-icon{font-size:1.3rem}
+.pf-stat-val{font-size:1.1rem;font-weight:900;color:#fff}
+.pf-stat-label{font-size:.6rem;color:rgba(255,255,255,.45);font-weight:600}
+
+/* Активность (GitHub-style) */
+.pf-activity{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:12px;
+  background:rgba(255,255,255,.03);border-radius:14px;border:1px solid rgba(255,255,255,.08)}
+.pf-act-day{aspect-ratio:1;border-radius:3px;background:rgba(255,255,255,.08)}
+.pf-act-day.lvl1{background:rgba(168,85,247,.25)}
+.pf-act-day.lvl2{background:rgba(168,85,247,.45)}
+.pf-act-day.lvl3{background:rgba(168,85,247,.65)}
+.pf-act-day.lvl4{background:rgba(168,85,247,.85)}
+
+/* Достижения */
+.pf-achs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pf-ach{padding:10px 6px;border-radius:12px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+.pf-ach.done{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3)}
+.pf-ach .emoji{font-size:1.5rem;filter:grayscale(1);opacity:.3}
+.pf-ach.done .emoji{filter:none;opacity:1}
+.pf-ach .name{font-size:.55rem;font-weight:700;color:rgba(255,255,255,.7);line-height:1.2}
+.pf-ach.done .name{color:#fff}
+
+/* Рефералы */
+.pf-ref{padding:14px;background:rgba(255,255,255,.04);border-radius:14px;border:1px solid rgba(255,255,255,.08)}
+.pf-ref-desc{font-size:.7rem;color:rgba(255,255,255,.6);margin-bottom:10px}
+.pf-ref-code{display:flex;gap:8px;margin-bottom:12px}
+.pf-ref-code span{flex:1;padding:10px;background:rgba(0,0,0,.3);border-radius:10px;
+  font-family:monospace;font-size:.8rem;color:#fff;font-weight:700}
+.pf-ref-code button{padding:10px 16px;border-radius:10px;background:var(--acc);color:#fff;font-weight:800;cursor:pointer}
+.pf-ref-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pf-ref-stats>div{padding:10px;background:rgba(255,255,255,.05);border-radius:10px;text-align:center}
+.pf-ref-stats b{display:block;font-size:1.2rem;font-weight:900;color:#fff}
+.pf-ref-stats span{font-size:.6rem;color:rgba(255,255,255,.5)}
+
+/* История */
+.pf-history{max-height:300px;overflow-y:auto}
+.pf-hist-item{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;
+  background:rgba(255,255,255,.03);margin-bottom:6px}
+.pf-hist-icon{font-size:1.3rem}
+.pf-hist-info{flex:1;min-width:0}
+.pf-hist-title{font-size:.72rem;font-weight:700;color:#fff;display:block}
+.pf-hist-time{font-size:.6rem;color:rgba(255,255,255,.4)}
+.pf-hist-sum{font-size:.8rem;font-weight:800}
+.pf-hist-sum.plus{color:#4ade80}
+.pf-hist-sum.minus{color:#f87171}
+
+/* Подписка */
+.pf-sub{display:flex;gap:12px;align-items:center;padding:14px;background:rgba(255,255,255,.04);
+  border-radius:14px;border:1px solid rgba(255,255,255,.08);cursor:pointer}
+.pf-sub:active{transform:scale(.98)}
+.pf-sub-icon{font-size:1.8rem}
+.pf-sub-info{flex:1;min-width:0}
+.pf-sub-info b{display:block;font-size:.8rem;font-weight:800;color:#fff}
+.pf-sub-info span{font-size:.65rem;color:rgba(255,255,255,.5)}
+.pf-sub-btn{padding:8px 16px;background:var(--acc);color:#fff;font-weight:700}
+
+/* Топ */
+.pf-top{max-height:300px;overflow-y:auto}
+
+/* Предметы */
+.pf-inv-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.pf-inv-head span{font-size:.75rem;color:rgba(255,255,255,.6)}
+.pf-sell-btn{padding:8px 14px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);
+  color:#f87171;font-size:.7rem;font-weight:700}
+.pf-inv{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+
+/* Промокод */
+.pf-promo{display:flex;gap:8px}
+.pf-promo input{flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);color:#fff;font-size:.8rem}
+.pf-promo button{padding:10px 20px;background:var(--acc);color:#fff;font-weight:700}
+
+/* Настройки */
+.pf-settings{padding:12px;background:rgba(255,255,255,.03);border-radius:14px}
+.pf-switch{display:flex;gap:10px;align-items:center;padding:8px 0;cursor:pointer}
+.pf-switch input{width:18px;height:18px;cursor:pointer}
+.pf-switch span{font-size:.75rem;color:rgba(255,255,255,.8)}
+.pf-fair-info{margin-top:8px;padding:8px;background:rgba(0,0,0,.2);border-radius:8px;
+  font-size:.6rem;color:rgba(255,255,255,.5);font-family:monospace;word-break:break-all}
+
+/* Админка */
+.pf-admin-stats,.pf-admin-info{padding:10px;background:rgba(255,255,255,.03);border-radius:10px;
+  font-size:.7rem;color:rgba(255,255,255,.6);margin-bottom:10px}
+.pf-admin-row{display:flex;gap:6px;margin-bottom:8px}
+.pf-admin-row input{flex:1;padding:8px;border-radius:8px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);color:#fff;font-size:.75rem}
+.pf-admin-row button{padding:8px 14px;background:var(--acc);color:#fff;font-weight:700}
