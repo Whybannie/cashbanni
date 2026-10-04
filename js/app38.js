@@ -864,7 +864,7 @@ window.addEventListener('load', function(){
 });
 
 
-// ===== v115: SUPPORT (silver, menu grid, tickets, 24h cleanup) =====
+// ===== v116: SUPPORT (fixed rendering + overscroll + operator mode) =====
 const SUPPORT_FAQ = [
   {q:'Как пополнить баланс?', a:'Открой «Кабинет» → «Пополнить баланс», выбери сумму и оплати через Telegram Stars. Звёзды зачисляются мгновенно.', kw:['пополн','баланс','оплат','звезд','звёзд','stars','деньг','депозит','купить','закинуть']},
   {q:'Где мой предмет из кейса?', a:'Все выпавшие предметы находятся в «Кабинет» → «Мои предметы». Оттуда их можно продать за звёзды.', kw:['предмет','кейс','выпал','дроп','инвентар','где','пропал','не пришёл','не пришел']},
@@ -873,77 +873,91 @@ const SUPPORT_FAQ = [
   {q:'Промокод не работает', a:'Проверь, что код введён без пробелов и в правильном регистре. Каждый промокод имеет лимит активаций и срок действия.', kw:['промокод','промо','код','активир','не работает','ошибка']},
   {q:'Что такое Апгрейд?', a:'Апгрейд позволяет обменять предмет на более дорогой с шансом. Чем выше множитель, тем ниже шанс успеха.', kw:['апгрейд','улучш','обмен','множит','шанс','прокач']}
 ];
-let supOperatorMode=false;
+let supOperatorMode=false, supActiveTicket=null;
+
+function supEl(id){ return document.getElementById(id); }
 
 function openSupport(){
-  const ov=$('supOverlay'); if(!ov)return;
+  const ov=supEl('supOverlay'); if(!ov)return;
   ov.classList.add('show');
+  document.body.style.overflow='hidden';
   try{cleanupSupTickets();}catch(e){}
-  supShowMenu();
+  if(supIsOperator()){ supOperatorPanel(); }
+  else { supShowMenu(); }
 }
-function closeSupport(){ const ov=$('supOverlay'); if(ov)ov.classList.remove('show'); }
+function closeSupport(){
+  const ov=supEl('supOverlay'); if(ov)ov.classList.remove('show');
+  document.body.style.overflow='';
+  supActiveTicket=null;
+}
 
 function supShowMenu(){
-  const body=$('supBody'); if(!body)return;
+  const body=supEl('supBody'); if(!body)return;
   body.innerHTML='';
   supOperatorMode=false;
-  const st=$('supStatus'); if(st)st.textContent='онлайн';
+  supActiveTicket=null;
+  const st=supEl('supStatus'); if(st)st.textContent='онлайн';
   supAddMsg('bot','Привет! Я помощник поддержки. Выбери тему — отвечу сразу, или напиши свой вопрос.');
   const grid=document.createElement('div');
   grid.className='sup-menu';
-  let h=SUPPORT_FAQ.map((f,i)=>'<button class="sup-menu-item" onclick="supQuick('+i+')">'+f.q+'</button>').join('');
-  h+='<button class="sup-menu-item sup-menu-op" onclick="supCallOperator()">Позвать оператора</button>';
+  let h=SUPPORT_FAQ.map((f,i)=>'<button type="button" class="sup-menu-item" onclick="supQuick('+i+')">'+f.q+'</button>').join('');
+  h+='<button type="button" class="sup-menu-item sup-menu-op" onclick="supCallOperator()">Позвать оператора</button>';
   grid.innerHTML=h;
   body.appendChild(grid);
-  supScroll();
 }
 
 function supAddMsg(who,text){
-  const body=$('supBody'); if(!body)return;
+  const body=supEl('supBody'); if(!body)return;
   const d=document.createElement('div');
   d.className='sup-msg '+who;
-  d.innerHTML='<div class="bubble">'+text+'</div>';
+  const b=document.createElement('div');
+  b.className='bubble';
+  b.textContent=text;
+  d.appendChild(b);
   body.appendChild(d);
-  supScroll();
+  requestAnimationFrame(()=>{ body.scrollTop=body.scrollHeight; });
 }
-function supScroll(){ const b=$('supBody'); if(b)b.scrollTop=b.scrollHeight; }
 
 function supQuick(i){
   const f=SUPPORT_FAQ[i]; if(!f)return;
-  const body=$('supBody'); if(!body)return;
+  const body=supEl('supBody'); if(!body)return;
   body.innerHTML='';
   supAddMsg('user',f.q);
   setTimeout(()=>{
     supAddMsg('bot',f.a);
     const w=document.createElement('div');
     w.className='sup-back-wrap';
-    w.innerHTML='<button class="sup-back-btn" onclick="supShowMenu()">← Все вопросы</button>';
+    const btn=document.createElement('button');
+    btn.type='button';btn.className='sup-back-btn';
+    btn.textContent='← Все вопросы';
+    btn.onclick=supShowMenu;
+    w.appendChild(btn);
     body.appendChild(w);
-    supScroll();
   },350);
 }
 
 function supMatch(text){
-  text=text.toLowerCase();
+  const t=text.toLowerCase();
   let best=null,bestScore=0;
   SUPPORT_FAQ.forEach(f=>{
-    let s=0; f.kw.forEach(k=>{ if(text.indexOf(k)!==-1)s++; });
+    let s=0; f.kw.forEach(k=>{ if(t.indexOf(k)!==-1)s++; });
     if(s>bestScore){bestScore=s;best=f;}
   });
   return bestScore>0?best:null;
 }
 
 function supSend(){
-  const inp=$('supInput'); if(!inp)return;
+  const inp=supEl('supInput'); if(!inp)return;
   const t=(inp.value||'').trim(); if(!t)return;
   inp.value='';
-  const body=$('supBody');
+  const body=supEl('supBody'); if(!body)return;
   const menu=body.querySelector('.sup-menu'); if(menu)menu.remove();
   const bw=body.querySelector('.sup-back-wrap'); if(bw)bw.remove();
   supAddMsg('user',t);
-  if(supOperatorMode){
-    saveSupTicket('operator',t);
-    setTimeout(()=>supAddMsg('bot','Сообщение передано оператору. Он ответит, как только освободится.'),400);
+  if(supOperatorMode && supActiveTicket){
+    supAddMsgToTicket(supActiveTicket,'user',t);
+    saveSupTickets();
+    setTimeout(()=>supAddMsg('bot','Сообщение отправлено оператору. Он ответит, как только освободится.'),400);
     return;
   }
   setTimeout(()=>{
@@ -952,39 +966,75 @@ function supSend(){
       supAddMsg('bot',m.a);
       const w=document.createElement('div');
       w.className='sup-back-wrap';
-      w.innerHTML='<button class="sup-back-btn" onclick="supShowMenu()">← Все вопросы</button>';
+      const btn=document.createElement('button');
+      btn.type='button';btn.className='sup-back-btn';
+      btn.textContent='← Все вопросы';
+      btn.onclick=supShowMenu;
+      w.appendChild(btn);
       body.appendChild(w);
     }else{
       supAddMsg('bot','Я пока не понял вопрос. Уточни его или позови оператора — он поможет лично.');
       const w=document.createElement('div');
       w.className='sup-back-wrap';
-      w.innerHTML='<button class="sup-chip-op" onclick="supCallOperator()">Позвать оператора</button><button class="sup-back-btn" onclick="supShowMenu()">← Все вопросы</button>';
+      const op=document.createElement('button');
+      op.type='button';op.className='sup-chip-op';
+      op.textContent='Позвать оператора';op.onclick=supCallOperator;
+      const bk=document.createElement('button');
+      bk.type='button';bk.className='sup-back-btn';
+      bk.textContent='← Все вопросы';bk.onclick=supShowMenu;
+      w.appendChild(op);w.appendChild(bk);
       body.appendChild(w);
       saveSupTicket('question',t);
     }
-    supScroll();
   },450);
 }
 
 function supCallOperator(){
   supOperatorMode=true;
-  const st=$('supStatus'); if(st)st.textContent='оператор подключается…';
-  const body=$('supBody'); if(!body)return;
+  const st=supEl('supStatus'); if(st)st.textContent='оператор подключается…';
+  const body=supEl('supBody'); if(!body)return;
   const menu=body.querySelector('.sup-menu'); if(menu)menu.remove();
   supAddMsg('bot','Соединяем с оператором поддержки…');
+  const ticket={
+    id:'t'+Date.now()+'_'+Math.random().toString(36).slice(2,8),
+    user:(S&&(S.id||S.tgId))||'?',
+    user_name:S.tgName||S.name||'Юзер',
+    time:Date.now(),
+    status:'open',
+    messages:[]
+  };
+  supActiveTicket=ticket;
   setTimeout(()=>{
-    supAddMsg('bot','Оператор скоро ответит в этом чате. Опиши проблему подробно — это ускорит решение.');
+    supAddMsg('bot','Тикет создан (ID: '+ticket.id.slice(-6)+'). Оператор скоро ответит. Опиши проблему подробно.');
     saveSupTicket('operator','');
   },800);
 }
 
-// ===== Тикеты: хранение + автоочистка через 24 часа =====
+function supAddMsgToTicket(ticket,who,text){
+  if(!ticket)return;
+  if(!ticket.messages)ticket.messages=[];
+  ticket.messages.push({who:who,text:text,time:Date.now()});
+}
+
+// ===== Тикеты: хранение + автоочистка 24ч =====
 function saveSupTicket(status,summary){
   if(!S.supTickets)S.supTickets=[];
-  S.supTickets.push({id:'t'+Date.now(),user:(S&&(S.id||S.tgId))||'?',time:Date.now(),status:status||'operator',q:summary||''});
+  const t={
+    id:'t'+Date.now(),
+    user:(S&&(S.id||S.tgId))||'?',
+    user_name:S.tgName||S.name||'Юзер',
+    time:Date.now(),
+    status:status||'operator',
+    q:summary||'',
+    resolved:false
+  };
+  S.supTickets.push(t);
   if(S.supTickets.length>200)S.supTickets=S.supTickets.slice(-200);
-  saveLocal();
-  try{ api('/api/support_ticket',{method:'POST',body:JSON.stringify({id:'t'+Date.now(),user:(S&&(S.id||S.tgId))||'?',status:status,q:summary||''})}); }catch(e){}
+  saveSupTickets();
+  try{ api('/api/support_ticket',{method:'POST',body:JSON.stringify(t)}); }catch(e){}
+}
+function saveSupTickets(){
+  if(S&&S.supTickets)saveLocal();
 }
 function cleanupSupTickets(){
   if(!S||!S.supTickets||!S.supTickets.length)return;
@@ -993,11 +1043,82 @@ function cleanupSupTickets(){
   S.supTickets=S.supTickets.filter(t=>(t.time||0)>dayAgo);
   if(S.supTickets.length!==before)saveLocal();
 }
-window.addEventListener('load',function(){ try{cleanupSupTickets();renderOperators();renderTickets();}catch(e){} });
 
-// ===== Операторы (админка) =====
+// ===== Система операторов =====
+function supIsOperator(){
+  if(!S)return false;
+  if(S.isAdmin)return true;
+  const myId=String(S.id||S.tgId||'');
+  const ops=S.operators||[];
+  return ops.indexOf(myId)!==-1;
+}
+
+function supOperatorPanel(){
+  const body=supEl('supBody'); if(!body)return;
+  body.innerHTML='';
+  const st=supEl('supStatus'); if(st)st.textContent='режим оператора';
+  const title=document.createElement('div');
+  title.style.cssText='padding:4px 0 10px;font-size:.7rem;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase';
+  title.textContent='Панель оператора';
+  body.appendChild(title);
+
+  const allTk=(S.supTickets||[]).slice().reverse();
+  if(!allTk.length){
+    const empty=document.createElement('div');
+    empty.className='muted';empty.style.padding='20px 0';empty.style.textAlign='center';
+    empty.textContent='Тикетов пока нет';
+    body.appendChild(empty);
+    return;
+  }
+  allTk.forEach(t=>{
+    const card=document.createElement('div');
+    card.className='task-card';card.style.cursor='pointer';
+    const info=document.createElement('div');info.className='task-info';
+    const b=document.createElement('b');b.textContent=t.q||'Обращение от '+t.user_name;
+    const sp=document.createElement('span');
+    sp.textContent='ID '+t.user+' · '+new Date(t.time).toLocaleString('ru');
+    info.appendChild(b);info.appendChild(sp);
+    card.appendChild(info);
+    const status=document.createElement('div');
+    status.style.cssText='font-size:.58rem;font-weight:800;padding:4px 8px;border-radius:10px;'+(t.resolved?'background:rgba(34,197,94,.15);color:#4ade80':'background:rgba(251,191,36,.15);color:#fbbf24');
+    status.textContent=t.resolved?'РЕШЁН':'ОТКРЫТ';
+    card.appendChild(status);
+    card.onclick=()=>supOpenTicket(t);
+    body.appendChild(card);
+  });
+}
+
+function supOpenTicket(ticket){
+  const body=supEl('supBody'); if(!body)return;
+  body.innerHTML='';
+  supActiveTicket=ticket;
+  supOperatorMode=true;
+
+  const head=document.createElement('div');
+  head.style.cssText='padding:6px 0 10px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:10px';
+  head.innerHTML='<div style="font-size:.6rem;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase">Тикет '+ticket.id.slice(-6)+'</div><div style="font-size:.85rem;font-weight:800;color:#fff;margin-top:2px">'+(ticket.q||'Обращение')+'</div><div style="font-size:.65rem;color:rgba(255,255,255,.5);margin-top:2px">ID юзера: '+ticket.user+' · '+new Date(ticket.time).toLocaleString('ru')+'</div>';
+  body.appendChild(head);
+
+  if(ticket.messages && ticket.messages.length){
+    ticket.messages.forEach(m=>supAddMsg(m.who,m.text));
+  } else {
+    supAddMsg('bot','Чистый тикет. Напиши первое сообщение юзеру.');
+  }
+
+  const actions=document.createElement('div');
+  actions.className='sup-back-wrap';
+  const back=document.createElement('button');back.type='button';back.className='sup-back-btn';back.textContent='← К тикетам';back.onclick=supOperatorPanel;
+  actions.appendChild(back);
+  if(!ticket.resolved){
+    const res=document.createElement('button');res.type='button';res.className='sup-chip-op';res.textContent='Пометить решённым';
+    res.onclick=()=>{ticket.resolved=true;ticket.resolvedAt=Date.now();ticket.resolvedBy=S.id||S.tgId;saveSupTickets();supOperatorPanel();toast('Тикет помечен решённым','good');};
+    actions.appendChild(res);
+  }
+  body.appendChild(actions);
+}
+
 function admAddOperator(){
-  const el=$('admOpId'); if(!el)return;
+  const el=supEl('admOpId'); if(!el)return;
   const id=(el.value||'').trim();
   if(!id)return toast('Введи ID оператора','bad');
   if(!S.operators)S.operators=[];
@@ -1011,17 +1132,18 @@ function admRemoveOperator(id){
   saveLocal();renderOperators();
 }
 function renderOperators(){
-  const el=$('adminOperators');if(!el)return;
+  const el=supEl('adminOperators');if(!el)return;
   const ops=S.operators||[];
   el.innerHTML=ops.length?ops.map(id=>'<div class="task-card"><div class="task-info"><b>ID '+id+'</b><span>Оператор поддержки</span></div><button class="btn btn-secondary task-btn" onclick="admRemoveOperator(\''+id+'\')">Убрать</button></div>').join(''):'<div class="muted small">Операторы не назначены</div>';
 }
 function renderTickets(){
-  const el=$('adminTickets');if(!el)return;
-  const tk=(S.supTickets||[]).slice(-20).reverse();
+  const el=supEl('adminTickets');if(!el)return;
+  const tk=(S.supTickets||[]).slice(-30).reverse();
   el.innerHTML=tk.length?tk.map(t=>{
     const when=new Date(t.time).toLocaleString('ru');
-    const type=t.status==='operator'?'Оператор':'Вопрос';
+    const type=t.resolved?'✅ Решён':(t.status==='operator'?'⏳ Оператор':'❓ Вопрос');
     return '<div class="task-card"><div class="task-info"><b>'+(t.q||type)+'</b><span>ID '+t.user+' · '+when+'</span></div></div>';
   }).join(''):'<div class="muted small">Тикетов нет</div>';
 }
-function supIsOperator(){ return (S&&S.isAdmin) || (S&&S.operators&&S.operators.indexOf(String(S.id||S.tgId))!==-1); }
+
+window.addEventListener('load',function(){ try{cleanupSupTickets();renderOperators();renderTickets();}catch(e){} });
