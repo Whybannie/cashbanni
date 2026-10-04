@@ -190,7 +190,7 @@ async function spin(n){
   spinning=true;
   
   // 🎁 Для бесплатного кейса - повторная проверка подписки
-  if(curCase && curCase.free){
+  if(curCase && (curCase.free || curCase.price === 0 || curCase.id === 'free')){
     const okSub=await checkSub();
     if(!okSub){ 
       spinning=false;
@@ -207,7 +207,7 @@ async function spin(n){
   
   if(!r || r.error){ 
     spinning=false;
-    if(r && r.error && /подписк|sub/i.test(r.error)){
+    if(r && r.error && /подписк|sub|403|forbidden/i.test(r.error)){
       gateSub();
     } else if(r && r.error && /24 ?ч|раз в|куoldown|cooldown/i.test(r.error)){
       smartError(r.error);
@@ -227,7 +227,7 @@ async function spin(n){
   S.inv=r.inv; 
   S.stats=Object.assign(DEF().stats,r.stats); 
   S.xp=r.xp||S.xp;
-  if(curCase.free) S.freeLast=Date.now();
+  if(curCase && (curCase.free || curCase.price === 0 || curCase.id === 'free')) S.freeLast=Date.now();
   saveLocal(); 
   renderHeader();
   // Обновляем баланс в модалке
