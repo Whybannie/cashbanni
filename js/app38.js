@@ -106,7 +106,7 @@ async function refreshMe(){ const me=await apiR('/api/me');
     try{ renderSection(activeTab()); }catch(e){} } }
 async function apiPay(stars){
   const r=await api("/api/pay",{method:"POST",body:JSON.stringify({stars})});
-  if(r.url && TG && TG.openInvoice){ modalClose('payModal');
+  if(r.url && TG && TG.openInvoice){ modalClose('payModal'); startBalanceWatcher();
     TG.openInvoice(r.url, st=>{ if(st==='paid'){ toast('✅ Оплата прошла! Зачисляем Stars…','good'); sfx.win(); confetti(80); var __prevBal=S.balance; setTimeout(function(){ pollBalanceAfterPay(__prevBal); },800); } else if(st==='cancelled'){ toast('Оплата отменена','bad'); } else { setTimeout(function(){ pollBalanceAfterPay(S.balance); },1500); } });
   } else if(r.url){ modalClose('payModal'); window.open(r.url); } else toast("Не удалось создать счёт","bad"); }
 function validInv(){ return S.inv.filter(i=>i&&i.gid&&gift(i.gid)); }
@@ -986,3 +986,41 @@ document.addEventListener('visibilitychange', function(){
   if(!document.hidden && S && S.serverMode){ try{ refreshBalanceOnly(); }catch(e){} }
 });
 var payVisibilityGuard=true;
+
+// ===== v121: надёжное обновление баланса после оплаты =====
+async function refreshBalanceOnly(){
+  try{
+    const me=await api('/api/me');
+    if(me&&me.tg_id){
+      const nb=Number(me.balance)||0;
+      if(nb!==S.balance){
+        S.balance=nb;
+        saveLocal();
+        renderHeader();
+        try{ renderProfile(); }catch(e){}
+        try{ refreshInv(); }catch(e){}
+      }
+      return nb;
+    }
+  }catch(e){}
+  return S.balance;
+}
+let __balWatcher=null;
+function startBalanceWatcher(){
+  if(__balWatcher) return;
+  const startBal=S.balance;
+  let ticks=0;
+  __balWatcher=setInterval(async function(){
+    ticks++;
+    if(ticks>30){ clearInterval(__balWatcher); __balWatcher=null; return; }
+    const nb=await refreshBalanceOnly();
+    if(nb>startBal){
+      clearInterval(__balWatcher); __balWatcher=null;
+      toast('⭐ Баланс пополнен: '+fmt(nb),'good');
+      try{ sfx.win(); }catch(e){}
+    }
+  },2000);
+}
+async function pollBalanceAfterPay(prevBalance,tries){
+  startBalanceWatcher();
+}
