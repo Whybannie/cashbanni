@@ -10,7 +10,7 @@
   
   <!-- 🚀 Performance: prefetch критичных ресурсов -->
   <link rel="prefetch" href="js/data38.js?v=940" as="script">
-  <link rel="prefetch" href="js/app38.js?v=1180" as="script">
+  <link rel="prefetch" href="js/app38.js?v=1190" as="script">
   <link rel="prefetch" href="js/caseimg38.js?v=1090" as="script">
   <link rel="preload" href="css/style.css?v=1160" as="style">
 
@@ -472,7 +472,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 <div class="toasts" id="toasts"></div>
 <script src="js/data38.js?v=940" defer></script>
-<script src="js/app38.js?v=1180" defer></script>
+<script src="js/app38.js?v=1190" defer></script>
 <script src="js/caseimg38.js?v=1090" defer></script>
   <script src="js/dogs38.js?v=940"></script>
   <!-- dogs отключены -->
@@ -548,10 +548,11 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 </div>
 
 <!-- ===== v114 SUPPORT ===== -->
+<!-- SUPPORT -->
 <div class="sup-overlay" id="supOverlay">
   <div class="sup-sheet">
     <div class="sup-head">
-      <button class="sup-back" onclick="supShowMenu()" aria-label="Назад">
+      <button class="sup-back" id="supBackBtn" type="button" aria-label="Назад">
         <svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="sup-head-info">
@@ -563,12 +564,12 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
           <span class="sup-status" id="supStatus">онлайн</span>
         </div>
       </div>
-      <button class="x" onclick="closeSupport()"><svg class="ic s"><use href="#i-x"/></svg></button>
+      <button class="x" id="supCloseBtn" type="button"><svg class="ic s"><use href="#i-x"/></svg></button>
     </div>
     <div class="sup-body" id="supBody"></div>
     <div class="sup-input-row">
-      <input class="sup-input" id="supInput" type="text" placeholder="Напиши сообщение…" onkeydown="if(event.key==='Enter')supSend()">
-      <button class="sup-send" onclick="supSend()" aria-label="Отправить">
+      <input class="sup-input" id="supInput" type="text" placeholder="Напиши сообщение…">
+      <button class="sup-send" id="supSendBtn" type="button" aria-label="Отправить">
         <svg viewBox="0 0 24 24" fill="none"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>

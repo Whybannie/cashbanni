@@ -864,58 +864,33 @@ window.addEventListener('load', function(){
 });
 
 
-// ===== v118: SUPPORT (event delegation, guaranteed clicks, console logs) =====
+// ===== v119: SUPPORT - simple FAQ, addEventListener, no operator =====
 const SUPPORT_FAQ = [
-  {q:'Как пополнить баланс?', a:'Открой «Кабинет» → «Пополнить баланс», выбери сумму и оплати через Telegram Stars. Звёзды зачисляются мгновенно.', kw:['пополн','баланс','оплат','звезд','звёзд','stars','деньг','депозит','купить','закинуть']},
-  {q:'Где мой предмет из кейса?', a:'Все выпавшие предметы находятся в «Кабинет» → «Мои предметы». Оттуда их можно продать за звёзды.', kw:['предмет','кейс','выпал','дроп','инвентар','где','пропал','не пришёл','не пришел']},
-  {q:'Как работает бесплатный кейс?', a:'Бесплатный кейс можно крутить раз в 24 часа. Для доступа нужна подписка на наш канал — это бесплатно.', kw:['бесплатн','фри','подписк','канал','24','раз в день','каждый день','без подписки']},
-  {q:'Как вывести подарок?', a:'Вывод подарков находится в разработке и скоро появится. Следи за анонсами в нашем канале.', kw:['вывод','вывести','подарок','забрать','получить','withdraw','обналичить']},
-  {q:'Промокод не работает', a:'Проверь, что код введён без пробелов и в правильном регистре. Каждый промокод имеет лимит активаций и срок действия.', kw:['промокод','промо','код','активир','не работает','ошибка']},
+  {q:'Как пополнить баланс?', a:'Открой «Кабинет» → «Пополнить баланс», выбери сумму и оплати через Telegram Stars. Звёзды зачисляются мгновенно.', kw:['пополн','баланс','оплат','звезд','звёзд','stars','деньг','депозит','купить']},
+  {q:'Где мой предмет из кейса?', a:'Все выпавшие предметы находятся в «Кабинет» → «Мои предметы». Оттуда их можно продать за звёзды.', kw:['предмет','кейс','выпал','дроп','инвентар','пропал','не пришёл','не пришел']},
+  {q:'Как работает бесплатный кейс?', a:'Бесплатный кейс можно крутить раз в 24 часа. Для доступа нужна подписка на наш канал — это бесплатно.', kw:['бесплатн','фри','подписк','канал','24','раз в день','каждый день']},
+  {q:'Как вывести подарок?', a:'Вывод подарков находится в разработке и скоро появится. Следи за анонсами в нашем канале.', kw:['вывод','вывести','подарок','забрать','получить','обналичить']},
+  {q:'Промокод не работает', a:'Проверь, что код введён без пробелов и в правильном регистре. Каждый промокод имеет лимит активаций и срок действия.', kw:['промокод','промо','код','активир','не работает']},
   {q:'Что такое Апгрейд?', a:'Апгрейд позволяет обменять предмет на более дорогой с шансом. Чем выше множитель, тем ниже шанс успеха.', kw:['апгрейд','улучш','обмен','множит','шанс','прокач']}
 ];
-let supOperatorMode=false, supActiveTicket=null;
 
-function supEl(id){ return document.getElementById(id); }
+function supOverlay(){ return document.getElementById('supOverlay'); }
+function supBody(){ const ov=supOverlay(); return ov?ov.querySelector('.sup-body'):null; }
 
 function openSupport(){
-  console.log('[SUP] openSupport');
-  const ov=supEl('supOverlay'); if(!ov){console.log('[SUP] no overlay');return;}
+  const ov=supOverlay(); if(!ov)return;
   ov.classList.add('show');
   document.body.style.overflow='hidden';
-  try{cleanupSupTickets();}catch(e){}
-  if(supIsOperator()){ supOperatorPanel(); }
-  else { supShowMenu(); }
+  supShowMenu();
 }
 function closeSupport(){
-  const ov=supEl('supOverlay'); if(ov)ov.classList.remove('show');
+  const ov=supOverlay(); if(!ov)return;
+  ov.classList.remove('show');
   document.body.style.overflow='';
-  supActiveTicket=null;
-}
-
-function supClearBody(){
-  const body=supEl('supBody');
-  if(body) body.innerHTML='';
-}
-
-function supShowMenu(){
-  console.log('[SUP] supShowMenu');
-  const body=supEl('supBody'); if(!body){console.log('[SUP] no body');return;}
-  supClearBody();
-  supOperatorMode=false;
-  supActiveTicket=null;
-  const st=supEl('supStatus'); if(st)st.textContent='онлайн';
-  supAddMsg('bot','Привет! Я помощник поддержки. Выбери тему — отвечу сразу, или напиши свой вопрос.');
-  const grid=document.createElement('div');
-  grid.className='sup-menu';
-  let h=SUPPORT_FAQ.map((f,i)=>'<button type="button" class="sup-menu-item" data-sup-quick="'+i+'">'+f.q+'</button>').join('');
-  h+='<button type="button" class="sup-menu-item sup-menu-op" data-sup-call-op="1">Позвать оператора</button>';
-  grid.innerHTML=h;
-  body.appendChild(grid);
-  console.log('[SUP] menu rendered, buttons:',grid.querySelectorAll('button').length);
 }
 
 function supAddMsg(who,text){
-  const body=supEl('supBody'); if(!body){console.log('[SUP] no body in addMsg');return;}
+  const body=supBody(); if(!body)return;
   const d=document.createElement('div');
   d.className='sup-msg '+who;
   const b=document.createElement('div');
@@ -923,292 +898,84 @@ function supAddMsg(who,text){
   b.textContent=text;
   d.appendChild(b);
   body.appendChild(d);
-  requestAnimationFrame(()=>{ body.scrollTop=body.scrollHeight; });
-  console.log('[SUP] msg added:',who,text.slice(0,30));
+  body.scrollTop=body.scrollHeight;
+}
+
+function supShowMenu(){
+  const body=supBody(); if(!body)return;
+  body.innerHTML='';
+  const st=document.getElementById('supStatus'); if(st)st.textContent='онлайн';
+  supAddMsg('bot','Привет! Я помощник поддержки. Выбери тему — отвечу сразу, или напиши свой вопрос.');
+  const grid=document.createElement('div');
+  grid.className='sup-menu';
+  SUPPORT_FAQ.forEach(function(f,i){
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='sup-menu-item';
+    btn.textContent=f.q;
+    btn.addEventListener('click',function(){ supQuick(i); });
+    grid.appendChild(btn);
+  });
+  body.appendChild(grid);
 }
 
 function supQuick(i){
-  console.log('[SUP] supQuick',i);
-  const f=SUPPORT_FAQ[i];
-  if(!f){console.log('[SUP] no FAQ item',i);return;}
-  const body=supEl('supBody'); if(!body){console.log('[SUP] no body in quick');return;}
-  supClearBody();
+  const f=SUPPORT_FAQ[i]; if(!f)return;
+  const body=supBody(); if(!body)return;
+  body.innerHTML='';
   supAddMsg('user',f.q);
   supAddMsg('bot',f.a);
   const w=document.createElement('div');
   w.className='sup-back-wrap';
-  const btn=document.createElement('button');
-  btn.type='button';btn.className='sup-back-btn';
-  btn.textContent='← Все вопросы';
-  btn.setAttribute('data-sup-back','1');
-  w.appendChild(btn);
+  const back=document.createElement('button');
+  back.type='button';back.className='sup-back-btn';
+  back.textContent='← Все вопросы';
+  back.addEventListener('click',supShowMenu);
+  w.appendChild(back);
   body.appendChild(w);
 }
 
 function supMatch(text){
   const t=text.toLowerCase();
-  let best=null,bestScore=0;
-  SUPPORT_FAQ.forEach(f=>{
-    let s=0; f.kw.forEach(k=>{ if(t.indexOf(k)!==-1)s++; });
-    if(s>bestScore){bestScore=s;best=f;}
+  let best=null,score=0;
+  SUPPORT_FAQ.forEach(function(f){
+    let s=0; f.kw.forEach(function(k){ if(t.indexOf(k)!==-1)s++; });
+    if(s>score){score=s;best=f;}
   });
-  return bestScore>0?best:null;
+  return score>0?best:null;
 }
 
 function supSend(){
-  const inp=supEl('supInput'); if(!inp)return;
+  const inp=document.getElementById('supInput'); if(!inp)return;
   const t=(inp.value||'').trim(); if(!t)return;
   inp.value='';
-  const body=supEl('supBody'); if(!body)return;
+  const body=supBody(); if(!body)return;
   const menu=body.querySelector('.sup-menu'); if(menu)menu.remove();
   const bw=body.querySelector('.sup-back-wrap'); if(bw)bw.remove();
   supAddMsg('user',t);
-  if(supOperatorMode && supActiveTicket){
-    supAddMsgToTicket(supActiveTicket,'user',t);
-    saveSupTickets();
-    supAddMsg('bot','Сообщение отправлено оператору. Он ответит, как только освободится.');
-    return;
-  }
   const m=supMatch(t);
-  if(m){
-    supAddMsg('bot',m.a);
-    const w=document.createElement('div');
-    w.className='sup-back-wrap';
-    const btn=document.createElement('button');
-    btn.type='button';btn.className='sup-back-btn';
-    btn.textContent='← Все вопросы';
-    btn.setAttribute('data-sup-back','1');
-    w.appendChild(btn);
-    body.appendChild(w);
-  }else{
-    supAddMsg('bot','Я пока не понял вопрос. Уточни его или позови оператора — он поможет лично.');
-    const w=document.createElement('div');
-    w.className='sup-back-wrap';
-    const op=document.createElement('button');
-    op.type='button';op.className='sup-chip-op';
-    op.textContent='Позвать оператора';
-    op.setAttribute('data-sup-call-op','1');
-    const bk=document.createElement('button');
-    bk.type='button';bk.className='sup-back-btn';
-    bk.textContent='← Все вопросы';
-    bk.setAttribute('data-sup-back','1');
-    w.appendChild(op);w.appendChild(bk);
-    body.appendChild(w);
-    saveSupTicket('question',t);
-  }
+  if(m){ supAddMsg('bot',m.a); }
+  else{ supAddMsg('bot','Я пока не понял вопрос. Попробуй выбрать тему из списка.'); }
+  const w=document.createElement('div');
+  w.className='sup-back-wrap';
+  const back=document.createElement('button');
+  back.type='button';back.className='sup-back-btn';
+  back.textContent='← Все вопросы';
+  back.addEventListener('click',supShowMenu);
+  w.appendChild(back);
+  body.appendChild(w);
 }
 
-function supCallOperator(){
-  console.log('[SUP] supCallOperator');
-  supOperatorMode=true;
-  const st=supEl('supStatus'); if(st)st.textContent='оператор подключается…';
-  const body=supEl('supBody'); if(!body)return;
-  const menu=body.querySelector('.sup-menu'); if(menu)menu.remove();
-  supAddMsg('bot','Соединяем с оператором поддержки…');
-  const ticket={
-    id:'t'+Date.now()+'_'+Math.random().toString(36).slice(2,8),
-    user:(S&&(S.id||S.tgId))||'?',
-    user_name:S.tgName||S.name||'Юзер',
-    time:Date.now(),
-    status:'open',
-    messages:[],
-    resolved:false
-  };
-  supActiveTicket=ticket;
-  supAddMsg('bot','Тикет создан (ID: '+ticket.id.slice(-6)+'). Оператор скоро ответит. Опиши проблему подробно.');
-  saveSupTicket('operator','');
-}
+// заглушки чтобы админ-блок не ломался
+function admAddOperator(){ toast('Раздел в разработке',''); }
+function admRemoveOperator(){ }
+function renderOperators(){ const el=document.getElementById('adminOperators'); if(el)el.innerHTML='<div class="muted small">Раздел в разработке</div>'; }
+function renderTickets(){ const el=document.getElementById('adminTickets'); if(el)el.innerHTML='<div class="muted small">Раздел в разработке</div>'; }
 
-function supAddMsgToTicket(ticket,who,text){
-  if(!ticket)return;
-  if(!ticket.messages)ticket.messages=[];
-  ticket.messages.push({who:who,text:text,time:Date.now()});
-}
-
-function saveSupTicket(status,summary){
-  if(!S.supTickets)S.supTickets=[];
-  const t={
-    id:'t'+Date.now()+'_'+Math.random().toString(36).slice(2,8),
-    user:(S&&(S.id||S.tgId))||'?',
-    user_name:S.tgName||S.name||'Юзер',
-    time:Date.now(),
-    status:status||'operator',
-    q:summary||'',
-    resolved:false
-  };
-  S.supTickets.push(t);
-  if(S.supTickets.length>200)S.supTickets=S.supTickets.slice(-200);
-  saveSupTickets();
-  try{ api('/api/support_ticket',{method:'POST',body:JSON.stringify(t)}); }catch(e){}
-}
-function saveSupTickets(){ if(S&&S.supTickets)saveLocal(); }
-function cleanupSupTickets(){
-  if(!S||!S.supTickets||!S.supTickets.length)return;
-  const dayAgo=Date.now()-24*60*60*1000;
-  const before=S.supTickets.length;
-  S.supTickets=S.supTickets.filter(t=>(t.time||0)>dayAgo);
-  if(S.supTickets.length!==before)saveLocal();
-}
-
-function supIsOperator(){
-  if(!S)return false;
-  if(S.isAdmin)return true;
-  const myId=String(S.id||S.tgId||'');
-  const ops=S.operators||[];
-  return ops.indexOf(myId)!==-1;
-}
-
-function supOperatorPanel(){
-  const body=supEl('supBody'); if(!body)return;
-  supClearBody();
-  const st=supEl('supStatus'); if(st)st.textContent='режим оператора';
-  const title=document.createElement('div');
-  title.style.cssText='padding:4px 0 10px;font-size:.7rem;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase';
-  title.textContent='Панель оператора';
-  body.appendChild(title);
-
-  const allTk=(S.supTickets||[]).slice().reverse();
-  if(!allTk.length){
-    const empty=document.createElement('div');
-    empty.className='muted';empty.style.padding='20px 0';empty.style.textAlign='center';
-    empty.textContent='Тикетов пока нет';
-    body.appendChild(empty);
-    return;
-  }
-  allTk.forEach(t=>{
-    const card=document.createElement('div');
-    card.className='task-card';card.style.cursor='pointer';
-    card.setAttribute('data-sup-ticket',t.id);
-    const info=document.createElement('div');info.className='task-info';
-    const b=document.createElement('b');b.textContent=t.q||'Обращение от '+(t.user_name||'Юзера');
-    const sp=document.createElement('span');
-    sp.textContent='ID '+t.user+' · '+new Date(t.time).toLocaleString('ru');
-    info.appendChild(b);info.appendChild(sp);
-    card.appendChild(info);
-    const status=document.createElement('div');
-    status.style.cssText='font-size:.58rem;font-weight:800;padding:4px 8px;border-radius:10px;white-space:nowrap;'+(t.resolved?'background:rgba(34,197,94,.15);color:#4ade80':'background:rgba(251,191,36,.15);color:#fbbf24');
-    status.textContent=t.resolved?'РЕШЁН':'ОТКРЫТ';
-    card.appendChild(status);
-    body.appendChild(card);
-  });
-}
-
-function supOpenTicket(ticketId){
-  const body=supEl('supBody'); if(!body)return;
-  const ticket=(S.supTickets||[]).find(t=>t.id===ticketId);
-  if(!ticket){console.log('[SUP] ticket not found',ticketId);return;}
-  supClearBody();
-  supActiveTicket=ticket;
-  supOperatorMode=true;
-
-  const head=document.createElement('div');
-  head.style.cssText='padding:6px 0 10px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:10px';
-  head.innerHTML='<div style="font-size:.6rem;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase">Тикет '+ticket.id.slice(-6)+'</div><div style="font-size:.85rem;font-weight:800;color:#fff;margin-top:2px">'+(ticket.q||'Обращение')+'</div><div style="font-size:.65rem;color:rgba(255,255,255,.5);margin-top:2px">ID юзера: '+ticket.user+' · '+new Date(ticket.time).toLocaleString('ru')+'</div>';
-  body.appendChild(head);
-
-  if(ticket.messages && ticket.messages.length){
-    ticket.messages.forEach(m=>supAddMsg(m.who,m.text));
-  } else {
-    supAddMsg('bot','Чистый тикет. Напиши первое сообщение юзеру.');
-  }
-
-  const actions=document.createElement('div');
-  actions.className='sup-back-wrap';
-  const back=document.createElement('button');back.type='button';back.className='sup-back-btn';back.textContent='← К тикетам';back.setAttribute('data-sup-panel','1');
-  actions.appendChild(back);
-  if(!ticket.resolved){
-    const res=document.createElement('button');res.type='button';res.className='sup-chip-op';res.textContent='Пометить решённым';
-    res.setAttribute('data-sup-resolve',ticket.id);
-    actions.appendChild(res);
-  }
-  body.appendChild(actions);
-}
-
-function admAddOperator(){
-  const el=supEl('admOpId'); if(!el)return;
-  const id=(el.value||'').trim();
-  if(!id)return toast('Введи ID оператора','bad');
-  if(!S.operators)S.operators=[];
-  if(S.operators.indexOf(id)===-1){S.operators.push(id);saveLocal();}
-  el.value='';
-  renderOperators();
-  toast('Оператор назначен','good');
-}
-function admRemoveOperator(id){
-  S.operators=(S.operators||[]).filter(x=>x!==id);
-  saveLocal();renderOperators();
-}
-function renderOperators(){
-  const el=supEl('adminOperators');if(!el)return;
-  const ops=S.operators||[];
-  el.innerHTML=ops.length?ops.map(id=>'<div class="task-card"><div class="task-info"><b>ID '+id+'</b><span>Оператор поддержки</span></div><button class="btn btn-secondary task-btn" onclick="admRemoveOperator(\''+id+'\')">Убрать</button></div>').join(''):'<div class="muted small">Операторы не назначены</div>';
-}
-function renderTickets(){
-  const el=supEl('adminTickets');if(!el)return;
-  const tk=(S.supTickets||[]).slice(-30).reverse();
-  el.innerHTML=tk.length?tk.map(t=>{
-    const when=new Date(t.time).toLocaleString('ru');
-    const type=t.resolved?'Решён':(t.status==='operator'?'Оператор':'Вопрос');
-    return '<div class="task-card"><div class="task-info"><b>'+(t.q||type)+'</b><span>ID '+t.user+' · '+when+'</span></div></div>';
-  }).join(''):'<div class="muted small">Тикетов нет</div>';
-}
-
-// ===== ДЕЛЕГИРОВАНИЕ СОБЫТИЙ (главный фикс) =====
-document.addEventListener('click', function(e){
-  const t = e.target;
-  // sup-quick (быстрые вопросы)
-  if(t.hasAttribute('data-sup-quick')){
-    e.preventDefault(); e.stopPropagation();
-    const i = parseInt(t.getAttribute('data-sup-quick'));
-    console.log('[SUP] clicked quick',i);
-    supQuick(i);
-    return;
-  }
-  // sup-call-op (позвать оператора)
-  if(t.hasAttribute('data-sup-call-op')){
-    e.preventDefault(); e.stopPropagation();
-    console.log('[SUP] clicked call-op');
-    supCallOperator();
-    return;
-  }
-  // sup-back (все вопросы / к тикетам)
-  if(t.hasAttribute('data-sup-back')){
-    e.preventDefault(); e.stopPropagation();
-    console.log('[SUP] clicked back');
-    supShowMenu();
-    return;
-  }
-  // sup-panel (к списку тикетов из оператора)
-  if(t.hasAttribute('data-sup-panel')){
-    e.preventDefault(); e.stopPropagation();
-    supOperatorPanel();
-    return;
-  }
-  // sup-resolve
-  if(t.hasAttribute('data-sup-resolve')){
-    e.preventDefault(); e.stopPropagation();
-    const id = t.getAttribute('data-sup-resolve');
-    const ticket=(S.supTickets||[]).find(x=>x.id===id);
-    if(ticket){
-      ticket.resolved=true;ticket.resolvedAt=Date.now();ticket.resolvedBy=S.id||S.tgId;
-      saveSupTickets();
-      toast('Тикет помечен решённым','good');
-      supOperatorPanel();
-    }
-    return;
-  }
-  // sup-ticket (открыть конкретный тикет)
-  if(t.hasAttribute('data-sup-ticket') || (t.closest && t.closest('[data-sup-ticket]'))){
-    const el = t.hasAttribute('data-sup-ticket') ? t : t.closest('[data-sup-ticket]');
-    if(el){
-      e.preventDefault(); e.stopPropagation();
-      const id = el.getAttribute('data-sup-ticket');
-      console.log('[SUP] clicked ticket',id);
-      supOpenTicket(id);
-    }
-    return;
-  }
+window.addEventListener('load',function(){
+  const bb=document.getElementById('supBackBtn');  if(bb)bb.addEventListener('click',supShowMenu);
+  const cc=document.getElementById('supCloseBtn'); if(cc)cc.addEventListener('click',closeSupport);
+  const ss=document.getElementById('supSendBtn');  if(ss)ss.addEventListener('click',supSend);
+  const ii=document.getElementById('supInput');    if(ii)ii.addEventListener('keydown',function(e){ if(e.key==='Enter'){e.preventDefault();supSend();} });
+  try{renderOperators();renderTickets();}catch(e){}
 });
-
-window.addEventListener('load',function(){ try{cleanupSupTickets();renderOperators();renderTickets();}catch(e){} });
-console.log('[SUP] v118 ready - event delegation active');
