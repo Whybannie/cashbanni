@@ -864,7 +864,7 @@ window.addEventListener('load', function(){
 });
 
 
-// ===== v116: SUPPORT (fixed rendering + overscroll + operator mode) =====
+// ===== v117: SUPPORT (reliable clicks, no race, guaranteed render) =====
 const SUPPORT_FAQ = [
   {q:'Как пополнить баланс?', a:'Открой «Кабинет» → «Пополнить баланс», выбери сумму и оплати через Telegram Stars. Звёзды зачисляются мгновенно.', kw:['пополн','баланс','оплат','звезд','звёзд','stars','деньг','депозит','купить','закинуть']},
   {q:'Где мой предмет из кейса?', a:'Все выпавшие предметы находятся в «Кабинет» → «Мои предметы». Оттуда их можно продать за звёзды.', kw:['предмет','кейс','выпал','дроп','инвентар','где','пропал','не пришёл','не пришел']},
@@ -874,6 +874,7 @@ const SUPPORT_FAQ = [
   {q:'Что такое Апгрейд?', a:'Апгрейд позволяет обменять предмет на более дорогой с шансом. Чем выше множитель, тем ниже шанс успеха.', kw:['апгрейд','улучш','обмен','множит','шанс','прокач']}
 ];
 let supOperatorMode=false, supActiveTicket=null;
+let supBusy=false, supRenderId=0;
 
 function supEl(id){ return document.getElementById(id); }
 
@@ -888,12 +889,19 @@ function openSupport(){
 function closeSupport(){
   const ov=supEl('supOverlay'); if(ov)ov.classList.remove('show');
   document.body.style.overflow='';
-  supActiveTicket=null;
+  supActiveTicket=null; supBusy=false;
+}
+
+function supClearBody(){
+  const body=supEl('supBody');
+  if(body) body.innerHTML='';
 }
 
 function supShowMenu(){
+  if(supBusy) return;
+  supRenderId++;
   const body=supEl('supBody'); if(!body)return;
-  body.innerHTML='';
+  supClearBody();
   supOperatorMode=false;
   supActiveTicket=null;
   const st=supEl('supStatus'); if(st)st.textContent='онлайн';
@@ -919,21 +927,26 @@ function supAddMsg(who,text){
 }
 
 function supQuick(i){
-  const f=SUPPORT_FAQ[i]; if(!f)return;
-  const body=supEl('supBody'); if(!body)return;
-  body.innerHTML='';
+  if(supBusy) return;
+  supBusy=true;
+  const f=SUPPORT_FAQ[i];
+  if(!f){ supBusy=false; return; }
+  const body=supEl('supBody'); if(!body){ supBusy=false; return; }
+  const rid=++supRenderId;
+  supClearBody();
   supAddMsg('user',f.q);
-  setTimeout(()=>{
-    supAddMsg('bot',f.a);
-    const w=document.createElement('div');
-    w.className='sup-back-wrap';
-    const btn=document.createElement('button');
-    btn.type='button';btn.className='sup-back-btn';
-    btn.textContent='← Все вопросы';
-    btn.onclick=supShowMenu;
-    w.appendChild(btn);
-    body.appendChild(w);
-  },350);
+  // Ответ без setTimeout — сразу видно, нет гонки
+  supAddMsg('bot',f.a);
+  const w=document.createElement('div');
+  w.className='sup-back-wrap';
+  const btn=document.createElement('button');
+  btn.type='button';btn.className='sup-back-btn';
+  btn.textContent='← Все вопросы';
+  btn.onclick=function(){ supShowMenu(); };
+  w.appendChild(btn);
+  body.appendChild(w);
+  // разблокируем через 250ms (anti-spam), но только если текущий рендер актуален
+  setTimeout(()=>{ if(supRenderId===rid) supBusy=false; },250);
 }
 
 function supMatch(text){
@@ -947,6 +960,7 @@ function supMatch(text){
 }
 
 function supSend(){
+  if(supBusy) return;
   const inp=supEl('supInput'); if(!inp)return;
   const t=(inp.value||'').trim(); if(!t)return;
   inp.value='';
@@ -960,7 +974,10 @@ function supSend(){
     setTimeout(()=>supAddMsg('bot','Сообщение отправлено оператору. Он ответит, как только освободится.'),400);
     return;
   }
+  supBusy=true;
+  const rid=supRenderId;
   setTimeout(()=>{
+    if(supRenderId!==rid){ supBusy=false; return; }
     const m=supMatch(t);
     if(m){
       supAddMsg('bot',m.a);
@@ -969,7 +986,7 @@ function supSend(){
       const btn=document.createElement('button');
       btn.type='button';btn.className='sup-back-btn';
       btn.textContent='← Все вопросы';
-      btn.onclick=supShowMenu;
+      btn.onclick=function(){ supShowMenu(); };
       w.appendChild(btn);
       body.appendChild(w);
     }else{
@@ -978,21 +995,24 @@ function supSend(){
       w.className='sup-back-wrap';
       const op=document.createElement('button');
       op.type='button';op.className='sup-chip-op';
-      op.textContent='Позвать оператора';op.onclick=supCallOperator;
+      op.textContent='Позвать оператора';op.onclick=function(){ supCallOperator(); };
       const bk=document.createElement('button');
       bk.type='button';bk.className='sup-back-btn';
-      bk.textContent='← Все вопросы';bk.onclick=supShowMenu;
+      bk.textContent='← Все вопросы';bk.onclick=function(){ supShowMenu(); };
       w.appendChild(op);w.appendChild(bk);
       body.appendChild(w);
       saveSupTicket('question',t);
     }
-  },450);
+    setTimeout(()=>{ if(supRenderId===rid) supBusy=false; },200);
+  },300);
 }
 
 function supCallOperator(){
+  if(supBusy) return;
+  supBusy=true;
   supOperatorMode=true;
   const st=supEl('supStatus'); if(st)st.textContent='оператор подключается…';
-  const body=supEl('supBody'); if(!body)return;
+  const body=supEl('supBody'); if(!body){ supBusy=false; return; }
   const menu=body.querySelector('.sup-menu'); if(menu)menu.remove();
   supAddMsg('bot','Соединяем с оператором поддержки…');
   const ticket={
@@ -1001,13 +1021,15 @@ function supCallOperator(){
     user_name:S.tgName||S.name||'Юзер',
     time:Date.now(),
     status:'open',
-    messages:[]
+    messages:[],
+    resolved:false
   };
   supActiveTicket=ticket;
   setTimeout(()=>{
     supAddMsg('bot','Тикет создан (ID: '+ticket.id.slice(-6)+'). Оператор скоро ответит. Опиши проблему подробно.');
     saveSupTicket('operator','');
-  },800);
+    supBusy=false;
+  },600);
 }
 
 function supAddMsgToTicket(ticket,who,text){
@@ -1020,7 +1042,7 @@ function supAddMsgToTicket(ticket,who,text){
 function saveSupTicket(status,summary){
   if(!S.supTickets)S.supTickets=[];
   const t={
-    id:'t'+Date.now(),
+    id:'t'+Date.now()+'_'+Math.random().toString(36).slice(2,8),
     user:(S&&(S.id||S.tgId))||'?',
     user_name:S.tgName||S.name||'Юзер',
     time:Date.now(),
@@ -1033,9 +1055,7 @@ function saveSupTicket(status,summary){
   saveSupTickets();
   try{ api('/api/support_ticket',{method:'POST',body:JSON.stringify(t)}); }catch(e){}
 }
-function saveSupTickets(){
-  if(S&&S.supTickets)saveLocal();
-}
+function saveSupTickets(){ if(S&&S.supTickets)saveLocal(); }
 function cleanupSupTickets(){
   if(!S||!S.supTickets||!S.supTickets.length)return;
   const dayAgo=Date.now()-24*60*60*1000;
@@ -1054,8 +1074,9 @@ function supIsOperator(){
 }
 
 function supOperatorPanel(){
+  supRenderId++;
   const body=supEl('supBody'); if(!body)return;
-  body.innerHTML='';
+  supClearBody();
   const st=supEl('supStatus'); if(st)st.textContent='режим оператора';
   const title=document.createElement('div');
   title.style.cssText='padding:4px 0 10px;font-size:.7rem;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase';
@@ -1074,23 +1095,24 @@ function supOperatorPanel(){
     const card=document.createElement('div');
     card.className='task-card';card.style.cursor='pointer';
     const info=document.createElement('div');info.className='task-info';
-    const b=document.createElement('b');b.textContent=t.q||'Обращение от '+t.user_name;
+    const b=document.createElement('b');b.textContent=t.q||'Обращение от '+(t.user_name||'Юзера');
     const sp=document.createElement('span');
     sp.textContent='ID '+t.user+' · '+new Date(t.time).toLocaleString('ru');
     info.appendChild(b);info.appendChild(sp);
     card.appendChild(info);
     const status=document.createElement('div');
-    status.style.cssText='font-size:.58rem;font-weight:800;padding:4px 8px;border-radius:10px;'+(t.resolved?'background:rgba(34,197,94,.15);color:#4ade80':'background:rgba(251,191,36,.15);color:#fbbf24');
+    status.style.cssText='font-size:.58rem;font-weight:800;padding:4px 8px;border-radius:10px;white-space:nowrap;'+(t.resolved?'background:rgba(34,197,94,.15);color:#4ade80':'background:rgba(251,191,36,.15);color:#fbbf24');
     status.textContent=t.resolved?'РЕШЁН':'ОТКРЫТ';
     card.appendChild(status);
-    card.onclick=()=>supOpenTicket(t);
+    card.onclick=function(){ supOpenTicket(t); };
     body.appendChild(card);
   });
 }
 
 function supOpenTicket(ticket){
+  supRenderId++;
   const body=supEl('supBody'); if(!body)return;
-  body.innerHTML='';
+  supClearBody();
   supActiveTicket=ticket;
   supOperatorMode=true;
 
@@ -1107,11 +1129,16 @@ function supOpenTicket(ticket){
 
   const actions=document.createElement('div');
   actions.className='sup-back-wrap';
-  const back=document.createElement('button');back.type='button';back.className='sup-back-btn';back.textContent='← К тикетам';back.onclick=supOperatorPanel;
+  const back=document.createElement('button');back.type='button';back.className='sup-back-btn';back.textContent='← К тикетам';back.onclick=function(){ supOperatorPanel(); };
   actions.appendChild(back);
   if(!ticket.resolved){
     const res=document.createElement('button');res.type='button';res.className='sup-chip-op';res.textContent='Пометить решённым';
-    res.onclick=()=>{ticket.resolved=true;ticket.resolvedAt=Date.now();ticket.resolvedBy=S.id||S.tgId;saveSupTickets();supOperatorPanel();toast('Тикет помечен решённым','good');};
+    res.onclick=function(){
+      ticket.resolved=true;ticket.resolvedAt=Date.now();ticket.resolvedBy=S.id||S.tgId;
+      saveSupTickets();
+      toast('Тикет помечен решённым','good');
+      supOperatorPanel();
+    };
     actions.appendChild(res);
   }
   body.appendChild(actions);
@@ -1141,7 +1168,7 @@ function renderTickets(){
   const tk=(S.supTickets||[]).slice(-30).reverse();
   el.innerHTML=tk.length?tk.map(t=>{
     const when=new Date(t.time).toLocaleString('ru');
-    const type=t.resolved?'✅ Решён':(t.status==='operator'?'⏳ Оператор':'❓ Вопрос');
+    const type=t.resolved?'Решён':(t.status==='operator'?'Оператор':'Вопрос');
     return '<div class="task-card"><div class="task-info"><b>'+(t.q||type)+'</b><span>ID '+t.user+' · '+when+'</span></div></div>';
   }).join(''):'<div class="muted small">Тикетов нет</div>';
 }
