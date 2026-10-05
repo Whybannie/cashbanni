@@ -107,7 +107,7 @@ async function refreshMe(){ const me=await apiR('/api/me');
 async function apiPay(stars){
   const r=await api("/api/pay",{method:"POST",body:JSON.stringify({stars})});
   if(r.url && TG && TG.openInvoice){ modalClose('payModal');
-    TG.openInvoice(r.url, st=>{ if(st==='paid'){ toast('✅ Оплата прошла! Stars зачислены','good'); sfx.win(); confetti(80); setTimeout(refreshMe,1200); } else toast('Оплата отменена','bad'); });
+    TG.openInvoice(r.url, st=>{ if(st==='paid'){ toast('✅ Оплата прошла! Зачисляем Stars…','good'); sfx.win(); confetti(80); var __prevBal=S.balance; setTimeout(function(){ pollBalanceAfterPay(__prevBal); },800); } else if(st==='cancelled'){ toast('Оплата отменена','bad'); } else { setTimeout(function(){ pollBalanceAfterPay(S.balance); },1500); } });
   } else if(r.url){ modalClose('payModal'); window.open(r.url); } else toast("Не удалось создать счёт","bad"); }
 function validInv(){ return S.inv.filter(i=>i&&i.gid&&gift(i.gid)); }
 function refreshInv(){ try{
@@ -979,3 +979,10 @@ window.addEventListener('load',function(){
   const ii=document.getElementById('supInput');    if(ii)ii.addEventListener('keydown',function(e){ if(e.key==='Enter'){e.preventDefault();supSend();} });
   try{renderOperators();renderTickets();}catch(e){}
 });
+
+// v120: при возврате в приложение обновляем баланс (страховка оплаты)
+window.__payVis=false;
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden && S && S.serverMode){ try{ refreshBalanceOnly(); }catch(e){} }
+});
+var payVisibilityGuard=true;
