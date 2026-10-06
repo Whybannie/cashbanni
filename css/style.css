@@ -1992,3 +1992,31 @@ h2,h3{color:#fff}
 .sup-sheet{overscroll-behavior:contain}
 .sup-msg{display:flex;min-height:0}
 .sup-msg .bubble{word-break:break-word;min-width:0}
+
+/* ===== v122: STORY PROMO ===== */
+.ic-box.story{background:linear-gradient(135deg,#ec4899,#a855f7);color:#fff}
+.story-task{position:relative;overflow:hidden}
+.story-task::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(236,72,153,.06),rgba(168,85,247,.04));pointer-events:none}
+.story-reward{color:#fbbf24;font-weight:900}
+
+.story-modal{max-width:380px;padding:28px 24px;position:relative}
+.story-content{text-align:center}
+.story-icon{font-size:3rem;margin-bottom:12px;filter:drop-shadow(0 0 20px rgba(236,72,153,.4))}
+.story-title{font-size:1.05rem;font-weight:900;letter-spacing:2.5px;
+  background:linear-gradient(180deg,#fff 0%,#d0d0da 45%,#8a8a98 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin:0 0 10px}
+.story-desc{font-size:.76rem;line-height:1.5;color:rgba(255,255,255,.6);margin:0 0 18px}
+.story-desc b{color:#fbbf24;font-weight:900}
+.story-preview{width:100%;aspect-ratio:9/16;max-height:240px;border-radius:18px;overflow:hidden;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);margin-bottom:16px;
+  display:flex;align-items:center;justify-content:center}
+.story-preview img, .story-preview video{width:100%;height:100%;object-fit:cover}
+.story-placeholder{text-align:center;color:rgba(255,255,255,.3);padding:20px}
+.story-placeholder svg{width:56px;height:56px;margin-bottom:10px;opacity:.6}
+.story-placeholder span{display:block;font-size:.72rem}
+.story-steps{text-align:left;margin-bottom:18px;padding:12px;background:rgba(255,255,255,.03);border-radius:12px;border:1px solid rgba(255,255,255,.06)}
+.story-step{font-size:.7rem;line-height:1.5;color:rgba(255,255,255,.7);padding:4px 0 4px 20px;position:relative}
+.story-step::before{content:'→';position:absolute;left:0;color:var(--acc);font-weight:800}
+.story-save-btn{width:100%;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(135deg,#ec4899,#a855f7)}
+.story-save-btn:active{transform:scale(.97)}

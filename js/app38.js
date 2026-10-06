@@ -1024,3 +1024,121 @@ function startBalanceWatcher(){
 async function pollBalanceAfterPay(prevBalance,tries){
   startBalanceWatcher();
 }
+
+// ===== v122: STORY PROMO =====
+let storyMediaLoaded = false;
+
+function openStoryModal(){
+  if(S && S.storyRewarded){
+    toast('Ты уже получил награду за сторис','');
+    return;
+  }
+  modalOpen('storyModal');
+  if(!storyMediaLoaded) loadStoryMedia();
+}
+
+function loadStoryMedia(){
+  const img = $('storyImg');
+  const ph = $('storyPlaceholder');
+  const preview = $('storyPreview');
+  if(!img || !ph || !preview) return;
+  const testImg = new Image();
+  testImg.onload = function(){
+    img.src = 'story_promo.jpg';
+    img.style.display = 'block';
+    ph.style.display = 'none';
+    storyMediaLoaded = true;
+  };
+  testImg.onerror = function(){
+    const video = document.createElement('video');
+    video.src = 'story_promo.mp4';
+    video.muted = true;
+    video.autoplay = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.style.width = '100%';
+    video.style.height = '100%';
+    video.style.objectFit = 'cover';
+    video.onloadeddata = function(){
+      ph.style.display = 'none';
+      preview.appendChild(video);
+      storyMediaLoaded = true;
+    };
+    video.onerror = function(){
+      console.log('[STORY] story_promo.jpg/.mp4 not found, showing placeholder');
+    };
+  };
+  testImg.src = 'story_promo.jpg';
+}
+
+async function saveStoryMedia(){
+  const btn = $('storySaveBtn');
+  if(btn) btn.disabled = true;
+  try{
+    const isImg = $('storyImg') && $('storyImg').style.display !== 'none';
+    const url = isImg ? 'story_promo.jpg' : 'story_promo.mp4';
+    const resp = await fetch(url);
+    if(!resp.ok) throw new Error('not found');
+    const blob = await resp.blob();
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = isImg ? 'cashbanni_story.jpg' : 'cashbanni_story.mp4';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(()=>URL.revokeObjectURL(link.href), 1000);
+    toast('Файл скачан! Теперь опубликуй его в сторис','good');
+  }catch(e){
+    toast('Не удалось скачать. Сделай скриншот','bad');
+  }
+  if(btn) btn.disabled = false;
+}
+
+async function claimStoryReward(){
+  if(S && S.storyRewarded){
+    toast('Награда уже получена','');
+    modalClose('storyModal');
+    return;
+  }
+  toast('Проверяю подписку и публикацию…','');
+  const r = await api('/api/story_reward',{method:'POST',body:'{}'});
+  if(r && r.ok){
+    S.balance = (S.balance||0) + (r.reward||0);
+    S.storyRewarded = true;
+    saveLocal();
+    renderHeader();
+    renderTasks();
+    try{ sfx.win(); confetti(80); }catch(e){}
+    toast('⭐+'+(r.reward||0)+' за сторис!','good');
+    modalClose('storyModal');
+  }else{
+    const err = (r && r.error) || 'Ошибка';
+    if(err.indexOf('подписк') !== -1 || err === 'нужна подписка на канал'){
+      toast('Сначала подпишись на канал','bad');
+      modalClose('storyModal');
+      setTimeout(()=>{ try{ gateSub && gateSub(); }catch(e){} }, 300);
+    }else if(err.indexOf('уже получено') !== -1){
+      S.storyRewarded = true;
+      saveLocal();
+      toast('Ты уже получал эту награду','');
+      modalClose('storyModal');
+      renderTasks();
+    }else{
+      toast('Ошибка: '+err,'bad');
+    }
+  }
+}
+
+// Обновление состояния карточки сторис
+window.addEventListener('load',function(){
+  try{
+    if(S && S.storyRewarded){
+      const t = document.querySelector('.story-task');
+      if(t){
+        t.style.opacity = '0.55';
+        const rw = t.querySelector('b.story-reward');
+        if(rw){ rw.textContent = 'ПОЛУЧЕНО'; rw.style.color = '#4ade80'; }
+      }
+    }
+  }catch(e){}
+});

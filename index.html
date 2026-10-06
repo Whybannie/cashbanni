@@ -10,9 +10,9 @@
   
   <!-- 🚀 Performance: prefetch критичных ресурсов -->
   <link rel="prefetch" href="js/data38.js?v=940" as="script">
-  <link rel="prefetch" href="js/app38.js?v=1210" as="script">
+  <link rel="prefetch" href="js/app38.js?v=1220" as="script">
   <link rel="prefetch" href="js/caseimg38.js?v=1090" as="script">
-  <link rel="preload" href="css/style.css?v=1160" as="style">
+  <link rel="preload" href="css/style.css?v=1220" as="style">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
@@ -20,7 +20,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=1160">
+<link rel="stylesheet" href="css/style.css?v=1220">
 <script src="https://telegram.org/js/telegram-web-app.js?v=715" defer></script>
 <link rel="preload" as="image" href="case_fri.JPG">
 <link rel="preload" as="image" href="case_mini.JPG">
@@ -272,6 +272,14 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
       <div class="task-info"><b>Подписка на канал</b><span>Бесплатный кейс</span></div>
       <button class="btn btn-secondary task-btn" id="subBtn" onclick="doSub()">Подписаться</button>
     </div>
+    <div class="task-card story-task" onclick="openStoryModal()">
+      <div class="ic-box story"><svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-info">
+        <b>Опубликуй сторис</b>
+        <span>Расскажи о Cash Banni в истории · <b class="story-reward">⭐50</b></span>
+      </div>
+      <div class="hero-go">›</div>
+    </div>
     <div class="task-card">
       <div class="ic-box blue"><svg class="ic"><use href="#i-users"/></svg></div>
       <div class="task-info"><b>Пригласи друга</b><span>⭐5 когда друг внесёт депозит от ⭐5 · <b id="refCount">0</b></span></div>
@@ -472,7 +480,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 <div class="toasts" id="toasts"></div>
 <script src="js/data38.js?v=940" defer></script>
-<script src="js/app38.js?v=1210" defer></script>
+<script src="js/app38.js?v=1220" defer></script>
 <script src="js/caseimg38.js?v=1090" defer></script>
   <script src="js/dogs38.js?v=940"></script>
   <!-- dogs отключены -->
@@ -572,6 +580,35 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
       <button class="sup-send" id="supSendBtn" type="button" aria-label="Отправить">
         <svg viewBox="0 0 24 24" fill="none"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
+    </div>
+  </div>
+</div>
+<!-- v122: STORY PROMO MODAL -->
+<div class="modal-overlay" id="storyModal">
+  <div class="modal story-modal">
+    <div class="sheet-grab"></div>
+    <button class="x" onclick="modalClose('storyModal')"><svg class="ic s"><use href="#i-x"/></svg></button>
+    <div class="story-content">
+      <div class="story-icon">📸</div>
+      <h3 class="story-title">ОПУБЛИКУЙ ИСТОРИЮ</h3>
+      <p class="story-desc">Расскажи о Cash Banni в своих сторис и получи <b>⭐50</b> на баланс!</p>
+      <div class="story-preview" id="storyPreview">
+        <img id="storyImg" style="display:none;">
+        <div class="story-placeholder" id="storyPlaceholder">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Медиафайл истории</span>
+        </div>
+      </div>
+      <div class="story-steps">
+        <div class="story-step">Сохрани картинку или видео к себе на устройство</div>
+        <div class="story-step">Открой Telegram → свой профиль → «Моя история»</div>
+        <div class="story-step">Опубликуй сохранённый файл в сторис</div>
+        <div class="story-step">Нажми «Я опубликовал» ниже</div>
+      </div>
+      <button class="btn btn-primary story-save-btn" id="storySaveBtn" onclick="saveStoryMedia()">
+        <span>СОХРАНИТЬ ФАЙЛ</span>
+      </button>
+      <button class="btn sg-check-btn" onclick="claimStoryReward()">Я ОПУБЛИКОВАЛ</button>
     </div>
   </div>
 </div>
