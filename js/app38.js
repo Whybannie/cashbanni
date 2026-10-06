@@ -1045,18 +1045,9 @@ function downloadStoryMedia(){
     .catch(() => toast('Ошибка скачивания','bad'));
 }
 
-function saveStoryPhoto(){
-  fetch('story_promo.jpg')
-    .then(r => r.blob())
-    .then(blob => {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'cashbanni_story.jpg';
-      a.click();
-      setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
-      toast('✅ Фото сохранено в галерею','good');
-    })
-    .catch(()=>toast('Ошибка скачивания','bad'));
+function openStoryImage(){
+  modalOpen('storyImageView');
+  toast('Нажми и удержи картинку чтобы сохранить','');
 }
 
 function copyStoryTextFinal(){
@@ -1078,6 +1069,8 @@ function copyStoryTextFinal(){
     })
     .catch(()=>toast('Ошибка копирования','bad'));
 }
+
+
 
 
 function copyStoryText(){
