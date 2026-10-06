@@ -20,6 +20,13 @@ function caseArt(c){
 
 async function openCaseModal(id){ 
   sfx.click(); 
+  
+  // 📸 КЕЙС ЗА СТОРИС: показываем специальную модалку
+  if(id==='story'){
+    openStoryCaseModal();
+    return;
+  }
+  
   curCase=CASES.find(c=>c.id===id);
   if(!curCase) return;
   

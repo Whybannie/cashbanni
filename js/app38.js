@@ -1025,120 +1025,142 @@ async function pollBalanceAfterPay(prevBalance,tries){
   startBalanceWatcher();
 }
 
-// ===== v122: STORY PROMO =====
-let storyMediaLoaded = false;
 
-function openStoryModal(){
-  if(S && S.storyRewarded){
-    toast('Ты уже получил награду за сторис','');
+// ===== v131: STORY CASE SYSTEM =====
+function openStoryCaseModal(){
+  modalOpen('storyCaseModal');
+  checkStoryStatus();
+}
+
+function downloadStoryMedia(){
+  const isImg = true; // по умолчанию картинка
+  const url = isImg ? 'story_promo.jpg' : 'story_promo.mp4';
+  fetch(url)
+    .then(resp => {
+      if(!resp.ok) throw new Error('not found');
+      return resp.blob();
+    })
+    .then(blob => {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = isImg ? 'cashbanni_story.jpg' : 'cashbanni_story.mp4';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(()=>URL.revokeObjectURL(link.href), 1000);
+      toast('Файл скачан! Опубликуй его в сторис','good');
+    })
+    .catch(e => {
+      toast('Не удалось скачать. Сделай скриншот','bad');
+    });
+}
+
+function copyStoryText(){
+  const text = `🎁 Халявный кейс каждый день в Cash Banni!
+
+Открывай кейсы с настоящими подарками Telegram 🎁
+Кейсы, Апгрейд, Crash, Mines, Plinko
+
+👉 t.me/CashBanni_bot`;
+  
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.getElementById('copyBtnText');
+    if(btn){
+      btn.textContent = '✅ СКОПИРОВАНО!';
+      setTimeout(()=>{ btn.textContent = '📋 СКОПИРОВАТЬ ТЕКСТ'; }, 2000);
+    }
+    toast('Текст скопирован!','good');
+  }).catch(e=>{
+    toast('Не удалось скопировать','bad');
+  });
+}
+
+async function submitStoryLink(){
+  const input = $('storyLinkInput');
+  const btn = $('storySubmitBtn');
+  const status = $('storyStatus');
+  const link = (input?.value||'').trim();
+  
+  if(!link || link.length < 10){
+    toast('Вставь ссылку на сторис','bad');
     return;
   }
-  modalOpen('storyModal');
-  if(!storyMediaLoaded) loadStoryMedia();
-}
-
-function loadStoryMedia(){
-  const img = $('storyImg');
-  const ph = $('storyPlaceholder');
-  const preview = $('storyPreview');
-  if(!img || !ph || !preview) return;
-  const testImg = new Image();
-  testImg.onload = function(){
-    img.src = 'story_promo.jpg';
-    img.style.display = 'block';
-    ph.style.display = 'none';
-    storyMediaLoaded = true;
-  };
-  testImg.onerror = function(){
-    const video = document.createElement('video');
-    video.src = 'story_promo.mp4';
-    video.muted = true;
-    video.autoplay = true;
-    video.loop = true;
-    video.playsInline = true;
-    video.style.width = '100%';
-    video.style.height = '100%';
-    video.style.objectFit = 'cover';
-    video.onloadeddata = function(){
-      ph.style.display = 'none';
-      preview.appendChild(video);
-      storyMediaLoaded = true;
-    };
-    video.onerror = function(){
-      console.log('[STORY] story_promo.jpg/.mp4 not found, showing placeholder');
-    };
-  };
-  testImg.src = 'story_promo.jpg';
-}
-
-async function saveStoryMedia(){
-  const btn = $('storySaveBtn');
+  
   if(btn) btn.disabled = true;
-  try{
-    const isImg = $('storyImg') && $('storyImg').style.display !== 'none';
-    const url = isImg ? 'story_promo.jpg' : 'story_promo.mp4';
-    const resp = await fetch(url);
-    if(!resp.ok) throw new Error('not found');
-    const blob = await resp.blob();
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = isImg ? 'cashbanni_story.jpg' : 'cashbanni_story.mp4';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setTimeout(()=>URL.revokeObjectURL(link.href), 1000);
-    toast('Файл скачан! Теперь опубликуй его в сторис','good');
-  }catch(e){
-    toast('Не удалось скачать. Сделай скриншот','bad');
+  if(status){
+    status.style.display = 'block';
+    status.className = 'story-status pending';
+    status.innerHTML = '⏳ Отправляю на проверку...';
   }
+  
+  try{
+    const r = await api('/api/story_submit',{method:'POST',body:JSON.stringify({link:link})});
+    if(r && r.ok){
+      if(status){
+        status.className = 'story-status pending';
+        status.innerHTML = '✅ Заявка отправлена!<br>Админ проверит сторис и пришлёт уведомление.';
+      }
+      toast('Заявка отправлена!','good');
+      input.value = '';
+    }else{
+      const err = (r && r.error) || 'Ошибка';
+      if(status){
+        status.className = 'story-status error';
+        status.innerHTML = '❌ '+err;
+      }
+      toast(err,'bad');
+    }
+  }catch(e){
+    if(status){
+      status.className = 'story-status error';
+      status.innerHTML = '❌ Ошибка сети';
+    }
+    toast('Ошибка сети','bad');
+  }
+  
   if(btn) btn.disabled = false;
 }
 
-async function claimStoryReward(){
-  if(S && S.storyRewarded){
-    toast('Награда уже получена','');
-    modalClose('storyModal');
-    return;
-  }
-  toast('Проверяю подписку и публикацию…','');
-  const r = await api('/api/story_reward',{method:'POST',body:'{}'});
-  if(r && r.ok){
-    S.balance = (S.balance||0) + (r.reward||0);
-    S.storyRewarded = true;
-    saveLocal();
-    renderHeader();
-    renderTasks();
-    try{ sfx.win(); confetti(80); }catch(e){}
-    toast('⭐+'+(r.reward||0)+' за сторис!','good');
-    modalClose('storyModal');
-  }else{
-    const err = (r && r.error) || 'Ошибка';
-    if(err.indexOf('подписк') !== -1 || err === 'нужна подписка на канал'){
-      toast('Сначала подпишись на канал','bad');
-      modalClose('storyModal');
-      setTimeout(()=>{ try{ gateSub && gateSub(); }catch(e){} }, 300);
-    }else if(err.indexOf('уже получено') !== -1){
-      S.storyRewarded = true;
-      saveLocal();
-      toast('Ты уже получал эту награду','');
-      modalClose('storyModal');
-      renderTasks();
+async function checkStoryStatus(){
+  try{
+    const r = await api('/api/story_status');
+    if(!r) return;
+    
+    const status = $('storyStatus');
+    const btn = $('storySubmitBtn');
+    const input = $('storyLinkInput');
+    
+    if(r.last_status === 'pending'){
+      if(status){
+        status.style.display = 'block';
+        status.className = 'story-status pending';
+        status.innerHTML = '⏳ Заявка на проверке...<br>Админ скоро проверит твою сторис.';
+      }
+      if(btn) btn.disabled = true;
+      if(input) input.disabled = true;
+    }else if(r.case_available){
+      if(status){
+        status.style.display = 'block';
+        status.className = 'story-status';
+        status.innerHTML = '🎉 <b>КЕЙС ДОСТУПЕН!</b><br>Закрой модалку и открой "Кейс за сторис" из списка.';
+      }
+      if(btn) btn.disabled = true;
+      if(input) input.disabled = true;
+      toast('🎉 Кейс за сторис доступен!','good');
+    }else if(r.last_status === 'rejected'){
+      if(status){
+        status.style.display = 'block';
+        status.className = 'story-status error';
+        status.innerHTML = '❌ Заявка отклонена.<br>Проверь требования и попробуй снова.';
+      }
+      if(btn) btn.disabled = false;
+      if(input) input.disabled = false;
     }else{
-      toast('Ошибка: '+err,'bad');
+      if(status) status.style.display = 'none';
+      if(btn) btn.disabled = false;
+      if(input) input.disabled = false;
     }
+  }catch(e){
+    console.error('checkStoryStatus:', e);
   }
 }
-
-// Обновление состояния карточки сторис
-window.addEventListener('load',function(){
-  try{
-    if(S && S.storyRewarded){
-      const t = document.querySelector('.story-task');
-      if(t){
-        t.style.opacity = '0.55';
-        const rw = t.querySelector('b.story-reward');
-        if(rw){ rw.textContent = 'ПОЛУЧЕНО'; rw.style.color = '#4ade80'; }
-      }
-    }
-  }catch(e){}
-});
