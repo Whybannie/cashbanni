@@ -1132,7 +1132,7 @@ async function submitStoryLink(){
   const status = $('storyStatus');
   const link = (input?.value||'').trim();
   
-  if(!link || link.length < 10){
+  if(!link || link.length < 3){
     toast('Вставь ссылку на сторис','bad');
     return;
   }
