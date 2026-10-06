@@ -1046,18 +1046,40 @@ function downloadStoryMedia(){
 }
 
 function storyScreenshot(){
-  const block = document.getElementById('storyPreviewBlock');
-  const btnText = document.getElementById('shotBtnText');
-  if(block){
-    block.classList.add('highlight');
-    setTimeout(()=>block.classList.remove('highlight'), 2200);
-  }
-  if(btnText){
-    btnText.textContent = '📸 СДЕЛАЙ СКРИНШОТ!';
-    setTimeout(()=>{ btnText.textContent = '📱 СОХРАНИТЬ ФОТО'; }, 2500);
-  }
-  toast('📱 Сделай скриншот превью выше','good');
+  openFullStoryImage();
 }
+
+function openFullStoryImage(){
+  // Удаляем старый оверлей если есть
+  const old = document.getElementById('fullStoryOverlay');
+  if(old) old.remove();
+  
+  // Создаём полноэкранный оверлей динамически
+  const ov = document.createElement('div');
+  ov.id = 'fullStoryOverlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
+  
+  const img = document.createElement('img');
+  img.src = 'story_promo.jpg';
+  img.style.cssText = 'max-width:100%;max-height:80vh;object-fit:contain;border-radius:12px;box-shadow:0 8px 40px rgba(236,72,153,.4);';
+  
+  const hint = document.createElement('div');
+  hint.textContent = '📱 Сделай скриншот чтобы сохранить';
+  hint.style.cssText = 'color:#fff;font-size:.9rem;font-weight:700;margin-top:16px;letter-spacing:.5px;text-align:center;';
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕ Закрыть';
+  closeBtn.style.cssText = 'margin-top:14px;padding:12px 28px;background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:24px;font-weight:700;font-size:.85rem;cursor:pointer;';
+  closeBtn.onclick = () => ov.remove();
+  
+  ov.appendChild(img);
+  ov.appendChild(hint);
+  ov.appendChild(closeBtn);
+  ov.onclick = (e) => { if(e.target === ov) ov.remove(); };
+  
+  document.body.appendChild(ov);
+}
+
 
 function copyStoryTextFinal(){
   const text = `🎁 Халявный кейс каждый день в Cash Banni!
