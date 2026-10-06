@@ -10,9 +10,9 @@
   
   <!-- 🚀 Performance: prefetch критичных ресурсов -->
   <link rel="prefetch" href="js/data38.js?v=1340" as="script">
-  <link rel="prefetch" href="js/app38.js?v=1370" as="script">
+  <link rel="prefetch" href="js/app38.js?v=1380" as="script">
   <link rel="prefetch" href="js/caseimg38.js?v=1310" as="script">
-  <link rel="preload" href="css/style.css?v=1370" as="style">
+  <link rel="preload" href="css/style.css?v=1380" as="style">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
@@ -20,7 +20,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=1370">
+<link rel="stylesheet" href="css/style.css?v=1380">
 <script src="https://telegram.org/js/telegram-web-app.js?v=715" defer></script>
 <link rel="preload" as="image" href="case_fri.JPG">
 <link rel="preload" as="image" href="case_mini.JPG">
@@ -480,7 +480,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 <div class="toasts" id="toasts"></div>
 <script src="js/data38.js?v=1340" defer></script>
-<script src="js/app38.js?v=1370" defer></script>
+<script src="js/app38.js?v=1380" defer></script>
 <script src="js/caseimg38.js?v=1310" defer></script>
   <script src="js/dogs38.js?v=940"></script>
   <!-- dogs отключены -->
@@ -657,21 +657,41 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
     </div>
 </div>
 
-<!-- v137: ONE STORY MODAL -->
+
+
+
+
+<!-- v138: STORY MODAL (final) -->
 <div class="modal-overlay" id="storyCaseModal">
-  <div class="modal story-one-modal">
+  <div class="modal story-v138-modal">
     <div class="sheet-grab"></div>
     <button class="x" onclick="modalClose('storyCaseModal')"><svg class="ic s"><use href="#i-x"/></svg></button>
-    <div class="story-one-head">
-      <div class="story-one-icon">📸</div>
-      <h3 class="story-one-title">КЕЙС ЗА СТОРИС</h3>
-      <p class="story-one-sub">Опубликуй и получи кейс с подарками</p>
+    
+    <div class="story-v138-head">
+      <div class="story-anim-icon">
+        <div class="story-ring story-ring-1"></div>
+        <div class="story-ring story-ring-2"></div>
+        <div class="story-ring story-ring-3"></div>
+        <svg class="story-cam-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="storyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#ec4899"/>
+              <stop offset="100%" style="stop-color:#a855f7"/>
+            </linearGradient>
+          </defs>
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z" stroke="url(#storyGrad)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="13" r="4" stroke="url(#storyGrad)" stroke-width="1.7"/>
+        </svg>
+      </div>
+      <h3 class="story-v138-title">КЕЙС ЗА СТОРИС</h3>
+      <p class="story-v138-sub">Опубликуй и получи кейс с подарками</p>
     </div>
-    <div class="story-one-preview">
-      <img src="story_promo.jpg" alt="Макет" class="story-one-img">
-      <div class="story-one-text">
-        <div class="story-one-text-label">ТЕКСТ:</div>
-        <div class="story-one-text-body">🎁 Халявный кейс каждый день в <b>Cash Banni</b>!
+    
+    <div class="story-v138-preview" id="storyPreviewBlock">
+      <img src="story_promo.jpg" alt="Макет" class="story-v138-img">
+      <div class="story-v138-text">
+        <div class="story-v138-text-label">ТЕКСТ ДЛЯ СТОРИС:</div>
+        <div class="story-v138-text-body">🎁 Халявный кейс каждый день в <b>Cash Banni</b>!
 
 Открывай кейсы с настоящими подарками Telegram 🎁
 Кейсы, Апгрейд, Crash, Mines, Plinko
@@ -679,33 +699,22 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 👉 t.me/CashBanni_bot</div>
       </div>
     </div>
-    <div class="story-one-btns">
-      <button class="btn story-one-dl-btn" onclick="openStoryImage()">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span>СОХРАНИТЬ ФОТО</span>
+    
+    <div class="story-v138-btns">
+      <button class="btn story-v138-shot-btn" onclick="storyScreenshot()">
+        <span id="shotBtnText">📱 СОХРАНИТЬ ФОТО</span>
       </button>
-      <button class="btn story-one-cp-btn" onclick="copyStoryTextFinal()">
+      <button class="btn story-v138-cp-btn" onclick="copyStoryTextFinal()">
         <span id="copyFinalText">📋 СКОПИРОВАТЬ ТЕКСТ</span>
       </button>
     </div>
-    <div class="story-one-submit">
-      <input type="text" id="storyLinkInput" class="story-one-inp" placeholder="Ссылка на твою сторис">
-      <button class="btn btn-primary story-one-send-btn" id="storySubmitBtn" onclick="submitStoryLink()">
-        ОТПРАВИТЬ НА ПРОВЕРКУ
-      </button>
+    
+    <div class="story-v138-submit">
+      <input type="text" id="storyLinkInput" class="story-v138-inp" placeholder="Ссылка на твою сторис">
+      <button class="btn btn-primary story-v138-send-btn" id="storySubmitBtn" onclick="submitStoryLink()">ОТПРАВИТЬ НА ПРОВЕРКУ</button>
     </div>
-    <div class="story-one-msg" id="storyStatus"></div>
-  </div>
-</div>
-
-<!-- v137: IMAGE VIEW MODAL -->
-<div class="modal-overlay" id="storyImageView">
-  <div class="modal story-img-view-modal">
-    <button class="x" onclick="modalClose('storyImageView')"><svg class="ic s"><use href="#i-x"/></svg></button>
-    <div class="story-img-view-content">
-      <img src="story_promo.jpg" alt="Макет" class="story-img-view-img">
-      <div class="story-img-view-hint">👆 Нажми и удержи чтобы сохранить</div>
-    </div>
+    
+    <div class="story-v138-msg" id="storyStatus"></div>
   </div>
 </div>
 </body>

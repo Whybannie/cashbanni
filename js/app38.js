@@ -1045,9 +1045,18 @@ function downloadStoryMedia(){
     .catch(() => toast('Ошибка скачивания','bad'));
 }
 
-function openStoryImage(){
-  modalOpen('storyImageView');
-  toast('Нажми и удержи картинку чтобы сохранить','');
+function storyScreenshot(){
+  const block = document.getElementById('storyPreviewBlock');
+  const btnText = document.getElementById('shotBtnText');
+  if(block){
+    block.classList.add('highlight');
+    setTimeout(()=>block.classList.remove('highlight'), 2200);
+  }
+  if(btnText){
+    btnText.textContent = '📸 СДЕЛАЙ СКРИНШОТ!';
+    setTimeout(()=>{ btnText.textContent = '📱 СОХРАНИТЬ ФОТО'; }, 2500);
+  }
+  toast('📱 Сделай скриншот превью выше','good');
 }
 
 function copyStoryTextFinal(){
@@ -1069,6 +1078,8 @@ function copyStoryTextFinal(){
     })
     .catch(()=>toast('Ошибка копирования','bad'));
 }
+
+
 
 
 
