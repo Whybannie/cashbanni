@@ -1045,6 +1045,44 @@ function downloadStoryMedia(){
     .catch(() => toast('Ошибка скачивания','bad'));
 }
 
+function saveAllStory(){
+  const btn = document.querySelector('.story-save-all-btn');
+  const text = btn ? btn.querySelector('#saveAllText') : null;
+  
+  // Копируем текст
+  const storyText = `🎁 Халявный кейс каждый день в Cash Banni!
+
+Открывай кейсы с настоящими подарками Telegram 🎁
+Кейсы, Апгрейд, Crash, Mines, Plinko
+
+👉 t.me/CashBanni_bot`;
+  
+  navigator.clipboard.writeText(storyText).catch(()=>{});
+  
+  // Скачиваем фото
+  fetch('story_promo.jpg')
+    .then(r => r.blob())
+    .then(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'cashbanni_story.jpg';
+      a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+    })
+    .catch(()=>{});
+  
+  // Визуал
+  if(btn){
+    btn.classList.add('saved');
+    if(text) text.textContent = '✅ СОХРАНЕНО! ФОТО + ТЕКСТ';
+    setTimeout(()=>{
+      btn.classList.remove('saved');
+      if(text) text.textContent = 'СОХРАНИТЬ ФОТО + ТЕКСТ';
+    }, 2500);
+  }
+  toast('Фото скачано, текст скопирован!','good');
+}
+
 function copyStoryText(){
   const text = `🎁 Халявный кейс каждый день в Cash Banni!
 
