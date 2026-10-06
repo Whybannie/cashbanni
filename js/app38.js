@@ -1033,26 +1033,16 @@ function openStoryCaseModal(){
 }
 
 function downloadStoryMedia(){
-  const isImg = true; // по умолчанию картинка
-  const url = isImg ? 'story_promo.jpg' : 'story_promo.mp4';
-  fetch(url)
-    .then(resp => {
-      if(!resp.ok) throw new Error('not found');
-      return resp.blob();
-    })
+  fetch('story_promo.jpg')
+    .then(r => r.blob())
     .then(blob => {
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = isImg ? 'cashbanni_story.jpg' : 'cashbanni_story.mp4';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(()=>URL.revokeObjectURL(link.href), 1000);
-      toast('Файл скачан! Опубликуй его в сторис','good');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'cashbanni_story.jpg';
+      a.click();
+      toast('Макет скачан!','good');
     })
-    .catch(e => {
-      toast('Не удалось скачать. Сделай скриншот','bad');
-    });
+    .catch(() => toast('Ошибка скачивания','bad'));
 }
 
 function copyStoryText(){
