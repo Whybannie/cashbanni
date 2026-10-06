@@ -1045,21 +1045,7 @@ function downloadStoryMedia(){
     .catch(() => toast('Ошибка скачивания','bad'));
 }
 
-function saveAllStory(){
-  const btn = document.querySelector('.story-save-all-btn');
-  const text = btn ? btn.querySelector('#saveAllText') : null;
-  
-  // Копируем текст
-  const storyText = `🎁 Халявный кейс каждый день в Cash Banni!
-
-Открывай кейсы с настоящими подарками Telegram 🎁
-Кейсы, Апгрейд, Crash, Mines, Plinko
-
-👉 t.me/CashBanni_bot`;
-  
-  navigator.clipboard.writeText(storyText).catch(()=>{});
-  
-  // Скачиваем фото
+function saveStoryPhoto(){
   fetch('story_promo.jpg')
     .then(r => r.blob())
     .then(blob => {
@@ -1068,20 +1054,31 @@ function saveAllStory(){
       a.download = 'cashbanni_story.jpg';
       a.click();
       setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+      toast('✅ Фото сохранено в галерею','good');
     })
-    .catch(()=>{});
-  
-  // Визуал
-  if(btn){
-    btn.classList.add('saved');
-    if(text) text.textContent = '✅ СОХРАНЕНО! ФОТО + ТЕКСТ';
-    setTimeout(()=>{
-      btn.classList.remove('saved');
-      if(text) text.textContent = 'СОХРАНИТЬ ФОТО + ТЕКСТ';
-    }, 2500);
-  }
-  toast('Фото скачано, текст скопирован!','good');
+    .catch(()=>toast('Ошибка скачивания','bad'));
 }
+
+function copyStoryTextFinal(){
+  const text = `🎁 Халявный кейс каждый день в Cash Banni!
+
+Открывай кейсы с настоящими подарками Telegram 🎁
+Кейсы, Апгрейд, Crash, Mines, Plinko
+
+👉 t.me/CashBanni_bot`;
+  
+  navigator.clipboard.writeText(text)
+    .then(()=>{
+      const btn = document.getElementById('copyFinalText');
+      if(btn){
+        btn.textContent = '✅ СКОПИРОВАНО!';
+        setTimeout(()=>{ btn.textContent = '📋 СКОПИРОВАТЬ ТЕКСТ'; }, 2200);
+      }
+      toast('✅ Текст скопирован','good');
+    })
+    .catch(()=>toast('Ошибка копирования','bad'));
+}
+
 
 function copyStoryText(){
   const text = `🎁 Халявный кейс каждый день в Cash Banni!

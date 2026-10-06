@@ -10,9 +10,9 @@
   
   <!-- 🚀 Performance: prefetch критичных ресурсов -->
   <link rel="prefetch" href="js/data38.js?v=1340" as="script">
-  <link rel="prefetch" href="js/app38.js?v=1350" as="script">
+  <link rel="prefetch" href="js/app38.js?v=1360" as="script">
   <link rel="prefetch" href="js/caseimg38.js?v=1310" as="script">
-  <link rel="preload" href="css/style.css?v=1350" as="style">
+  <link rel="preload" href="css/style.css?v=1360" as="style">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
@@ -20,7 +20,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=1350">
+<link rel="stylesheet" href="css/style.css?v=1360">
 <script src="https://telegram.org/js/telegram-web-app.js?v=715" defer></script>
 <link rel="preload" as="image" href="case_fri.JPG">
 <link rel="preload" as="image" href="case_mini.JPG">
@@ -480,7 +480,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 <div class="toasts" id="toasts"></div>
 <script src="js/data38.js?v=1340" defer></script>
-<script src="js/app38.js?v=1350" defer></script>
+<script src="js/app38.js?v=1360" defer></script>
 <script src="js/caseimg38.js?v=1310" defer></script>
   <script src="js/dogs38.js?v=940"></script>
   <!-- dogs отключены -->
@@ -620,32 +620,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
   </div>
 </div>
 </div>
-<!-- v135: SMART STORY MODAL -->
-<div class="modal-overlay" id="storyCaseModal">
-  <div class="modal story-smart-modal">
-    <div class="sheet-grab"></div>
-    <button class="x" onclick="modalClose('storyCaseModal')"><svg class="ic s"><use href="#i-x"/></svg></button>
-    
-    <div class="story-smart-head">
-      <div class="story-smart-icon">📸</div>
-      <h3 class="story-smart-title">КЕЙС ЗА СТОРИС</h3>
-      <p class="story-smart-sub">Опубликуй и получи кейс с подарками</p>
-    </div>
-    
-    <div class="story-preview-block">
-      <div class="story-preview-frame">
-        <img id="storyPreviewImg" src="story_promo.jpg" alt="Макет сторис" class="story-preview-img">
-      </div>
-      <div class="story-text-preview">
-        <div class="story-text-preview-label">ТЕКСТ:</div>
-        <div class="story-text-preview-body">🎁 Халявный кейс каждый день в <b>Cash Banni</b>!
-
-Открывай кейсы с настоящими подарками Telegram 🎁
-Кейсы, Апгрейд, Crash, Mines, Plinko
-
-👉 t.me/CashBanni_bot</div>
-      </div>
-    </div>
+</div>
     
     <button class="btn story-save-all-btn" onclick="saveAllStory()">
       <svg viewBox="0 0 24 24" fill="none"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -660,6 +635,53 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
     </div>
     
     <div class="story-msg" id="storyStatus"></div>
+  </div>
+</div>
+<!-- v136: FINAL STORY MODAL -->
+<div class="modal-overlay" id="storyCaseModal">
+  <div class="modal story-final-modal">
+    <div class="sheet-grab"></div>
+    <button class="x" onclick="modalClose('storyCaseModal')"><svg class="ic s"><use href="#i-x"/></svg></button>
+    
+    <div class="story-final-head">
+      <div class="story-final-icon">📸</div>
+      <h3 class="story-final-title">КЕЙС ЗА СТОРИС</h3>
+      <p class="story-final-sub">Опубликуй и получи кейс с подарками</p>
+    </div>
+    
+    <div class="story-preview-card">
+      <div class="story-preview-img-wrap">
+        <img src="story_promo.jpg" alt="Макет сторис" class="story-preview-img">
+      </div>
+      <div class="story-text-card">
+        <div class="story-text-card-label">ТЕКСТ ДЛЯ СТОРИС:</div>
+        <div class="story-text-card-body">🎁 Халявный кейс каждый день в <b>Cash Banni</b>!
+
+Открывай кейсы с настоящими подарками Telegram 🎁
+Кейсы, Апгрейд, Crash, Mines, Plinko
+
+👉 t.me/CashBanni_bot</div>
+      </div>
+    </div>
+    
+    <div class="story-action-buttons">
+      <button class="btn story-save-photo-btn" onclick="saveStoryPhoto()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>💾 СОХРАНИТЬ ФОТО</span>
+      </button>
+      <button class="btn story-copy-text-btn" onclick="copyStoryTextFinal()">
+        <span id="copyFinalText">📋 СКОПИРОВАТЬ ТЕКСТ</span>
+      </button>
+    </div>
+    
+    <div class="story-submit-section">
+      <input type="text" id="storyLinkInput" class="story-input" placeholder="Ссылка на твою сторис">
+      <button class="btn btn-primary story-submit-btn" id="storySubmitBtn" onclick="submitStoryLink()">
+        ОТПРАВИТЬ НА ПРОВЕРКУ
+      </button>
+    </div>
+    
+    <div class="story-status-msg" id="storyStatus"></div>
   </div>
 </div>
 </body>
