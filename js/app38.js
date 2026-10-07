@@ -1,15 +1,4 @@
 
-// v142: принудительная защита от мёртвых модалок
-(function forceHideModals(){
-  try{
-    document.querySelectorAll('.modal-overlay').forEach(function(ov){
-      if(!ov.classList.contains('active')){
-        ov.style.display = 'none';
-      }
-    });
-  }catch(e){}
-})();
-
 const BUILD = 67;
 
 // ===== v68: aggressive cache-bust reload =====
@@ -128,8 +117,8 @@ function refreshInv(){ try{
 
 let upFrom=null, upTo=null, curCase=null, spinning=false, upBusy=false;
 const IMG = {};
-function modalOpen(id){ const e=$(id); if(e){e.classList.add('active'); document.body.classList.add('modal-open');} }
-function modalClose(id){ const e=$(id); if(e)e.classList.remove('active');
+function modalOpen(id){ const e=$(id); if(e){e.style.display=''; e.classList.add('active'); document.body.classList.add('modal-open');} }
+function modalClose(id){ const e=$(id); if(e){e.classList.remove('active'); e.style.display='';}
   if(!document.querySelector('.modal-overlay.active')) document.body.classList.remove('modal-open'); }
 
 let AC;
