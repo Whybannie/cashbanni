@@ -18,7 +18,7 @@ img{user-select:none;-webkit-user-drag:none}button{font-family:inherit}
 @keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,-80px)}}
 
 .header{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px clamp(10px,3vw,20px);background:rgba(8,8,26,.8);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--line);transition:opacity .2s}
-body.modal-open .header{opacity:0;pointer-events:none}
+body.modal-open .header{opacity:1;pointer-events:auto}
 .logo{font-size:clamp(22px,5vw,32px);font-weight:900;letter-spacing:-.6px;background:linear-gradient(135deg,#a855f7,#ec4899,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;line-height:1}
 .hdr-right{display:flex;align-items:center;gap:8px}
 .balance{display:flex;align-items:center;gap:6px;background:var(--card);padding:9px 14px;border-radius:50px;font-weight:900;border:1px solid var(--line);font-size:1rem;min-height:42px}
