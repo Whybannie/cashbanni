@@ -265,34 +265,52 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 
   <section class="section" id="sec-tasks">
-    <div class="sec-title"><h2>Достижения</h2></div>
+    <div class="tasks-head">
+      <h2 class="tasks-title">🎯 Задания</h2>
+      <div class="tasks-stats">Выполнено: <b id="tasksCompleted">0</b> / <span id="tasksTotal">4</span></div>
+    </div>
     
-    <div class="task-card" onclick="openCaseModal('free')">
-      <div class="ic-box green"><svg class="ic"><use href="#i-gift"/></svg></div>
-      <div class="task-info"><b>Бесплатный кейс</b><span id="freeCaseState">1 раз в 24 часа · нужна подписка</span></div>
-      <div class="hero-go">›</div>
-    </div>
-    <div class="task-card">
-      <div class="ic-box purple"><svg class="ic"><use href="#i-mega"/></svg></div>
-      <div class="task-info"><b>Подписка на канал</b><span>Бесплатный кейс</span></div>
-      <button class="btn btn-secondary task-btn" id="subBtn" onclick="doSub()">Подписаться</button>
-    </div>
-    <div class="task-card story-task" onclick="openStoryCaseModal()">
-      <div class="ic-box story"><svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-info">
-        <b>Опубликуй сторис</b>
-        <span>Расскажи о Cash Banni и получи <b class="story-reward">кейс за сторис 🎁</b></span>
+    <div class="task-premium task-green" onclick="openCaseModal('free')">
+      <div class="task-premium-icon">🎁</div>
+      <div class="task-premium-content">
+        <div class="task-badge daily">ЕЖЕДНЕВНО</div>
+        <div class="task-premium-title">Бесплатный кейс</div>
+        <div class="task-premium-desc" id="freeCaseState">1 раз в 24 часа · нужна подписка</div>
       </div>
-      <div class="hero-go">›</div>
     </div>
-    <div class="task-card">
-      <div class="ic-box blue"><svg class="ic"><use href="#i-users"/></svg></div>
-      <div class="task-info"><b>Пригласи друга</b><span>⭐5 когда друг внесёт депозит от ⭐5 · <b id="refCount">0</b></span></div>
-      <button class="btn btn-secondary task-btn" onclick="copyRef()">Ссылка</button>
+    
+    <div class="task-premium task-purple">
+      <div class="task-premium-icon">📢</div>
+      <div class="task-premium-content">
+        <div class="task-badge once">РАЗОВОЕ</div>
+        <div class="task-premium-title">Подписка на канал</div>
+        <div class="task-premium-desc">Подпишись на <b>@CashBanni</b> и получи <b>бесплатный кейс</b></div>
+        <button class="task-premium-btn" id="subBtn" onclick="doSub(); event.stopPropagation();">Подписаться</button>
+      </div>
     </div>
+    
+    <div class="task-premium task-pink" onclick="openStoryCaseModal()">
+      <div class="task-premium-icon">📸</div>
+      <div class="task-premium-content">
+        <div class="task-badge special">СПЕЦИАЛЬНОЕ</div>
+        <div class="task-premium-title">Опубликуй сторис</div>
+        <div class="task-premium-desc">Расскажи о Cash Banni и получи <b>кейс за сторис 🎁</b></div>
+      </div>
+    </div>
+    
+    <div class="task-premium task-blue">
+      <div class="task-premium-icon">👥</div>
+      <div class="task-premium-content">
+        <div class="task-badge once">РАЗОВОЕ</div>
+        <div class="task-premium-title">Пригласи друга</div>
+        <div class="task-premium-desc">Получи <b>⭐5</b> когда друг внесёт депозит от ⭐5 · Приглашено: <b id="refCount">0</b></div>
+        <button class="task-premium-btn" onclick="copyRef(); event.stopPropagation();">Скопировать ссылку</button>
+      </div>
+    </div>
+    
     <div id="refExplain"></div>
     
-    
+    <h3 style="margin-top:20px;margin-bottom:10px;color:rgba(255,255,255,.7)">🏆 Достижения</h3>
     <div id="achList"></div>
   </section>
 

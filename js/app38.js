@@ -703,9 +703,33 @@ function smartError(msg){
   errGeneric(msg);
 }
 
-function renderAchs(){ var el=$('achList'); if(!el)return;
-  el.innerHTML=ACHS.map(function(a){ var d=false; try{ d=a.cond(S); }catch(e){}
-    return '<div class="ach '+(d?'done':'locked')+'"><span class="emoji">'+a.emoji+'</span><div><b>'+a.name+'</b><div class="muted small">'+(d?'Выполнено ✅':'Не выполнено')+'</div></div></div>'; }).join(''); }
+function renderAchs(){
+  const achs = [
+    {id:'first_case',emoji:'🎁',name:'Первый кейс',desc:'Открой свой первый кейс',done:S.stats.opened>=1},
+    {id:'ten_cases',emoji:'📦',name:'Коллекционер',desc:'Открой 10 кейсов',done:S.stats.opened>=10},
+    {id:'fifty_cases',emoji:'👑',name:'Легенда',desc:'Открой 50 кейсов',done:S.stats.opened>=50},
+    {id:'first_win',emoji:'🏆',name:'Первая победа',desc:'Выиграй в любой игре',done:S.stats.won>0},
+    {id:'big_win',emoji:'💰',name:'Крупный выигрыш',desc:'Выиграй ⭐100+',done:S.stats.won>=100},
+    {id:'upgrade',emoji:'⚡',name:'Улучшатель',desc:'Сделай 5 апгрейдов',done:S.stats.upgrades>=5},
+    {id:'referral',emoji:'🤝',name:'Социальный',desc:'Пригласи друга',done:S.refs>=1},
+    {id:'story',emoji:'📸',name:'Блогер',desc:'Опубликуй сторис',done:S.storyRewarded||false}
+  ];
+  
+  const done = achs.filter(a=>a.done).length;
+  setT('tasksCompleted', done);
+  
+  setH('achList', '<div class="ach-grid">' + achs.map(a=>{
+    const cls = a.done ? 'ach-card done' : 'ach-card locked';
+    const badge = a.done ? '<div class="ach-badge">✓</div>' : '';
+    return '<div class="'+cls+'">'+
+      badge+
+      '<div class="ach-emoji">'+a.emoji+'</div>'+
+      '<div class="ach-name">'+a.name+'</div>'+
+      '<div class="ach-desc">'+a.desc+'</div>'+
+    '</div>';
+  }).join('') + '</div>');
+}
+
 
 function renderQuests(){ var el=$('questsList'); if(!el)return;
   el.innerHTML=QUESTS.map(function(q){ var p=Math.min(S.qp[q.type]||0,q.target),done=p>=q.target,cl=(S.qc||[]).includes(q.id);
