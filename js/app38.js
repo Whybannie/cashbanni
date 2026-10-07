@@ -1,3 +1,15 @@
+
+// v142: принудительная защита от мёртвых модалок
+(function forceHideModals(){
+  try{
+    document.querySelectorAll('.modal-overlay').forEach(function(ov){
+      if(!ov.classList.contains('active')){
+        ov.style.display = 'none';
+      }
+    });
+  }catch(e){}
+})();
+
 const BUILD = 67;
 
 // ===== v68: aggressive cache-bust reload =====
