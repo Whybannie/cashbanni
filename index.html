@@ -15,9 +15,9 @@
   
   <!-- 🚀 Performance: prefetch критичных ресурсов -->
   <link rel="prefetch" href="js/data38.js?v=1340" as="script">
-  <link rel="prefetch" href="js/app38.js?v=1500" as="script">
+  <link rel="prefetch" href="js/app38.js?v=1510" as="script">
   <link rel="prefetch" href="js/caseimg38.js?v=1310" as="script">
-  <link rel="preload" href="css/style.css?v=1500" as="style">
+  <link rel="preload" href="css/style.css?v=1510" as="style">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
@@ -25,7 +25,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=1500">
+<link rel="stylesheet" href="css/style.css?v=1510">
 <script src="https://telegram.org/js/telegram-web-app.js?v=715" defer></script>
 <link rel="preload" as="image" href="case_fri.JPG">
 <link rel="preload" as="image" href="case_mini.JPG">
@@ -265,53 +265,53 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 
   <section class="section" id="sec-tasks">
-  <div class="section-head">
-    <div class="section-label">Задания</div>
-    <div class="section-stat">Выполнено <b id="tasksCompleted">0</b> / <span id="tasksTotal">4</span></div>
+  <div class="sec-lbl">
+    <div class="sec-lbl-t">Задания</div>
+    <div class="sec-lbl-s"><b id="tasksCompleted">0</b>/4 выполнено</div>
   </div>
   
-  <div class="task-grid">
-    <div class="task-glass green" onclick="openCaseModal('free')">
-      <div class="task-icon-wrap">
-        <svg viewBox="0 0 24 24"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+  <div class="tasks-wrap">
+    <div class="task-row green" onclick="openCaseModal('free')">
+      <div class="task-ico"><svg viewBox="0 0 24 24"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></div>
+      <div class="task-body">
+        <div class="task-top"><div class="task-name">Бесплатный кейс</div><div class="task-reward">+кейс</div></div>
+        <div class="task-sub" id="freeCaseState">Раз в 24 часа · нужна подписка</div>
+        <div class="task-bar"><div class="task-bar-fill" id="freeBar" style="width:0%"></div></div>
       </div>
-      <div class="task-tag daily">Ежедневно</div>
-      <div class="task-title">Бесплатный кейс</div>
-      <div class="task-desc" id="freeCaseState">Открывай кейс каждый день · нужна подписка</div>
+      <div class="task-go">›</div>
     </div>
     
-    <div class="task-glass purple">
-      <div class="task-icon-wrap">
-        <svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+    <div class="task-row purple">
+      <div class="task-ico"><svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></div>
+      <div class="task-body">
+        <div class="task-top"><div class="task-name">Подписка на канал</div><div class="task-reward">+кейс</div></div>
+        <div class="task-sub">Подпишись на <b>@CashBanni</b></div>
       </div>
-      <div class="task-tag">Разовое</div>
-      <div class="task-title">Подписка на канал</div>
-      <div class="task-desc">Подпишись на <b>@CashBanni</b> и получи бесплатный кейс</div>
-      <button class="task-btn" id="subBtn" onclick="doSub(); event.stopPropagation();">Подписаться</button>
+      <button class="task-act" id="subBtn" onclick="doSub(); event.stopPropagation();">Подписаться</button>
     </div>
     
-    <div class="task-glass pink" onclick="openStoryCaseModal()">
-      <div class="task-icon-wrap">
-        <svg viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zM15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+    <div class="task-row pink" onclick="openStoryCaseModal()">
+      <div class="task-ico"><svg viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zM15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+      <div class="task-body">
+        <div class="task-top"><div class="task-name">Опубликуй сторис</div><div class="task-reward">+кейс</div></div>
+        <div class="task-sub">Расскажи о нас и получи <b>кейс за сторис</b></div>
       </div>
-      <div class="task-tag special">Специальное</div>
-      <div class="task-title">Опубликуй сторис</div>
-      <div class="task-desc">Расскажи о Cash Banni и получи <b>кейс за сторис</b></div>
+      <div class="task-go">›</div>
     </div>
     
-    <div class="task-glass blue">
-      <div class="task-icon-wrap">
-        <svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+    <div class="task-row blue">
+      <div class="task-ico"><svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div>
+      <div class="task-body">
+        <div class="task-top"><div class="task-name">Пригласи друга</div><div class="task-reward">+⭐5</div></div>
+        <div class="task-sub">Друг внесёт депозит от ⭐5 · Приглашено: <b id="refCount">0</b></div>
       </div>
-      <div class="task-tag">Разовое</div>
-      <div class="task-title">Пригласи друга</div>
-      <div class="task-desc">Получи <b>⭐5</b> когда друг внесёт депозит · Приглашено: <b id="refCount">0</b></div>
-      <button class="task-btn" onclick="copyRef(); event.stopPropagation();">Скопировать ссылку</button>
+      <button class="task-act" onclick="copyRef(); event.stopPropagation();">Ссылка</button>
     </div>
   </div>
   
-  <div class="section-head" style="margin-top:32px">
-    <div class="section-label">Достижения</div>
+  <div class="sec-lbl" style="margin-top:26px">
+    <div class="sec-lbl-t">Достижения</div>
+    <div class="sec-lbl-s"><b id="achDone">0</b>/<span id="achTotal">8</span></div>
   </div>
   <div id="achList"></div>
 </section>
@@ -505,7 +505,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 <div class="toasts" id="toasts"></div>
 <script src="js/data38.js?v=1340" defer></script>
-<script src="js/app38.js?v=1500" defer></script>
+<script src="js/app38.js?v=1510" defer></script>
 <script src="js/caseimg38.js?v=1310" defer></script>
   <script src="js/dogs38.js?v=940"></script>
   <!-- dogs отключены -->

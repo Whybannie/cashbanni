@@ -704,41 +704,33 @@ function smartError(msg){
 }
 
 function renderAchs(){
-  const achs = [
-    {id:'first_case',icon:'<path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>',name:'Первый кейс',desc:'Открой свой первый кейс',done:S.stats.opened>=1,progress:Math.min(S.stats.opened,1)},
-    {id:'ten_cases',icon:'<path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',name:'Коллекционер',desc:'Открой 10 кейсов',done:S.stats.opened>=10,progress:Math.min(S.stats.opened/10,1)},
-    {id:'fifty_cases',icon:'<path d="M12 15l8.5-8.5a2.121 2.121 0 00-3-3L9 12m3 3l-3 3m3-3l-3-3m3 3H5"/>',name:'Легенда',desc:'Открой 50 кейсов',done:S.stats.opened>=50,progress:Math.min(S.stats.opened/50,1)},
-    {id:'first_win',icon:'<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',name:'Первая победа',desc:'Выиграй в любой игре',done:S.stats.won>0,progress:Math.min(S.stats.won,1)},
-    {id:'big_win',icon:'<path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>',name:'Крупный выигрыш',desc:'Выиграй ⭐100+',done:S.stats.won>=100,progress:Math.min(S.stats.won/100,1)},
-    {id:'upgrade',icon:'<path d="M13 10V3L4 14h7v7l9-11h-7z"/>',name:'Улучшатель',desc:'Сделай 5 апгрейдов',done:S.stats.upgrades>=5,progress:Math.min(S.stats.upgrades/5,1)},
-    {id:'referral',icon:'<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>',name:'Социальный',desc:'Пригласи друга',done:S.refs>=1,progress:Math.min(S.refs,1)},
-    {id:'story',icon:'<path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zM15 13a3 3 0 11-6 0 3 3 0 016 0z"/>',name:'Блогер',desc:'Опубликуй сторис',done:S.storyRewarded||false,progress:S.storyRewarded?1:0}
+  const A = [
+    {icon:'<path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>',name:'Первый кейс',p:Math.min(S.stats.opened||0,1),t:1},
+    {icon:'<path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',name:'10 кейсов',p:Math.min((S.stats.opened||0)/10,1),t:10},
+    {icon:'<path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>',name:'50 кейсов',p:Math.min((S.stats.opened||0)/50,1),t:50},
+    {icon:'<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',name:'Первая победа',p:Math.min(S.stats.won||0,1),t:1},
+    {icon:'<path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>',name:'⭐100 выигрыш',p:Math.min((S.stats.won||0)/100,1),t:100},
+    {icon:'<path d="M13 10V3L4 14h7v7l9-11h-7z"/>',name:'5 апгрейдов',p:Math.min((S.stats.upgrades||0)/5,1),t:5},
+    {icon:'<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>',name:'Друг в игре',p:Math.min(S.refs||0,1),t:1},
+    {icon:'<path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zM15 13a3 3 0 11-6 0 3 3 0 016 0z"/>',name:'Блогер',p:(S.storyRewarded?1:0),t:1}
   ];
   
-  const done = achs.filter(a=>a.done).length;
-  setT('tasksCompleted', done);
+  const done = A.filter(a=>a.p>=1).length;
+  setT('achDone', done);
+  setT('achTotal', A.length);
+  setT('tasksCompleted', Math.min(4, (S.stats.opened>0?1:0)+(S.subDone?1:0)+(S.storyRewarded?1:0)+((S.refs||0)>0?1:0)));
   
-  const circumference = 2 * Math.PI * 28;
-  
-  setH('achList', '<div class="ach-grid">' + achs.map(a=>{
-    const cls = a.done ? 'ach-ring done' : (a.progress > 0 ? 'ach-ring' : 'ach-ring locked');
-    const badge = a.done ? '<div class="ach-badge">✓</div>' : '';
-    const offset = circumference - (a.progress * circumference);
-    return '<div class="'+cls+'" style="--ring:'+(a.done?'#22c55e':'#a855f7')+'">'+
-      badge+
-      '<div class="ach-circle">'+
-        '<svg viewBox="0 0 64 64">'+
-          '<circle class="ach-circle-bg" cx="32" cy="32" r="28"/>'+
-          '<circle class="ach-circle-fill" cx="32" cy="32" r="28" '+
-            'stroke-dasharray="'+circumference+'" '+
-            'stroke-dashoffset="'+offset+'"/>'+
-        '</svg>'+
-        '<div class="ach-circle-center">'+
-          '<svg class="ach-circle-icon" viewBox="0 0 24 24">'+a.icon+'</svg>'+
-        '</div>'+
-      '</div>'+
-      '<div class="ach-name">'+a.name+'</div>'+
-      '<div class="ach-desc">'+a.desc+'</div>'+
+  setH('achList', '<div class="ach-medals">' + A.map(a=>{
+    const d = a.p >= 1;
+    const cls = d ? 'medal done' : (a.p > 0 ? 'medal' : 'medal locked');
+    const lockIco = d
+      ? '<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>'
+      : '<svg viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>';
+    const prog = d ? '' : '<div class="medal-prog">'+Math.floor(a.p*100)+'%</div>';
+    return '<div class="'+cls+'">'+
+      '<div class="medal-disc"><svg viewBox="0 0 24 24">'+a.icon+'</svg></div>'+
+      '<div class="medal-lock">'+lockIco+'</div>'+
+      '<div class="medal-name">'+a.name+'</div>'+prog+
     '</div>';
   }).join('') + '</div>');
 }
