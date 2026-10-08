@@ -705,25 +705,25 @@ function smartError(msg){
 
 function renderAchs(){
   const achs = [
-    {id:'first_case',emoji:'🎁',name:'Первый кейс',desc:'Открой свой первый кейс',done:S.stats.opened>=1},
-    {id:'ten_cases',emoji:'📦',name:'Коллекционер',desc:'Открой 10 кейсов',done:S.stats.opened>=10},
-    {id:'fifty_cases',emoji:'👑',name:'Легенда',desc:'Открой 50 кейсов',done:S.stats.opened>=50},
-    {id:'first_win',emoji:'🏆',name:'Первая победа',desc:'Выиграй в любой игре',done:S.stats.won>0},
-    {id:'big_win',emoji:'💰',name:'Крупный выигрыш',desc:'Выиграй ⭐100+',done:S.stats.won>=100},
-    {id:'upgrade',emoji:'⚡',name:'Улучшатель',desc:'Сделай 5 апгрейдов',done:S.stats.upgrades>=5},
-    {id:'referral',emoji:'🤝',name:'Социальный',desc:'Пригласи друга',done:S.refs>=1},
-    {id:'story',emoji:'📸',name:'Блогер',desc:'Опубликуй сторис',done:S.storyRewarded||false}
+    {id:'first_case',icon:'🎁',name:'Первый кейс',desc:'Открой свой первый кейс',done:S.stats.opened>=1},
+    {id:'ten_cases',icon:'📦',name:'Коллекционер',desc:'Открой 10 кейсов',done:S.stats.opened>=10},
+    {id:'fifty_cases',icon:'👑',name:'Легенда',desc:'Открой 50 кейсов',done:S.stats.opened>=50},
+    {id:'first_win',icon:'🏆',name:'Первая победа',desc:'Выиграй в любой игре',done:S.stats.won>0},
+    {id:'big_win',icon:'💰',name:'Крупный выигрыш',desc:'Выиграй ⭐100+',done:S.stats.won>=100},
+    {id:'upgrade',icon:'⚡',name:'Улучшатель',desc:'Сделай 5 апгрейдов',done:S.stats.upgrades>=5},
+    {id:'referral',icon:'🤝',name:'Социальный',desc:'Пригласи друга',done:S.refs>=1},
+    {id:'story',icon:'📸',name:'Блогер',desc:'Опубликуй сторис',done:S.storyRewarded||false}
   ];
   
   const done = achs.filter(a=>a.done).length;
   setT('tasksCompleted', done);
   
-  setH('achList', '<div class="ach-grid">' + achs.map(a=>{
-    const cls = a.done ? 'ach-card done' : 'ach-card locked';
-    const badge = a.done ? '<div class="ach-badge">✓</div>' : '';
+  setH('achList', '<div class="ach-list">' + achs.map(a=>{
+    const cls = a.done ? 'ach-item done' : 'ach-item locked';
+    const check = a.done ? '<div class="ach-check">✓</div>' : '';
     return '<div class="'+cls+'">'+
-      badge+
-      '<div class="ach-emoji">'+a.emoji+'</div>'+
+      check+
+      '<div class="ach-icon">'+a.icon+'</div>'+
       '<div class="ach-name">'+a.name+'</div>'+
       '<div class="ach-desc">'+a.desc+'</div>'+
     '</div>';

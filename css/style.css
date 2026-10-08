@@ -2176,92 +2176,71 @@ h2,h3{color:#fff}
 .story-v138-msg.pending{background:rgba(251,191,36,.15);color:#fbbf24}
 .story-v138-msg.error{background:rgba(239,68,68,.15);color:#fca5a5}
 .story-v138-msg.success{background:rgba(34,197,94,.15);color:#4ade80}
-/* ===== v148: PREMIUM TASKS SECTION ===== */
-.task-premium{position:relative;background:linear-gradient(165deg,var(--taskA),var(--taskB));
- border:1px solid var(--taskLine);border-radius:22px;padding:18px 16px;
- cursor:pointer;transition:transform .18s,box-shadow .3s,border-color .3s;
- overflow:hidden;margin-bottom:12px}
-.task-premium::before{content:'';position:absolute;top:-50%;right:-30%;width:200px;height:200px;
- background:radial-gradient(circle,var(--taskGlow),transparent 70%);opacity:.3;pointer-events:none}
-.task-premium::after{content:'';position:absolute;inset:0;border-radius:22px;
- background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.06) 50%,transparent 70%);
- pointer-events:none;opacity:0;transition:opacity .3s}
-.task-premium:hover::after{opacity:1}
-.task-premium:active{transform:scale(.97)}
 
-/* Темы заданий */
-.task-green{--taskA:rgba(34,197,94,.12);--taskB:rgba(16,185,129,.06);--taskLine:rgba(34,197,94,.35);
- --taskGlow:rgba(34,197,94,.4);--taskIcon:#22c55e;--taskIconBg:rgba(34,197,94,.2);--taskBtnBg:#22c55e;--taskBtnText:#052e16}
-.task-purple{--taskA:rgba(168,85,247,.12);--taskB:rgba(139,92,246,.06);--taskLine:rgba(168,85,247,.35);
- --taskGlow:rgba(168,85,247,.4);--taskIcon:#a855f7;--taskIconBg:rgba(168,85,247,.2);--taskBtnBg:#a855f7;--taskBtnText:#fff}
-.task-blue{--taskA:rgba(59,130,246,.12);--taskB:rgba(37,99,235,.06);--taskLine:rgba(59,130,246,.35);
- --taskGlow:rgba(59,130,246,.4);--taskIcon:#3b82f6;--taskIconBg:rgba(59,130,246,.2);--taskBtnBg:#3b82f6;--taskBtnText:#fff}
-.task-pink{--taskA:rgba(236,72,153,.12);--taskB:rgba(219,39,119,.06);--taskLine:rgba(236,72,153,.35);
- --taskGlow:rgba(236,72,153,.4);--taskIcon:#ec4899;--taskIconBg:rgba(236,72,153,.2);--taskBtnBg:#ec4899;--taskBtnText:#fff}
-.task-gold{--taskA:rgba(251,191,36,.12);--taskB:rgba(245,158,11,.06);--taskLine:rgba(251,191,36,.35);
- --taskGlow:rgba(251,191,36,.4);--taskIcon:#fbbf24;--taskIconBg:rgba(251,191,36,.2);--taskBtnBg:#fbbf24;--taskBtnText:#422006}
 
-/* Иконка с анимацией */
-.task-premium-icon{width:56px;height:56px;border-radius:16px;background:var(--taskIconBg);
- display:flex;align-items:center;justify-content:center;font-size:1.8rem;
- filter:drop-shadow(0 0 12px var(--taskGlow));animation:taskFloat 3.2s ease-in-out infinite;flex-shrink:0}
-@keyframes taskFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+/* ===== v149: MINIMAL PREMIUM TASKS ===== */
+.task-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
 
-/* Контент */
-.task-premium-content{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
-.task-premium-title{font-size:.95rem;font-weight:900;color:#fff;letter-spacing:.5px}
-.task-premium-desc{font-size:.72rem;color:rgba(255,255,255,.55);line-height:1.4}
-.task-premium-desc b{color:var(--taskIcon);font-weight:800}
+.task-item{position:relative;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);
+ border-radius:16px;padding:16px;cursor:pointer;transition:all .2s;overflow:hidden}
+.task-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+ background:var(--accent);opacity:0;transition:opacity .2s}
+.task-item:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
+.task-item:hover::before{opacity:1}
+.task-item:active{transform:scale(.98)}
 
-/* Бейдж типа */
-.task-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
- background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
- border-radius:10px;font-size:.58rem;font-weight:800;letter-spacing:1.2px;
- color:rgba(255,255,255,.7);margin-bottom:6px;width:fit-content}
-.task-badge.daily{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.4);color:#86efac}
-.task-badge.once{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.4);color:#d8b4fe}
-.task-badge.special{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.4);color:#fde68a}
+.task-item.green{--accent:#22c55e}
+.task-item.purple{--accent:#a855f7}
+.task-item.blue{--accent:#3b82f6}
+.task-item.pink{--accent:#ec4899}
 
-/* Кнопка действия */
-.task-premium-btn{padding:10px 18px;border-radius:12px;border:none;
- background:var(--taskBtnBg);color:var(--taskBtnText);font-weight:900;font-size:.72rem;
- letter-spacing:1px;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.3);
- margin-top:8px;width:fit-content}
-.task-premium-btn:active{transform:scale(.95)}
-.task-premium-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.task-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+.task-title{font-size:.95rem;font-weight:700;color:#fff;line-height:1.3}
+.task-tag{font-size:.62rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+ padding:4px 10px;border-radius:8px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);
+ border:1px solid rgba(255,255,255,.1);white-space:nowrap}
+.task-tag.daily{background:rgba(34,197,94,.12);color:#86efac;border-color:rgba(34,197,94,.3)}
+.task-tag.special{background:rgba(251,191,36,.12);color:#fde68a;border-color:rgba(251,191,36,.3)}
 
-/* Прогресс-бар для квестов */
-.task-progress{margin-top:10px}
-.task-progress-bar{height:6px;border-radius:50px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:6px}
-.task-progress-fill{height:100%;background:linear-gradient(90deg,var(--taskIcon),var(--taskBtnBg));
- border-radius:50px;transition:width .4s;box-shadow:0 0 10px var(--taskGlow)}
-.task-progress-text{display:flex;justify-content:space-between;font-size:.62rem;font-weight:700;
- color:rgba(255,255,255,.6)}
-.task-progress-text b{color:var(--taskIcon);font-size:.7rem}
+.task-desc{font-size:.75rem;color:rgba(255,255,255,.5);line-height:1.5;margin-bottom:12px}
+.task-desc b{color:var(--accent);font-weight:700}
 
-/* Ачивки — премиум стиль */
-.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:14px}
-.ach-card{background:linear-gradient(165deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
- border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px 10px;text-align:center;
- transition:.2s;position:relative;overflow:hidden}
-.ach-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
- background:radial-gradient(circle,rgba(168,85,247,.15),transparent 70%);opacity:0;transition:opacity .3s}
-.ach-card.done{border-color:rgba(34,197,94,.4);background:linear-gradient(165deg,rgba(34,197,94,.12),rgba(16,185,129,.06))}
-.ach-card.done::before{opacity:1}
-.ach-card.locked{opacity:.4;filter:grayscale(.5)}
-.ach-card:not(.locked):active{transform:scale(.95)}
-.ach-emoji{font-size:2.2rem;margin-bottom:6px;filter:drop-shadow(0 0 10px rgba(168,85,247,.4))}
-.ach-name{font-size:.72rem;font-weight:900;color:#fff;margin-bottom:4px}
-.ach-desc{font-size:.58rem;color:rgba(255,255,255,.5);line-height:1.3}
-.ach-badge{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;
- background:linear-gradient(135deg,#22c55e,#10b981);display:flex;align-items:center;justify-content:center;
- font-size:.7rem;color:#fff;box-shadow:0 2px 8px rgba(34,197,94,.5)}
+.task-btn{padding:10px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.15);
+ background:rgba(255,255,255,.04);color:#fff;font-size:.75rem;font-weight:700;
+ cursor:pointer;transition:all .2s}
+.task-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.25)}
+.task-btn:active{transform:scale(.96)}
+.task-btn:disabled{opacity:.3;cursor:not-allowed}
 
-/* Заголовок секции заданий */
-.tasks-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.tasks-title{font-size:1.1rem;font-weight:900;letter-spacing:.5px;
- background:linear-gradient(135deg,#a855f7,#ec4899);
+/* Прогресс */
+.task-progress{display:flex;align-items:center;gap:10px;margin-top:12px}
+.task-progress-bar{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
+.task-progress-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .4s}
+.task-progress-text{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.6)}
+
+/* Ачивки — минимализм */
+.ach-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.ach-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);
+ border-radius:14px;padding:14px;transition:all .2s;position:relative}
+.ach-item:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
+.ach-item.done{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.06)}
+.ach-item.locked{opacity:.35;filter:grayscale(1)}
+
+.ach-icon{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.06);
+ display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:10px}
+.ach-item.done .ach-icon{background:rgba(34,197,94,.15)}
+
+.ach-name{font-size:.82rem;font-weight:700;color:#fff;margin-bottom:4px}
+.ach-desc{font-size:.65rem;color:rgba(255,255,255,.45);line-height:1.4}
+
+.ach-check{position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:50%;
+ background:#22c55e;display:flex;align-items:center;justify-content:center;
+ color:#fff;font-size:.75rem;font-weight:900;box-shadow:0 2px 8px rgba(34,197,94,.4)}
+
+/* Заголовок */
+.section-title{font-size:1.1rem;font-weight:900;margin-bottom:16px;
+ display:flex;align-items:center;justify-content:space-between}
+.section-title-main{background:linear-gradient(135deg,#fff,rgba(255,255,255,.7));
  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.tasks-stats{font-size:.68rem;color:rgba(255,255,255,.5);font-weight:700}
-.tasks-stats b{color:#fbbf24;font-size:.75rem}
-
+.section-title-stat{font-size:.72rem;color:rgba(255,255,255,.5);font-weight:600}
+.section-title-stat b{color:#fbbf24;font-weight:800}

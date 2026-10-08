@@ -15,9 +15,9 @@
   
   <!-- 🚀 Performance: prefetch критичных ресурсов -->
   <link rel="prefetch" href="js/data38.js?v=1340" as="script">
-  <link rel="prefetch" href="js/app38.js?v=1470" as="script">
+  <link rel="prefetch" href="js/app38.js?v=1490" as="script">
   <link rel="prefetch" href="js/caseimg38.js?v=1310" as="script">
-  <link rel="preload" href="css/style.css?v=1460" as="style">
+  <link rel="preload" href="css/style.css?v=1490" as="style">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
@@ -25,7 +25,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=1460">
+<link rel="stylesheet" href="css/style.css?v=1490">
 <script src="https://telegram.org/js/telegram-web-app.js?v=715" defer></script>
 <link rel="preload" as="image" href="case_fri.JPG">
 <link rel="preload" as="image" href="case_mini.JPG">
@@ -265,54 +265,52 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 
   <section class="section" id="sec-tasks">
-    <div class="tasks-head">
-      <h2 class="tasks-title">🎯 Задания</h2>
-      <div class="tasks-stats">Выполнено: <b id="tasksCompleted">0</b> / <span id="tasksTotal">4</span></div>
-    </div>
-    
-    <div class="task-premium task-green" onclick="openCaseModal('free')">
-      <div class="task-premium-icon">🎁</div>
-      <div class="task-premium-content">
-        <div class="task-badge daily">ЕЖЕДНЕВНО</div>
-        <div class="task-premium-title">Бесплатный кейс</div>
-        <div class="task-premium-desc" id="freeCaseState">1 раз в 24 часа · нужна подписка</div>
+  <div class="section-title">
+    <div class="section-title-main">Задания</div>
+    <div class="section-title-stat">Выполнено <b id="tasksCompleted">0</b> / <span id="tasksTotal">4</span></div>
+  </div>
+  
+  <div class="task-list">
+    <div class="task-item green" onclick="openCaseModal('free')">
+      <div class="task-head">
+        <div class="task-title">Бесплатный кейс</div>
+        <div class="task-tag daily">Ежедневно</div>
       </div>
+      <div class="task-desc" id="freeCaseState">Открывай кейс каждый день · нужна подписка</div>
     </div>
     
-    <div class="task-premium task-purple">
-      <div class="task-premium-icon">📢</div>
-      <div class="task-premium-content">
-        <div class="task-badge once">РАЗОВОЕ</div>
-        <div class="task-premium-title">Подписка на канал</div>
-        <div class="task-premium-desc">Подпишись на <b>@CashBanni</b> и получи <b>бесплатный кейс</b></div>
-        <button class="task-premium-btn" id="subBtn" onclick="doSub(); event.stopPropagation();">Подписаться</button>
+    <div class="task-item purple">
+      <div class="task-head">
+        <div class="task-title">Подписка на канал</div>
+        <div class="task-tag">Разовое</div>
       </div>
+      <div class="task-desc">Подпишись на <b>@CashBanni</b> и получи бесплатный кейс</div>
+      <button class="task-btn" id="subBtn" onclick="doSub(); event.stopPropagation();">Подписаться</button>
     </div>
     
-    <div class="task-premium task-pink" onclick="openStoryCaseModal()">
-      <div class="task-premium-icon">📸</div>
-      <div class="task-premium-content">
-        <div class="task-badge special">СПЕЦИАЛЬНОЕ</div>
-        <div class="task-premium-title">Опубликуй сторис</div>
-        <div class="task-premium-desc">Расскажи о Cash Banni и получи <b>кейс за сторис 🎁</b></div>
+    <div class="task-item pink" onclick="openStoryCaseModal()">
+      <div class="task-head">
+        <div class="task-title">Опубликуй сторис</div>
+        <div class="task-tag special">Специальное</div>
       </div>
+      <div class="task-desc">Расскажи о Cash Banni и получи <b>кейс за сторис</b></div>
     </div>
     
-    <div class="task-premium task-blue">
-      <div class="task-premium-icon">👥</div>
-      <div class="task-premium-content">
-        <div class="task-badge once">РАЗОВОЕ</div>
-        <div class="task-premium-title">Пригласи друга</div>
-        <div class="task-premium-desc">Получи <b>⭐5</b> когда друг внесёт депозит от ⭐5 · Приглашено: <b id="refCount">0</b></div>
-        <button class="task-premium-btn" onclick="copyRef(); event.stopPropagation();">Скопировать ссылку</button>
+    <div class="task-item blue">
+      <div class="task-head">
+        <div class="task-title">Пригласи друга</div>
+        <div class="task-tag">Разовое</div>
       </div>
+      <div class="task-desc">Получи <b>⭐5</b> когда друг внесёт депозит · Приглашено: <b id="refCount">0</b></div>
+      <button class="task-btn" onclick="copyRef(); event.stopPropagation();">Скопировать ссылку</button>
     </div>
-    
-    <div id="refExplain"></div>
-    
-    <h3 style="margin-top:20px;margin-bottom:10px;color:rgba(255,255,255,.7)">🏆 Достижения</h3>
-    <div id="achList"></div>
-  </section>
+  </div>
+  
+  <div class="section-title" style="margin-top:28px">
+    <div class="section-title-main">Достижения</div>
+  </div>
+  <div id="achList"></div>
+</section>
 
   <section class="section" id="sec-upgrade">
     <h2>Апгрейд</h2>
@@ -503,7 +501,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 <div class="toasts" id="toasts"></div>
 <script src="js/data38.js?v=1340" defer></script>
-<script src="js/app38.js?v=1470" defer></script>
+<script src="js/app38.js?v=1490" defer></script>
 <script src="js/caseimg38.js?v=1310" defer></script>
   <script src="js/dogs38.js?v=940"></script>
   <!-- dogs отключены -->
