@@ -704,35 +704,41 @@ function smartError(msg){
 }
 
 function renderAchs(){
-  const A = [
-    {icon:'<path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>',name:'Первый кейс',p:Math.min(S.stats.opened||0,1),t:1},
-    {icon:'<path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',name:'10 кейсов',p:Math.min((S.stats.opened||0)/10,1),t:10},
-    {icon:'<path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>',name:'50 кейсов',p:Math.min((S.stats.opened||0)/50,1),t:50},
-    {icon:'<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',name:'Первая победа',p:Math.min(S.stats.won||0,1),t:1},
-    {icon:'<path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>',name:'⭐100 выигрыш',p:Math.min((S.stats.won||0)/100,1),t:100},
-    {icon:'<path d="M13 10V3L4 14h7v7l9-11h-7z"/>',name:'5 апгрейдов',p:Math.min((S.stats.upgrades||0)/5,1),t:5},
-    {icon:'<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>',name:'Друг в игре',p:Math.min(S.refs||0,1),t:1},
-    {icon:'<path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zM15 13a3 3 0 11-6 0 3 3 0 016 0z"/>',name:'Блогер',p:(S.storyRewarded?1:0),t:1}
+  const st=S.stats||{};
+  const A=[
+    {i:'<path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>',n:'Первый кейс',p:Math.min(st.opened||0,1)},
+    {i:'<path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',n:'10 кейсов',p:Math.min((st.opened||0)/10,1)},
+    {i:'<path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>',n:'50 кейсов',p:Math.min((st.opened||0)/50,1)},
+    {i:'<path d="M12 15l8.5-8.5a2.121 2.121 0 00-3-3L9 12m3 3l-3 3m3-3l-3-3m3 3H5"/>',n:'100 кейсов',p:Math.min((st.opened||0)/100,1)},
+    {i:'<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',n:'Первая победа',p:Math.min(st.won||0,1)},
+    {i:'<path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>',n:'Оборот ⭐1 000',p:Math.min((st.spent||0)/1000,1)},
+    {i:'<path d="M23 6l-9.5 9.5-5-5L1 18M17 6h6v6"/>',n:'Оборот ⭐5 000',p:Math.min((st.spent||0)/5000,1)},
+    {i:'<path d="M13 10V3L4 14h7v7l9-11h-7z"/>',n:'5 апгрейдов',p:Math.min((st.upgrades||0)/5,1)},
+    {i:'<path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>',n:'Мастер апгрейда',p:Math.min((st.upWins||0)/10,1)},
+    {i:'<path d="M6 3h12l4 6-10 12L2 9l4-6z"/>',n:'Минёр',p:Math.min(st.minesW||0,1)},
+    {i:'<path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6l2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6l2.1-2.1"/><circle cx="12" cy="12" r="3"/>',n:'Plinko-про',p:Math.min(st.plinkoW||0,1)},
+    {i:'<path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>',n:'Король краша',p:Math.min(st.crashWins||0,1)},
+    {i:'<path d="M7 7h.01M7 3h5a2 2 0 011.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>',n:'Продавец',p:Math.min((st.sells||0)/5,1)},
+    {i:'<path d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7M4 7c0-2 1-3 3-3h10c2 0 3 1 3 3M4 7c0 2 1 3 3 3h10c2 0 3-1 3-3M12 10v4"/>',n:'Коллекционер',p:Math.min((S.inv||[]).length/10,1)},
+    {i:'<path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>',n:'Богач ⭐500',p:Math.min((S.balance||0)/500,1)},
+    {i:'<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>',n:'Друг в игре',p:Math.min(S.refs||0,1)},
+    {i:'<path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zM15 13a3 3 0 11-6 0 3 3 0 016 0z"/>',n:'Блогер',p:(S.storyRewarded?1:0)}
   ];
-  
-  const done = A.filter(a=>a.p>=1).length;
-  setT('achDone', done);
-  setT('achTotal', A.length);
-  setT('tasksCompleted', Math.min(4, (S.stats.opened>0?1:0)+(S.subDone?1:0)+(S.storyRewarded?1:0)+((S.refs||0)>0?1:0)));
-  
-  setH('achList', '<div class="ach-medals">' + A.map(a=>{
-    const d = a.p >= 1;
-    const cls = d ? 'medal done' : (a.p > 0 ? 'medal' : 'medal locked');
-    const lockIco = d
-      ? '<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>'
-      : '<svg viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>';
-    const prog = d ? '' : '<div class="medal-prog">'+Math.floor(a.p*100)+'%</div>';
+  const done=A.filter(a=>a.p>=1).length;
+  setT('achDone',done); setT('achTotal',A.length);
+  setT('tasksCompleted',Math.min(4,(st.opened>0?1:0)+(S.subDone?1:0)+(S.storyRewarded?1:0)+((S.refs||0)>0?1:0)));
+  setH('achList','<div class="ach-medals">'+A.map(a=>{
+    const d=a.p>=1;
+    const cls=d?'medal done':(a.p>0?'medal':'medal locked');
+    const lockIco=d?'<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>'
+      :'<svg viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>';
+    const prog=d?'':'<div class="medal-prog">'+Math.floor(a.p*100)+'%</div>';
     return '<div class="'+cls+'">'+
-      '<div class="medal-disc"><svg viewBox="0 0 24 24">'+a.icon+'</svg></div>'+
+      '<div class="medal-disc"><svg viewBox="0 0 24 24">'+a.i+'</svg></div>'+
       '<div class="medal-lock">'+lockIco+'</div>'+
-      '<div class="medal-name">'+a.name+'</div>'+prog+
+      '<div class="medal-name">'+a.n+'</div>'+prog+
     '</div>';
-  }).join('') + '</div>');
+  }).join('')+'</div>');
 }
 
 
@@ -1243,5 +1249,32 @@ async function checkStoryStatus(){
     }
   }catch(e){
     console.error('checkStoryStatus:', e);
+  }
+}
+
+async function renderBonus(){
+  const card=$('bonusCard'); if(!card) return;
+  let st=null;
+  try{ st=await api('/api/bonus_status'); }catch(e){}
+  if(!st||st.error){ card.style.display='none'; return; }
+  card.style.display='flex';
+  const items=[['free','Кейс'],['sub','Подписка'],['story','Сторис'],['ref','Друг']];
+  const doneN=items.filter(i=>st[i[0]]).length;
+  setT('bonusProg',doneN+'/4');
+  setH('bonusDots',items.map(i=>'<div class="bdot'+(st[i[0]]?' on':'')+'"></div>').join(''));
+  const btn=$('bonusBtn');
+  if(st.claimed){ btn.textContent='✅ Получено'; btn.disabled=true; card.classList.add('claimed'); }
+  else if(doneN>=4){ btn.textContent='Забрать ⭐222'; btn.disabled=false; }
+  else { btn.textContent='Забрать ⭐222'; btn.disabled=true; }
+}
+
+async function claimBonus222(){
+  const r=await api('/api/claim_bonus222',{method:'POST',body:'{}'});
+  if(r&&r.ok){
+    S.balance+=222; save(); renderHeader();
+    confetti(150); toast('🎉 Бонус +⭐222 получен!','good');
+    renderBonus(); renderTasks();
+  } else {
+    toast((r&&r.error)||'Ошибка','bad');
   }
 }

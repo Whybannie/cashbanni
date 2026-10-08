@@ -15,9 +15,9 @@
   
   <!-- 🚀 Performance: prefetch критичных ресурсов -->
   <link rel="prefetch" href="js/data38.js?v=1340" as="script">
-  <link rel="prefetch" href="js/app38.js?v=1510" as="script">
-  <link rel="prefetch" href="js/caseimg38.js?v=1310" as="script">
-  <link rel="preload" href="css/style.css?v=1510" as="style">
+  <link rel="prefetch" href="js/app38.js?v=1520" as="script">
+  <link rel="prefetch" href="js/caseimg38.js?v=1520" as="script">
+  <link rel="preload" href="css/style.css?v=1520" as="style">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
@@ -25,7 +25,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=1510">
+<link rel="stylesheet" href="css/style.css?v=1520">
 <script src="https://telegram.org/js/telegram-web-app.js?v=715" defer></script>
 <link rel="preload" as="image" href="case_fri.JPG">
 <link rel="preload" as="image" href="case_mini.JPG">
@@ -287,7 +287,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
         <div class="task-top"><div class="task-name">Подписка на канал</div><div class="task-reward">+кейс</div></div>
         <div class="task-sub">Подпишись на <b>@CashBanni</b></div>
       </div>
-      <button class="task-act" id="subBtn" onclick="doSub(); event.stopPropagation();">Подписаться</button>
+      <button class="task-act" id="subBtn" onclick="openChannel(); event.stopPropagation();">Подписаться</button>
     </div>
     
     <div class="task-row pink" onclick="openStoryCaseModal()">
@@ -307,6 +307,22 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
       </div>
       <button class="task-act" onclick="copyRef(); event.stopPropagation();">Ссылка</button>
     </div>
+  </div>
+  
+  <div class="bonus-card" id="bonusCard" style="display:none">
+    <div class="bonus-glow"></div>
+    <div class="bonus-top">
+      <div>
+        <div class="bonus-title">Бонус за все задания</div>
+        <div class="bonus-sub">Выполни все 4 задания — забери гарантированную награду</div>
+      </div>
+      <div class="bonus-amt">⭐222</div>
+    </div>
+    <div class="bonus-mid">
+      <div class="bonus-dots" id="bonusDots"></div>
+      <div class="bonus-prog" id="bonusProg">0/4</div>
+    </div>
+    <button class="bonus-btn" id="bonusBtn" disabled onclick="claimBonus222()">Забрать ⭐222</button>
   </div>
   
   <div class="sec-lbl" style="margin-top:26px">
@@ -505,8 +521,8 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 <div class="toasts" id="toasts"></div>
 <script src="js/data38.js?v=1340" defer></script>
-<script src="js/app38.js?v=1510" defer></script>
-<script src="js/caseimg38.js?v=1310" defer></script>
+<script src="js/app38.js?v=1520" defer></script>
+<script src="js/caseimg38.js?v=1520" defer></script>
   <script src="js/dogs38.js?v=940"></script>
   <!-- dogs отключены -->
 <script src="js/plinko38.js?v=940" defer></script>
