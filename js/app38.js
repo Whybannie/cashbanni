@@ -1251,30 +1251,3 @@ async function checkStoryStatus(){
     console.error('checkStoryStatus:', e);
   }
 }
-
-async function renderBonus(){
-  const card=$('bonusCard'); if(!card) return;
-  let st=null;
-  try{ st=await api('/api/bonus_status'); }catch(e){}
-  if(!st||st.error){ card.style.display='none'; return; }
-  card.style.display='flex';
-  const items=[['free','Кейс'],['sub','Подписка'],['story','Сторис'],['ref','Друг']];
-  const doneN=items.filter(i=>st[i[0]]).length;
-  setT('bonusProg',doneN+'/4');
-  setH('bonusDots',items.map(i=>'<div class="bdot'+(st[i[0]]?' on':'')+'"></div>').join(''));
-  const btn=$('bonusBtn');
-  if(st.claimed){ btn.textContent='✅ Получено'; btn.disabled=true; card.classList.add('claimed'); }
-  else if(doneN>=4){ btn.textContent='Забрать ⭐222'; btn.disabled=false; }
-  else { btn.textContent='Забрать ⭐222'; btn.disabled=true; }
-}
-
-async function claimBonus222(){
-  const r=await api('/api/claim_bonus222',{method:'POST',body:'{}'});
-  if(r&&r.ok){
-    S.balance+=222; save(); renderHeader();
-    confetti(150); toast('🎉 Бонус +⭐222 получен!','good');
-    renderBonus(); renderTasks();
-  } else {
-    toast((r&&r.error)||'Ошибка','bad');
-  }
-}

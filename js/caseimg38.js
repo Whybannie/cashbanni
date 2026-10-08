@@ -135,7 +135,7 @@ function renderTasks(){
   const sb=$('subBtn');
   if(sb){ 
     if(S.subDone){
-      sb.textContent='✅ Выполнено · открыть канал';
+      sb.textContent='✅ Выполнено';
       sb.disabled=false;
       sb.classList.add('pressed');
     } else {
@@ -153,7 +153,6 @@ function renderTasks(){
     '<div class="re-step reward">4. Ты получаешь ⭐'+REF_REWARD+'!</div>';
   renderQuests(); 
   renderAchs();
-  try{ renderBonus(); }catch(e){}
   if(S.serverMode && !S.subDone && Date.now()-_subCheckTs>15000){ 
     _subCheckTs=Date.now();
     checkSub().then(ok=>{ 
