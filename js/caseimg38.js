@@ -21,10 +21,14 @@ function caseArt(c){
 async function openCaseModal(id){ 
   sfx.click(); 
   
-  // 📸 КЕЙС ЗА СТОРИС: показываем специальную модалку
+  // 📸 КЕЙС ЗА СТОРИС: если доступен — открываем рулетку, иначе модалку инструкции
   if(id==='story'){
-    openStoryCaseModal();
-    return;
+    let avail=false;
+    try{
+      const st=await api('/api/story_status');
+      avail=!!(st&&st.case_available);
+    }catch(e){}
+    if(!avail){ openStoryCaseModal(); return; }
   }
   
   curCase=CASES.find(c=>c.id===id);
