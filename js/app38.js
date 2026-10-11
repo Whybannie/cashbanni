@@ -941,7 +941,8 @@ function supShowMenu(){
   const body=supBody(); if(!body)return;
   body.innerHTML='';
   const st=document.getElementById('supStatus'); if(st)st.textContent='онлайн';
-  supAddMsg('bot','Привет! Я помощник поддержки. Выбери тему — отвечу сразу, или напиши свой вопрос.');
+  supAddMsg('bot','Привет! Выбери тему вопроса:');
+  
   const grid=document.createElement('div');
   grid.className='sup-menu';
   SUPPORT_FAQ.forEach(function(f,i){
@@ -953,6 +954,19 @@ function supShowMenu(){
     grid.appendChild(btn);
   });
   body.appendChild(grid);
+  
+  // Карточка с почтой
+  const emailCard=document.createElement('div');
+  emailCard.className='sup-email-card';
+  emailCard.innerHTML=`
+    <div class="sup-email-icon">✉️</div>
+    <div class="sup-email-text">
+      <div class="sup-email-title">Остались вопросы?</div>
+      <div class="sup-email-addr">banni.support@gmail.com</div>
+    </div>
+    <a href="mailto:banni.support@gmail.com" class="sup-email-btn">Написать</a>
+  `;
+  body.appendChild(emailCard);
 }
 
 function supQuick(i){

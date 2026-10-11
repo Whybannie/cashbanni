@@ -2272,3 +2272,15 @@ h2,h3{color:#fff}
  background:linear-gradient(180deg,#a855f7,#ec4899)}
 .sec-lbl-s{font-size:.7rem;color:rgba(255,255,255,.5);font-weight:700}
 .sec-lbl-s b{color:#fbbf24}
+
+/* ===== v155: SUPPORT EMAIL CARD ===== */
+.sup-email-card{display:flex;align-items:center;gap:12px;margin-top:14px;padding:14px;
+ background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(37,99,235,.06));
+ border:1px solid rgba(59,130,246,.3);border-radius:14px}
+.sup-email-icon{font-size:1.8rem;flex-shrink:0}
+.sup-email-text{flex:1;min-width:0}
+.sup-email-title{font-size:.82rem;font-weight:800;color:#fff;margin-bottom:3px}
+.sup-email-addr{font-size:.7rem;color:#93c5fd;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sup-email-btn{padding:8px 14px;border-radius:10px;background:rgba(59,130,246,.2);border:1px solid rgba(59,130,246,.4);
+ color:#93c5fd;font-size:.72rem;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:.2s}
+.sup-email-btn:active{background:rgba(59,130,246,.3);transform:scale(.96)}
