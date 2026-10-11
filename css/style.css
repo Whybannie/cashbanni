@@ -2312,3 +2312,25 @@ h2,h3{color:#fff}
  font-size:.75rem;font-weight:800;cursor:pointer;white-space:nowrap;
  transition:.2s;flex-shrink:0;box-shadow:0 4px 14px rgba(59,130,246,.3)}
 .email-support-btn:active{transform:scale(.96)}
+
+/* ===== v164: WRITE US MODAL ===== */
+.write-us-btn{width:100%;padding:15px;margin-top:18px;border-radius:14px;border:none;
+ background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-size:.9rem;font-weight:800;
+ cursor:pointer;transition:.2s;box-shadow:0 4px 18px rgba(59,130,246,.35)}
+.write-us-btn:active{transform:scale(.97)}
+
+.write-us-modal{max-width:380px;padding:24px;text-align:center;position:relative}
+.write-us-head{margin-bottom:20px}
+.write-us-icon{font-size:3rem;margin-bottom:10px}
+.write-us-title{font-size:1.3rem;font-weight:900;margin:0 0 8px;
+ background:linear-gradient(135deg,#3b82f6,#60a5fa);
+ -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.write-us-sub{font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.5;margin:0}
+
+.write-us-box{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.08);
+ border-radius:14px;padding:16px;margin-top:4px}
+.write-us-email{font-size:1rem;font-weight:700;color:#93c5fd;margin-bottom:12px;
+ letter-spacing:.5px}
+.write-us-copy-btn{width:100%;padding:14px;border-radius:12px;
+ background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-weight:800;font-size:.85rem}
+.write-us-copy-btn:active{transform:scale(.97)}

@@ -15,9 +15,9 @@
   
   <!-- 🚀 Performance: prefetch критичных ресурсов -->
   <link rel="prefetch" href="js/data38.js?v=1340" as="script">
-  <link rel="prefetch" href="js/app38.js?v=1620" as="script">
-  <link rel="prefetch" href="js/caseimg38.js?v=1540" as="script">
-  <link rel="preload" href="css/style.css?v=1580" as="style">
+  <link rel="prefetch" href="js/app38.js?v=1640" as="script">
+  <link rel="prefetch" href="js/caseimg38.js?v=1530" as="script">
+  <link rel="preload" href="css/style.css?v=1640" as="style">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
@@ -25,7 +25,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=1580">
+<link rel="stylesheet" href="css/style.css?v=1640">
 <script src="https://telegram.org/js/telegram-web-app.js?v=715" defer></script>
 <link rel="preload" as="image" href="case_fri.JPG">
 <link rel="preload" as="image" href="case_mini.JPG">
@@ -316,6 +316,8 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
     <div class="sec-lbl-s"><b id="achDone">0</b>/<span id="achTotal">8</span></div>
   </div>
   <div id="achList"></div>
+
+    <button class="write-us-btn" onclick="openWriteUsModal()">✉️ Написать нам</button>
 </section>
 
   <section class="section" id="sec-upgrade">
@@ -456,9 +458,29 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
     <h3 class="mt">Игроки</h3>
       <div id="adminUsers"></div>
     </div>
-  
-    
-    
+  </section>
+</main>
+
+<nav class="bottom-nav">
+  <button data-tab="home" class="active"><svg class="ic"><use href="#i-home"/></svg><span class="nl">Главная</span></button>
+  <button data-tab="tasks"><svg class="ic"><use href="#i-tasks"/></svg><span class="nl">Задания</span></button>
+  <button data-tab="upgrade"><svg class="ic"><use href="#i-bolt"/></svg><span class="nl">Апгрейд</span></button>
+  <button data-tab="modes"><svg class="ic"><use href="#i-modes"/></svg><span class="nl">Режимы</span></button>
+  <button data-tab="profile"><svg class="ic"><use href="#i-user"/></svg><span class="nl">Кабинет</span></button>
+</nav>
+
+<div class="modal-overlay" id="caseModal">
+  <div class="modal case-full">
+    <div class="cf-head"><h3 id="cmTitle"></h3><button class="x" onclick="closeCaseModal()"><svg class="ic s"><use href="#i-x"/></svg></button></div>
+    <div class="cf-contents" id="cmContents"></div>
+    <div class="cf-strips" id="cfStrips"></div>
+    <div class="cf-actions">
+      <button class="btn btn-secondary" id="btnX1" onclick="spin(1)">×1 ⭐<span id="p1"></span></button>
+      <button class="btn btn-secondary" id="btnX3" onclick="spin(3)">×3 ⭐<span id="p3"></span></button>
+      <button class="btn btn-primary" id="btnX5" onclick="spin(5)">×5 ⭐<span id="p5"></span></button>
+    </div>
+  </div>
+</div>
 
 <div class="modal-overlay" id="payModal">
   <div class="modal">
@@ -487,8 +509,8 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 <div class="toasts" id="toasts"></div>
 <script src="js/data38.js?v=1340" defer></script>
-<script src="js/app38.js?v=1620" defer></script>
-<script src="js/caseimg38.js?v=1540" defer></script>
+<script src="js/app38.js?v=1640" defer></script>
+<script src="js/caseimg38.js?v=1530" defer></script>
   <script src="js/dogs38.js?v=940"></script>
   <!-- dogs отключены -->
 <script src="js/plinko38.js?v=940" defer></script>
@@ -559,7 +581,23 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
   </div>
 </div>
 
-
+<!-- ===== v114 SUPPORT ===== -->
+<!-- SUPPORT -->
+<div class="sup-overlay" id="supOverlay">
+  <div class="sup-sheet">
+    <div class="sup-head">
+      <button class="sup-back" id="supBackBtn" type="button" aria-label="Назад">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="sup-head-info">
+        <div class="sup-ava">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 18v-6a9 9 0 0 1 18 0v6" stroke="#2a2a3e" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5ZM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5Z" fill="#2a2a3e"/></svg>
+        </div>
+        <div class="sup-head-text">
+          <b>Поддержка</b>
+          <span class="sup-status" id="supStatus">онлайн</span>
+        </div>
+      </div>
       <button class="x" id="supCloseBtn" type="button"><svg class="ic s"><use href="#i-x"/></svg></button>
     </div>
     <div class="sup-body" id="supBody"></div>
@@ -626,6 +664,21 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
     </div>
     
     <div class="story-v138-msg" id="storyStatus"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="writeUsModal">
+  <div class="modal write-us-modal">
+    <button class="x" onclick="modalClose('writeUsModal')"><svg class="ic s"><use href="#i-x"/></svg></button>
+    <div class="write-us-head">
+      <div class="write-us-icon">✉️</div>
+      <h3 class="write-us-title">Написать нам</h3>
+      <p class="write-us-sub">Вопросы, предложения, проблемы? Мы ответим в течение 24 часов</p>
+    </div>
+    <div class="write-us-box">
+      <div class="write-us-email">banni.support@gmail.com</div>
+      <button class="btn write-us-copy-btn" onclick="copyWriteUsEmail()">📋 Скопировать email</button>
+    </div>
   </div>
 </div>
 </body>
