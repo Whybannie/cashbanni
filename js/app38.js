@@ -926,7 +926,9 @@ function closeSupport(){
 }
 
 function supAddMsg(who,text){
-  const body=supBody(); if(!body)return;
+  console.log('supAddMsg:',who,text);
+  const body=supBody();
+  if(!body){ console.error('supAddMsg: body is null!'); return; }
   const d=document.createElement('div');
   d.className='sup-msg '+who;
   const b=document.createElement('div');
@@ -934,7 +936,8 @@ function supAddMsg(who,text){
   b.textContent=text;
   d.appendChild(b);
   body.appendChild(d);
-  body.scrollTop=body.scrollHeight;
+  console.log('Added element, body now has',body.children.length,'children');
+  setTimeout(()=>{ body.scrollTop=body.scrollHeight; },50);
 }
 
 function supShowMenu(){
@@ -970,11 +973,19 @@ function supShowMenu(){
 }
 
 function supQuick(i){
-  const f=SUPPORT_FAQ[i]; if(!f)return;
-  const body=supBody(); if(!body)return;
+  console.log('supQuick called with i=',i);
+  const f=SUPPORT_FAQ[i];
+  console.log('FAQ item:',f);
+  if(!f){ console.error('FAQ item not found!'); return; }
+  const body=supBody();
+  console.log('body:',body);
+  if(!body){ console.error('body is null!'); return; }
   body.innerHTML='';
+  console.log('Adding user message:',f.q);
   supAddMsg('user',f.q);
+  console.log('Adding bot message:',f.a);
   supAddMsg('bot',f.a);
+  console.log('Body children count:',body.children.length);
   const w=document.createElement('div');
   w.className='sup-back-wrap';
   const back=document.createElement('button');
