@@ -964,7 +964,7 @@ function supShowMenu(){
       <div class="sup-email-title">Остались вопросы?</div>
       <div class="sup-email-addr">banni.support@gmail.com</div>
     </div>
-    <a href="mailto:banni.support@gmail.com" class="sup-email-btn">Написать</a>
+    <button class="sup-email-btn" onclick="copySupEmail()">Копировать</button>
   `;
   body.appendChild(emailCard);
 }
@@ -1264,4 +1264,11 @@ async function checkStoryStatus(){
   }catch(e){
     console.error('checkStoryStatus:', e);
   }
+}
+
+
+function copySupEmail(){
+  navigator.clipboard.writeText('banni.support@gmail.com')
+    .then(()=>{ toast('📧 Email скопирован!','good'); })
+    .catch(()=>{ toast('Не удалось скопировать','bad'); });
 }

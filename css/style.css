@@ -2284,3 +2284,8 @@ h2,h3{color:#fff}
 .sup-email-btn{padding:8px 14px;border-radius:10px;background:rgba(59,130,246,.2);border:1px solid rgba(59,130,246,.4);
  color:#93c5fd;font-size:.72rem;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:.2s}
 .sup-email-btn:active{background:rgba(59,130,246,.3);transform:scale(.96)}
+
+/* ===== v156: EMAIL COPY BUTTON ===== */
+.sup-email-btn{padding:8px 14px;border-radius:10px;background:rgba(59,130,246,.2);border:1px solid rgba(59,130,246,.4);
+ color:#93c5fd;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:.2s}
+.sup-email-btn:active{background:rgba(59,130,246,.3);transform:scale(.96)}
