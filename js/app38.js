@@ -1150,11 +1150,6 @@ async function checkStoryStatus(){
   }
 }
 
-
-)
-    .catch(()=>{ toast('Не удалось скопировать','bad'); });
-}
-
 function openWriteUsModal(){
   modalOpen('writeUsModal');
 }
