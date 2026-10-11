@@ -2289,3 +2289,26 @@ h2,h3{color:#fff}
 .sup-email-btn{padding:8px 14px;border-radius:10px;background:rgba(59,130,246,.2);border:1px solid rgba(59,130,246,.4);
  color:#93c5fd;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:.2s}
 .sup-email-btn:active{background:rgba(59,130,246,.3);transform:scale(.96)}
+
+/* ===== v158: EMAIL SUPPORT IN PROFILE ===== */
+.email-support-card{position:relative;margin-top:22px;padding:18px;
+ background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(37,99,235,.05));
+ border:1px solid rgba(59,130,246,.28);border-radius:20px;overflow:hidden}
+.email-support-glow{position:absolute;top:-50%;right:-30%;width:200px;height:200px;border-radius:50%;
+ background:radial-gradient(circle,rgba(59,130,246,.25),transparent 65%);pointer-events:none;
+ animation:emailPulse 4s ease-in-out infinite}
+@keyframes emailPulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.8;transform:scale(1.1)}}
+.email-support-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.email-support-icon{font-size:1.8rem}
+.email-support-title{font-size:1rem;font-weight:900;color:#fff;letter-spacing:-.2px}
+.email-support-desc{font-size:.75rem;color:rgba(255,255,255,.55);line-height:1.45;margin-bottom:14px}
+.email-support-box{display:flex;gap:8px;align-items:center;
+ background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.08);
+ border-radius:12px;padding:4px 4px 4px 14px}
+.email-support-addr{flex:1;font-size:.78rem;color:#93c5fd;font-weight:600;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.email-support-btn{padding:10px 16px;border-radius:10px;border:none;
+ background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;
+ font-size:.75rem;font-weight:800;cursor:pointer;white-space:nowrap;
+ transition:.2s;flex-shrink:0;box-shadow:0 4px 14px rgba(59,130,246,.3)}
+.email-support-btn:active{transform:scale(.96)}

@@ -901,35 +901,7 @@ window.addEventListener('load', function(){
 
 
 // ===== v119: SUPPORT - simple FAQ, addEventListener, no operator =====
-const SUPPORT_FAQ = [
-  {q:'Как пополнить баланс?', a:'Открой «Кабинет» → «Пополнить баланс», выбери сумму и оплати через Telegram Stars. Звёзды зачисляются мгновенно.', kw:['пополн','баланс','оплат','звезд','звёзд','stars','деньг','депозит','купить']},
-  {q:'Где мой предмет из кейса?', a:'Все выпавшие предметы находятся в «Кабинет» → «Мои предметы». Оттуда их можно продать за звёзды.', kw:['предмет','кейс','выпал','дроп','инвентар','пропал','не пришёл','не пришел']},
-  {q:'Как работает бесплатный кейс?', a:'Бесплатный кейс можно крутить раз в 24 часа. Для доступа нужна подписка на наш канал — это бесплатно.', kw:['бесплатн','фри','подписк','канал','24','раз в день','каждый день']},
-  {q:'Как вывести подарок?', a:'Вывод подарков находится в разработке и скоро появится. Следи за анонсами в нашем канале.', kw:['вывод','вывести','подарок','забрать','получить','обналичить']},
-  {q:'Промокод не работает', a:'Проверь, что код введён без пробелов и в правильном регистре. Каждый промокод имеет лимит активаций и срок действия.', kw:['промокод','промо','код','активир','не работает']},
-  {q:'Что такое Апгрейд?', a:'Апгрейд позволяет обменять предмет на более дорогой с шансом. Чем выше множитель, тем ниже шанс успеха.', kw:['апгрейд','улучш','обмен','множит','шанс','прокач']}
-];
-
-function supOverlay(){ return document.getElementById('supOverlay'); }
-function supBody(){ const ov=supOverlay(); return ov?ov.querySelector('.sup-body'):null; }
-
-function openSupport(){
-  const ov=supOverlay(); if(!ov)return;
-  ov.classList.add('show');
-  document.body.style.overflow='hidden';
-  supShowMenu();
-}
-function closeSupport(){
-  const ov=supOverlay(); if(!ov)return;
-  ov.classList.remove('show');
-  document.body.style.overflow='';
-}
-
-function supAddMsg(who,text){
-  console.log('supAddMsg:',who,text);
-  const body=supBody();
-  if(!body){ console.error('supAddMsg: body is null!'); return; }
-  const d=document.createElement('div');
+const d=document.createElement('div');
   d.className='sup-msg '+who;
   const b=document.createElement('div');
   b.className='bubble';
@@ -940,20 +912,7 @@ function supAddMsg(who,text){
   setTimeout(()=>{ body.scrollTop=body.scrollHeight; },50);
 }
 
-function supShowMenu(){
-  const body=supBody(); if(!body)return;
-  body.innerHTML='';
-  const st=document.getElementById('supStatus'); if(st)st.textContent='онлайн';
-  supAddMsg('bot','Привет! Выбери тему вопроса:');
-  
-  const grid=document.createElement('div');
-  grid.className='sup-menu';
-  SUPPORT_FAQ.forEach(function(f,i){
-    const btn=document.createElement('button');
-    btn.type='button';
-    btn.className='sup-menu-item';
-    btn.textContent=f.q;
-    btn.addEventListener('click',function(){ supQuick(i); });
+);
     grid.appendChild(btn);
   });
   body.appendChild(grid);
@@ -972,12 +931,7 @@ function supShowMenu(){
   body.appendChild(emailCard);
 }
 
-function supQuick(i){
-  console.log('supQuick called with i=',i);
-  const f=SUPPORT_FAQ[i];
-  console.log('FAQ item:',f);
-  if(!f){ console.error('FAQ item not found!'); return; }
-  const body=supBody();
+const body=supBody();
   console.log('body:',body);
   if(!body){ console.error('body is null!'); return; }
   body.innerHTML='';
@@ -996,27 +950,13 @@ function supQuick(i){
   body.appendChild(w);
 }
 
-function supMatch(text){
-  const t=text.toLowerCase();
-  let best=null,score=0;
-  SUPPORT_FAQ.forEach(function(f){
-    let s=0; f.kw.forEach(function(k){ if(t.indexOf(k)!==-1)s++; });
+);
     if(s>score){score=s;best=f;}
   });
   return score>0?best:null;
 }
 
-function supSend(){
-  const inp=document.getElementById('supInput'); if(!inp)return;
-  const t=(inp.value||'').trim(); if(!t)return;
-  inp.value='';
-  const body=supBody(); if(!body)return;
-  const menu=body.querySelector('.sup-menu'); if(menu)menu.remove();
-  const bw=body.querySelector('.sup-back-wrap'); if(bw)bw.remove();
-  supAddMsg('user',t);
-  const m=supMatch(t);
-  if(m){ supAddMsg('bot',m.a); }
-  else{ supAddMsg('bot','Я пока не понял вопрос. Попробуй выбрать тему из списка.'); }
+else{ supAddMsg('bot','Я пока не понял вопрос. Попробуй выбрать тему из списка.'); }
   const w=document.createElement('div');
   w.className='sup-back-wrap';
   const back=document.createElement('button');
@@ -1036,8 +976,8 @@ function renderTickets(){ const el=document.getElementById('adminTickets'); if(e
 window.addEventListener('load',function(){
   const bb=document.getElementById('supBackBtn');  if(bb)bb.addEventListener('click',supShowMenu);
   const cc=document.getElementById('supCloseBtn'); if(cc)cc.addEventListener('click',closeSupport);
-  const ss=document.getElementById('supSendBtn');  if(ss)ss.addEventListener('click',supSend);
-  const ii=document.getElementById('supInput');    if(ii)ii.addEventListener('keydown',function(e){ if(e.key==='Enter'){e.preventDefault();supSend();} });
+  if(ss)ss.addEventListener('click',supSend);
+  if(ii)ii.addEventListener('keydown',function(e){ if(e.key==='Enter'){e.preventDefault();supSend();} });
   try{renderOperators();renderTickets();}catch(e){}
 });
 
