@@ -907,7 +907,7 @@ function renderOperators(){ const el=document.getElementById('adminOperators'); 
 function renderTickets(){ const el=document.getElementById('adminTickets'); if(el)el.innerHTML='<div class="muted small">Раздел в разработке</div>'; }
 
 window.addEventListener('load',function(){
-  const bb=document.getElementById('supBackBtn');  if(bb)bb.addEventListener('click',supShowMenu);
+  if(bb)bb.addEventListener('click',supShowMenu);
   const cc=document.getElementById('supCloseBtn'); if(cc)cc.addEventListener('click',closeSupport);
   if(ss)ss.addEventListener('click',supSend);
   if(ii)ii.addEventListener('keydown',function(e){ if(e.key==='Enter'){e.preventDefault();supSend();} });
@@ -1151,8 +1151,16 @@ async function checkStoryStatus(){
 }
 
 
-function copySupEmail(){
+)
+    .catch(()=>{ toast('Не удалось скопировать','bad'); });
+}
+
+function openWriteUsModal(){
+  modalOpen('writeUsModal');
+}
+
+function copyWriteUsEmail(){
   navigator.clipboard.writeText('banni.support@gmail.com')
-    .then(()=>{ toast('📧 Email скопирован!','good'); })
+    .then(()=>{ toast('📧 Email скопирован! Вставь в почтовый клиент','good'); })
     .catch(()=>{ toast('Не удалось скопировать','bad'); });
 }
