@@ -1214,3 +1214,118 @@ setInterval(checkMaintenance, 30000);
 function isMaintenanceAdmin(){
   return !!(window.S && (S.isAdmin || S.admin || (S.me && S.me.admin) || (S.user && S.user.admin)));
 }
+
+// ===== v173: MAINTENANCE ADMIN FIX =====
+function cbHasAdminFlag(){
+  return !!(window.S && (S.isAdmin || S.admin || (S.me && S.me.admin) || (S.user && S.user.admin)));
+}
+
+async function cbVerifyAdmin(){
+  if (cbHasAdminFlag()) return true;
+  if (window.__cbAdminOk === true) return true;
+  if (window.__cbAdminNoAt && (Date.now() - window.__cbAdminNoAt < 60000)) return false;
+
+  try {
+    var me = await api('/api/me');
+    if (me && me.admin) {
+      window.__cbAdminOk = true;
+      if (window.S) {
+        S.isAdmin = true;
+        S.admin = true;
+      }
+      return true;
+    }
+  } catch(e) {}
+
+  window.__cbAdminNoAt = Date.now();
+  return false;
+}
+
+async function checkMaintenance(){
+  var overlay = document.getElementById('maintenanceOverlay');
+  var mode = 0;
+
+  try {
+    var r = await api('/api/maintenance_status');
+    mode = (r && r.mode === 1) ? 1 : 0;
+  } catch(e) {
+    mode = 0;
+  }
+
+  var admin = await cbVerifyAdmin();
+
+  // Экстренное выключение для админа: ?maintenance_off=1
+  try {
+    var qs = new URLSearchParams(location.search);
+    if (qs.get('maintenance_off') === '1' && admin && mode === 1) {
+      await api('/api/toggle_maintenance', {method:'POST', body:'{}'});
+      mode = 0;
+      window.__cbAdminOk = true;
+      history.replaceState({}, '', location.pathname + location.hash);
+      if (typeof toast === 'function') toast('🔧 Режим обслуживания выключен', 'good');
+    }
+  } catch(e) {}
+
+  if (overlay) {
+    if (mode && !admin) {
+      overlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    } else {
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  }
+
+  var ab = document.getElementById('adminBlock');
+  if (ab && admin) ab.style.display = '';
+
+  var btn = document.getElementById('toggleMaintBtn');
+  if (btn) {
+    btn.disabled = false;
+    if (mode) {
+      btn.textContent = 'Выключить';
+      btn.className = 'maint-toggle-btn active';
+    } else {
+      btn.textContent = 'Включить';
+      btn.className = 'maint-toggle-btn';
+    }
+  }
+}
+
+async function toggleMaintenance(){
+  var btn = document.getElementById('toggleMaintBtn');
+  if (!btn) return;
+
+  var admin = await cbVerifyAdmin();
+  if (!admin) {
+    if (typeof toast === 'function') toast('Только для админа', 'bad');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Загрузка...';
+
+  try {
+    var res = await api('/api/toggle_maintenance', {method:'POST', body:'{}'});
+    if (res && res.ok) {
+      window.__cbAdminOk = true;
+      if (typeof toast === 'function') {
+        toast(
+          res.mode === 1 ? '🔧 Режим обслуживания ВКЛЮЧЕН' : '✅ Проект доступен для всех',
+          res.mode === 1 ? 'bad' : 'good'
+        );
+      }
+      await checkMaintenance();
+    } else {
+      if (typeof toast === 'function') toast((res && res.error) || 'Ошибка переключения', 'bad');
+    }
+  } catch(e) {
+    if (typeof toast === 'function') toast('Ошибка переключения', 'bad');
+  }
+
+  btn.disabled = false;
+  await checkMaintenance();
+}
+
+setTimeout(checkMaintenance, 250);
+setInterval(checkMaintenance, 20000);

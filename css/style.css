@@ -2364,3 +2364,7 @@ h2,h3{color:#fff}
  font-weight:800;font-size:0.8rem;border:none;border-radius:10px;cursor:pointer;transition:0.2s}
 .maint-toggle-btn:active{transform:scale(0.96)}
 .maint-toggle-btn.active{background:linear-gradient(135deg,#22c55e,#16a34a)}
+
+/* ===== v173: maintenance toggle only inside adminBlock ===== */
+.maint-toggle-row{display:none !important}
+#adminBlock .maint-toggle-row{display:flex !important}
