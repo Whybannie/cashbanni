@@ -15,9 +15,9 @@
   
   <!-- 🚀 Performance: prefetch критичных ресурсов -->
   <link rel="prefetch" href="js/data38.js?v=1340" as="script">
-  <link rel="prefetch" href="js/app38.js?v=1710" as="script">
+  <link rel="prefetch" href="js/app38.js?v=1720" as="script">
   <link rel="prefetch" href="js/caseimg38.js?v=1530" as="script">
-  <link rel="preload" href="css/style.css?v=1651" as="style">
+  <link rel="preload" href="css/style.css?v=1720" as="style">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
@@ -25,7 +25,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=1651">
+<link rel="stylesheet" href="css/style.css?v=1720">
 <script src="https://telegram.org/js/telegram-web-app.js?v=715" defer></script>
 <link rel="preload" as="image" href="case_fri.JPG">
 <link rel="preload" as="image" href="case_mini.JPG">
@@ -413,7 +413,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
     </div>
     <div class="rank-card mt" id="rankCard"></div>
     <div class="stats-grid mt" id="statsGrid"></div>
-    <div class="task-card mt" onclick="offerGate('openPay()')">
+    <div class="task-card mt" onclick="openPay()">
       <div class="ic-box gold"><svg class="ic"><use href="#i-star"/></svg></div>
       <div class="task-info"><b>Пополнить баланс</b><span>От ⭐1 · оплата через Telegram Stars</span></div>
       <div class="hero-go">›</div>
@@ -423,7 +423,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
       <div class="task-info"><b>Подписка на канал</b><span id="subState">Не активна</span></div>
       <button class="btn btn-secondary task-btn" id="subBtn2" onclick="doSub()">Получить</button>
     </div>
-    <div class="task-card mt" id="supProfileBtn" onclick="openSupport()">
+    <div class="task-card mt" id="supProfileBtn" onclick="openWriteUsModal()">
       <div class="ic-box silver"><svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M3 18v-6a9 9 0 0 1 18 0v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5ZM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5Z" fill="currentColor"/></svg></div>
       <div class="task-info"><b>Связаться с нами</b><span>banni.support@gmail.com</span></div>
       <div class="hero-go">›</div>
@@ -457,14 +457,18 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
     <div id="adminTickets"></div>
     <h3 class="mt">Игроки</h3>
       <div id="adminUsers"></div>
+    
+
+      <button class="maint-toggle-btn" id="toggleMaintBtn" onclick="toggleMaintenance()">Включить</button>
     </div>
     <div class="maint-toggle-row">
       <div class="maint-toggle-info">
         <div class="maint-toggle-title">🔧 Режим обслуживания</div>
         <div class="maint-toggle-desc">Скроет проект для всех, кроме админа</div>
+</div>
+    
       </div>
-      <button class="maint-toggle-btn" id="toggleMaintBtn" onclick="toggleMaintenance()">Включить</button>
-    </div>
+  
 
   </section>
 </main>
@@ -517,7 +521,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 <div class="toasts" id="toasts"></div>
 <script src="js/data38.js?v=1340" defer></script>
-<script src="js/app38.js?v=1710" defer></script>
+<script src="js/app38.js?v=1720" defer></script>
 <script src="js/caseimg38.js?v=1530" defer></script>
   <script src="js/dogs38.js?v=940"></script>
   <!-- dogs отключены -->

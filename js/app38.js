@@ -1166,7 +1166,7 @@ async function checkMaintenance(){
   try{
     const res = await api('/api/maintenance_status');
     const overlay = document.getElementById('maintenanceOverlay');
-    if(res && res.mode === 1 && !S.isAdmin){
+    if(res && res.mode === 1 && !isMaintenanceAdmin()){
       if(overlay) overlay.style.display = 'flex';
       document.body.style.overflow = 'hidden';
       return true;
@@ -1210,3 +1210,7 @@ async function toggleMaintenance(){
 setTimeout(checkMaintenance, 500);
 // Повторная проверка каждые 30 секунд
 setInterval(checkMaintenance, 30000);
+
+function isMaintenanceAdmin(){
+  return !!(window.S && (S.isAdmin || S.admin || (S.me && S.me.admin) || (S.user && S.user.admin)));
+}
