@@ -2334,3 +2334,33 @@ h2,h3{color:#fff}
 .write-us-copy-btn{width:100%;padding:14px;border-radius:12px;
  background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-weight:800;font-size:.85rem}
 .write-us-copy-btn:active{transform:scale(.97)}
+
+/* ===== v165: MAINTENANCE MODE ===== */
+.maintenance-overlay{position:fixed;inset:0;z-index:9999;
+ background:rgba(6,6,26,0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+ display:flex;align-items:center;justify-content:center;text-align:center;padding:20px}
+.maintenance-content{max-width:360px;animation:fadeInUp 0.6s cubic-bezier(0.2,0.8,0.2,1)}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.maintenance-icon{font-size:4.5rem;margin-bottom:20px;
+ filter:drop-shadow(0 0 20px rgba(168,85,247,0.5));
+ animation:spinSlow 6s linear infinite}
+@keyframes spinSlow{100%{transform:rotate(360deg)}}
+.maintenance-title{font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:12px;letter-spacing:-0.5px}
+.maintenance-text{font-size:0.9rem;color:rgba(255,255,255,0.6);line-height:1.6;margin-bottom:30px}
+.maintenance-sub{font-size:0.75rem;color:rgba(255,255,255,0.4);margin-top:20px;font-weight:700;letter-spacing:1px}
+.maintenance-loader{width:60px;height:4px;background:rgba(255,255,255,0.1);border-radius:4px;margin:0 auto;overflow:hidden}
+.maintenance-loader::after{content:'';display:block;width:50%;height:100%;
+ background:linear-gradient(90deg,#a855f7,#ec4899);border-radius:4px;
+ animation:loadSlide 1.5s ease-in-out infinite}
+@keyframes loadSlide{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+.maint-toggle-row{display:flex;justify-content:space-between;align-items:center;gap:12px;
+ padding:16px;margin-top:16px;background:rgba(239,68,68,0.1);
+ border:1px solid rgba(239,68,68,0.3);border-radius:14px}
+.maint-toggle-info{display:flex;flex-direction:column;gap:4px;text-align:left}
+.maint-toggle-title{font-weight:800;color:#fca5a5;font-size:0.9rem}
+.maint-toggle-desc{font-size:0.75rem;color:rgba(255,255,255,0.6)}
+.maint-toggle-btn{padding:10px 16px;min-height:40px;width:auto;flex-shrink:0;
+ background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;
+ font-weight:800;font-size:0.8rem;border:none;border-radius:10px;cursor:pointer;transition:0.2s}
+.maint-toggle-btn:active{transform:scale(0.96)}
+.maint-toggle-btn.active{background:linear-gradient(135deg,#22c55e,#16a34a)}

@@ -1159,3 +1159,54 @@ function copyWriteUsEmail(){
     .then(()=>{ toast('📧 Email скопирован! Вставь в почтовый клиент','good'); })
     .catch(()=>{ toast('Не удалось скопировать','bad'); });
 }
+
+
+// ===== v165: MAINTENANCE MODE =====
+async function checkMaintenance(){
+  try{
+    const res = await api('/api/maintenance_status');
+    const overlay = document.getElementById('maintenanceOverlay');
+    if(res && res.mode === 1 && !S.isAdmin){
+      if(overlay) overlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      return true;
+    } else {
+      if(overlay) overlay.style.display = 'none';
+      document.body.style.overflow = '';
+      // Обновляем текст кнопки в админке
+      const btn = document.getElementById('toggleMaintBtn');
+      if(btn && res && res.mode === 1){
+        btn.textContent = 'Выключить';
+        btn.className = 'maint-toggle-btn active';
+      }
+      return false;
+    }
+  }catch(e){ return false; }
+}
+
+async function toggleMaintenance(){
+  const btn = document.getElementById('toggleMaintBtn');
+  if(!btn) return;
+  btn.disabled = true;
+  btn.textContent = 'Загрузка...';
+  try{
+    const res = await api('/api/toggle_maintenance',{method:'POST',body:'{}'});
+    if(res && res.ok){
+      const isOn = res.mode === 1;
+      btn.textContent = isOn ? 'Выключить' : 'Включить';
+      btn.className = isOn ? 'maint-toggle-btn active' : 'maint-toggle-btn';
+      toast(isOn ? '🔧 Режим обслуживания ВКЛЮЧЕН' : '✅ Проект доступен для всех', isOn ? 'bad' : 'good');
+      checkMaintenance();
+    } else {
+      toast((res && res.error) || 'Ошибка переключения','bad');
+    }
+  }catch(e){
+    toast('Ошибка переключения','bad');
+  }
+  btn.disabled = false;
+}
+
+// Проверка при загрузке
+setTimeout(checkMaintenance, 500);
+// Повторная проверка каждые 30 секунд
+setInterval(checkMaintenance, 30000);
