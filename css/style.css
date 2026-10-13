@@ -2368,3 +2368,404 @@ h2,h3{color:#fff}
 /* ===== v173: maintenance toggle only inside adminBlock ===== */
 .maint-toggle-row{display:none !important}
 #adminBlock .maint-toggle-row{display:flex !important}
+/* ===== v175: roulette / arts / profile layout polish ===== */
+
+.roulette-item,
+.inv-item,
+.contents .c-item,
+.chip,
+.stat-card,
+.ach {
+  box-sizing: border-box;
+}
+
+/* ===== ROULETTE ITEMS ===== */
+.roulette-item {
+  width: 88px;
+  min-width: 88px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 4px 8px;
+  overflow: hidden;
+}
+
+.roulette-item .gimg,
+.roulette-item img {
+  width: 70px;
+  height: 70px;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+  margin: 0;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.35));
+}
+
+.roulette-item .emoji,
+.roulette-item > span.emoji {
+  width: 100%;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.7rem;
+  line-height: 1;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.35));
+}
+
+.roulette-item .name {
+  flex: 0 0 auto;
+  width: 100%;
+  text-align: center;
+  font-size: .58rem;
+  line-height: 1.1;
+  color: rgba(255,255,255,.62);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roulette-item:nth-child(even) {
+  background: rgba(255,255,255,.035);
+}
+
+.roulette-item + .roulette-item {
+  border-left: 1px solid rgba(255,255,255,.045);
+}
+
+/* ===== WIN OVERLAY ===== */
+.strip-win {
+  gap: 10px;
+  font-size: .95rem;
+}
+
+.strip-win .gimg,
+.strip-win img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.strip-win .emoji {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+/* ===== CASE CONTENTS ===== */
+.contents {
+  grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
+  gap: 8px;
+}
+
+.contents .c-item {
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 6px;
+  border: 1px solid rgba(255,255,255,.05);
+  background: rgba(255,255,255,.035);
+}
+
+.contents .gimg,
+.contents img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.contents .emoji {
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.contents .name {
+  font-size: .58rem;
+  line-height: 1.12;
+  color: rgba(255,255,255,.68);
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ===== INVENTORY ===== */
+.inventory-grid,
+.market-grid {
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 10px;
+}
+
+.inv-item {
+  min-height: 142px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 12px 8px 10px;
+}
+
+.inv-item .gimg,
+.inv-item img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.inv-item .emoji {
+  width: 100%;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.3rem;
+  line-height: 1;
+}
+
+.inv-item .name {
+  font-size: .68rem;
+  line-height: 1.15;
+  font-weight: 800;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 1.9em;
+}
+
+.inv-item .price {
+  font-size: .68rem;
+  font-weight: 900;
+  color: var(--gold);
+}
+
+.inv-item .acts {
+  margin-top: auto;
+  width: 100%;
+}
+
+.mini-btn {
+  min-height: 32px;
+  font-size: .6rem;
+}
+
+/* ===== UPGRADE CHIPS ===== */
+.chip {
+  min-height: 98px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 6px;
+}
+
+.chip .gimg,
+.chip img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.chip .emoji {
+  width: 100%;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.chip .name {
+  font-size: .6rem;
+  line-height: 1.1;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== PROFILE CARD ===== */
+.pcard {
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+}
+
+.pava {
+  width: 58px;
+  height: 58px;
+  font-size: 1.85rem;
+}
+
+.pinfo {
+  gap: 3px;
+}
+
+.pbads {
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.pbad {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 3px 9px;
+  font-size: .58rem;
+  line-height: 1;
+  border-radius: 9px;
+  white-space: nowrap;
+}
+
+.rank-card {
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+}
+
+.rank-card .gimg,
+.rank-card img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+/* ===== STATS GRID ===== */
+.stats-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (min-width: 480px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.stat-card {
+  min-height: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.stat-card > * {
+  max-width: 100%;
+}
+
+.stat-card b,
+.stat-card strong {
+  font-size: 1rem;
+  line-height: 1.1;
+  word-break: break-word;
+}
+
+.stat-card span,
+.stat-card .muted {
+  font-size: .68rem;
+  line-height: 1.15;
+}
+
+/* ===== ACHIEVEMENTS ===== */
+.ach {
+  min-height: 64px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+}
+
+.ach .gimg,
+.ach img,
+.ach svg.ic {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.ach > div {
+  min-width: 0;
+}
+
+.ach b,
+.ach strong {
+  display: block;
+  font-size: .82rem;
+  line-height: 1.15;
+}
+
+.ach span,
+.ach .muted {
+  display: block;
+  font-size: .68rem;
+  line-height: 1.2;
+  color: rgba(255,255,255,.58);
+}
+
+/* ===== TOP ROWS ===== */
+.top-row {
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+}
+
+.top-row .pos {
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.top-row > div:nth-child(2) {
+  min-width: 0;
+  flex: 1;
+}
+
+.top-row b,
+.top-row strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== CASE MODAL SPACING ===== */
+.case-full .cf-strips {
+  gap: 12px;
+}
+
+.case-full .roulette-container {
+  border-radius: 18px;
+}
