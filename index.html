@@ -15,9 +15,9 @@
   
   <!-- 🚀 Performance: prefetch критичных ресурсов -->
   <link rel="prefetch" href="js/data38.js?v=1340" as="script">
-  <link rel="prefetch" href="js/app38.js?v=1751" as="script">
+  <link rel="prefetch" href="js/app38.js?v=1770" as="script">
   <link rel="prefetch" href="js/caseimg38.js?v=1530" as="script">
-  <link rel="preload" href="css/style.css?v=1751" as="style">
+  <link rel="preload" href="css/style.css?v=1770" as="style">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cash Banni</title>
@@ -25,7 +25,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="css/style.css?v=1751">
+<link rel="stylesheet" href="css/style.css?v=1770">
 <script src="https://telegram.org/js/telegram-web-app.js?v=715" defer></script>
 <link rel="preload" as="image" href="case_fri.JPG">
 <link rel="preload" as="image" href="case_mini.JPG">
@@ -523,7 +523,7 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
 
 <div class="toasts" id="toasts"></div>
 <script src="js/data38.js?v=1340" defer></script>
-<script src="js/app38.js?v=1751" defer></script>
+<script src="js/app38.js?v=1770" defer></script>
 <script src="js/caseimg38.js?v=1530" defer></script>
   <script src="js/dogs38.js?v=940"></script>
   <!-- dogs отключены -->
@@ -554,32 +554,44 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
   </div>
 </div>
 <div class="modal-overlay" id="subGateModal">
-  <div class="modal sg-modal">
-    <div class="sg-icon-wrap">
-      <div class="sg-ring sg-ring1"></div>
-      <div class="sg-ring sg-ring2"></div>
-      <div class="sg-ring sg-ring3"></div>
-      <svg class="sg-icon-svg" viewBox="0 0 64 64" fill="none">
-        <defs>
-          <linearGradient id="sgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:var(--acc)"/>
-            <stop offset="100%" style="stop-color:var(--acc2)"/>
-          </linearGradient>
-        </defs>
-        <circle cx="32" cy="32" r="30" fill="url(#sgGrad)" opacity="0.15"/>
-        <path d="M18 26 L18 38 L26 38 L42 48 L42 16 L26 26 Z" fill="url(#sgGrad)"/>
-        <path d="M48 26 Q52 32 48 38" stroke="url(#sgGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.8"/>
-        <path d="M52 22 Q58 32 52 42" stroke="url(#sgGrad)" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
-        <circle cx="14" cy="32" r="3" fill="url(#sgGrad)"/>
-      </svg>
+  <div class="modal sg-modal sg-v177">
+    <button class="x" onclick="modalClose('subGateModal')" style="position:absolute;top:12px;right:12px;z-index:10;"><svg class="ic s"><use href="#i-x"/></svg></button>
+    
+    <div class="sg-v177-head">
+      <div class="sg-v177-emoji">🎁</div>
+      <h3 class="sg-v177-title">Бесплатный кейс</h3>
+      <p class="sg-v177-desc">Выполни одно из действий, чтобы получить бесплатный кейс</p>
     </div>
-    <h3 class="sg-title">НУЖНА ПОДПИСКА</h3>
-    <p class="sg-desc">Бесплатный кейс доступен только подписчикам нашего канала. Подпишись — и крути бесплатно каждый день.</p>
-    <button class="btn sg-sub-btn" onclick="openChannel()">
-      <span>ПОДПИСАТЬСЯ НА КАНАЛ</span>
-      <span class="sg-sub-arrow">→</span>
+
+    <div class="sg-v177-actions">
+      <!-- Действие 1: Подписка -->
+      <div class="sg-v177-card" id="sgCardSub">
+        <div class="sg-v177-card-icon">📢</div>
+        <div class="sg-v177-card-body">
+          <div class="sg-v177-card-title">Подпишись на канал</div>
+          <div class="sg-v177-card-sub">@CashBanni · новости и подарки</div>
+        </div>
+        <button class="sg-v177-card-btn" onclick="openChannel()">Подписаться</button>
+      </div>
+
+      <!-- Действие 2: Переслать пост -->
+      <div class="sg-v177-card" id="sgCardShare">
+        <div class="sg-v177-card-icon">💬</div>
+        <div class="sg-v177-card-body">
+          <div class="sg-v177-card-title">Переслать пост другу</div>
+          <div class="sg-v177-card-sub">Расскажи друзьям о халявных кейсах</div>
+        </div>
+        <button class="sg-v177-card-btn" onclick="sharePost()">Переслать</button>
+      </div>
+    </div>
+
+    <div class="sg-v177-preview" id="sgPostPreview" style="display:none;">
+      <img src="post_preview.jpg" alt="Пост" class="sg-v177-preview-img">
+    </div>
+
+    <button class="btn sg-v177-check" onclick="recheckSub()">
+      ✅ Я выполнил действие
     </button>
-    <button class="btn sg-check-btn" onclick="recheckSub()">Я ПОДПИСАЛСЯ</button>
   </div>
 </div>
 
@@ -704,6 +716,42 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
     <p class="maintenance-text">Мы обновляем Cash Banni, чтобы сделать его ещё лучше.<br>Пожалуйста, зайдите немного позже.</p>
     <div class="maintenance-loader"></div>
     <p class="maintenance-sub">Скоро вернёмся! 🚀</p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="giftSendModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>🎁 Отправить подарок</h3>
+      <button class="x" onclick="modalClose('giftSendModal')"><svg class="ic s"><use href="#i-x"/></svg></button>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,.04);border-radius:14px;margin-bottom:12px;">
+        <div id="giftSendPreview" style="font-size:2.4rem;"></div>
+        <div style="flex:1;">
+          <div id="giftSendName" style="font-weight:800;font-size:.95rem;"></div>
+          <div id="giftSendPrice" style="font-size:.75rem;color:rgba(255,255,255,.6);"></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-size:.75rem;font-weight:800;margin-bottom:6px;color:rgba(255,255,255,.7);">
+        Username получателя
+      </label>
+      <input 
+        id="giftRecipientInput" 
+        type="text" 
+        placeholder="@username" 
+        style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px;color:#fff;font-size:.9rem;outline:none;"
+      />
+    </div>
+    <div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:10px;font-size:.72rem;color:rgba(255,255,255,.7);margin-bottom:12px;">
+      ⚡ Комиссия за отправку: <b>10%</b> от стоимости подарка
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-secondary" onclick="modalClose('giftSendModal')" style="flex:1;">Отмена</button>
+      <button class="btn btn-primary" id="giftSendBtn" onclick="sendGiftToFriend()" style="flex:1;">🎁 Отправить</button>
+    </div>
   </div>
 </div>
 </body>

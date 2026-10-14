@@ -1329,3 +1329,92 @@ async function toggleMaintenance(){
 
 setTimeout(checkMaintenance, 250);
 setInterval(checkMaintenance, 20000);
+
+
+// ===== v176: GIFT SEND TO FRIEND =====
+let pendingGiftSend = null;
+
+function openGiftSendModal(uid, gid, name, emoji, price) {
+  pendingGiftSend = { uid, gid, name, emoji, price };
+  
+  const preview = $('giftSendPreview');
+  const nameEl = $('giftSendName');
+  const priceEl = $('giftSendPrice');
+  
+  if (preview) preview.textContent = emoji;
+  if (nameEl) nameEl.textContent = name;
+  if (priceEl) priceEl.textContent = '⭐ ' + fmt(price) + ' · комиссия 10%';
+  
+  const input = $('giftRecipientInput');
+  if (input) {
+    input.value = '';
+    input.focus();
+  }
+  
+  modalOpen('giftSendModal');
+}
+
+async function sendGiftToFriend() {
+  if (!pendingGiftSend) return;
+  
+  const input = $('giftRecipientInput');
+  const recipient = input ? input.value.trim() : '';
+  
+  if (!recipient) {
+    toast('Введи username получателя', 'bad');
+    return;
+  }
+  
+  const btn = $('giftSendBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Отправка...';
+  }
+  
+  try {
+    const res = await api('/api/gift_send', {
+      method: 'POST',
+      body: JSON.stringify({
+        uid: pendingGiftSend.uid,
+        recipient: recipient
+      })
+    });
+    
+    if (res && res.ok) {
+      S.inv = res.inv;
+      S.balance = res.balance;
+      save();
+      renderInventory();
+      renderHeader();
+      
+      modalClose('giftSendModal');
+      toast('🎁 Подарок отправлен!', 'good');
+      
+      sfx.win();
+    } else {
+      toast((res && res.error) || 'Ошибка отправки', 'bad');
+    }
+  } catch(e) {
+    toast('Ошибка сети', 'bad');
+  }
+  
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = '🎁 Отправить';
+  }
+}
+
+
+// ===== v177: SHARE POST TO FRIEND =====
+function sharePost(){
+  // Открываем Telegram Share с ссылкой на канал
+  const shareUrl = 'https://t.me/share/url?url=' + encodeURIComponent('https://t.me/CashBanni') + '&text=' + encodeURIComponent('🎁 Халявные кейсы с настоящими подарками Telegram! Заходи 👉');
+  
+  if(window.Telegram && Telegram.WebApp && Telegram.WebApp.openTelegramLink){
+    Telegram.WebApp.openTelegramLink(shareUrl);
+  } else {
+    window.open(shareUrl, '_blank');
+  }
+  
+  toast('💬 Выбери друга для пересылки', '');
+}
