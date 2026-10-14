@@ -1406,17 +1406,56 @@ async function sendGiftToFriend() {
 
 
 
-// ===== v178: INLINE SHARE =====
+
+
+// ===== v180: SHARE POST WITH MULTIPLE FALLBACKS =====
 function sharePost(){
-  if(window.Telegram && Telegram.WebApp && Telegram.WebApp.switchInlineQuery){
-    // Открываем инлайн режим выбора получателя
-    Telegram.WebApp.switchInlineQuery('🎁 Cash Banni — халявные кейсы! Заходи 👉', ['users', 'groups']);
-    toast('💬 Выбери получателя', '');
-  } else if(window.Telegram && Telegram.WebApp){
-    // Fallback: обычная пересылка
-    const shareUrl = 'https://t.me/share/url?url=' + encodeURIComponent('https://t.me/CashBanni') + '&text=' + encodeURIComponent('🎁 Халявные кейсы с настоящими подарками Telegram!');
-    Telegram.WebApp.openTelegramLink(shareUrl);
-  } else {
-    window.open('https://t.me/CashBanni', '_blank');
+  const shareText = '🎁 Халявные кейсы с настоящими подарками Telegram! Заходи 👉';
+  const shareUrl = 'https://t.me/CashBanni_bot';
+  
+  // 1. Telegram WebApp switchInlineQuery (лучший вариант)
+  if(window.Telegram && Telegram.WebApp && typeof Telegram.WebApp.switchInlineQuery === 'function'){
+    try{
+      Telegram.WebApp.switchInlineQuery(shareText + ' ' + shareUrl, ['users','groups','bots']);
+      modalClose('subGateModal');
+      return;
+    }catch(e){
+      console.warn('switchInlineQuery failed:', e);
+    }
+  }
+  
+  // 2. Telegram WebApp openTelegramLink
+  if(window.Telegram && Telegram.WebApp && typeof Telegram.WebApp.openTelegramLink === 'function'){
+    try{
+      const tgShare = 'https://t.me/share/url?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(shareText);
+      Telegram.WebApp.openTelegramLink(tgShare);
+      modalClose('subGateModal');
+      return;
+    }catch(e){
+      console.warn('openTelegramLink failed:', e);
+    }
+  }
+  
+  // 3. Обычный window.open с Telegram Share
+  try{
+    const shareLink = 'https://t.me/share/url?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(shareText);
+    window.open(shareLink, '_blank');
+    modalClose('subGateModal');
+    return;
+  }catch(e){
+    console.warn('window.open failed:', e);
+  }
+  
+  // 4. Fallback: копируем в буфер
+  const fullText = shareText + ' ' + shareUrl;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(fullText).then(()=>{
+      toast('📋 Ссылка скопирована! Отправь её другу', 'good');
+      modalClose('subGateModal');
+    }).catch(()=>{
+      toast('⚠️ Не удалось открыть окно шаринга', 'bad');
+    });
+  }else{
+    toast('⚠️ Шаринг недоступен на этом устройстве', 'bad');
   }
 }
