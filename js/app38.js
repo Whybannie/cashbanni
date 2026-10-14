@@ -1405,16 +1405,25 @@ async function sendGiftToFriend() {
 }
 
 
-// ===== v177: SHARE POST TO FRIEND =====
-function sharePost(){
-  // Открываем Telegram Share с ссылкой на канал
-  const shareUrl = 'https://t.me/share/url?url=' + encodeURIComponent('https://t.me/CashBanni') + '&text=' + encodeURIComponent('🎁 Халявные кейсы с настоящими подарками Telegram! Заходи 👉');
-  
-  if(window.Telegram && Telegram.WebApp && Telegram.WebApp.openTelegramLink){
-    Telegram.WebApp.openTelegramLink(shareUrl);
-  } else {
+ else {
     window.open(shareUrl, '_blank');
   }
   
   toast('💬 Выбери друга для пересылки', '');
+}
+
+
+// ===== v178: INLINE SHARE =====
+function sharePost(){
+  if(window.Telegram && Telegram.WebApp && Telegram.WebApp.switchInlineQuery){
+    // Открываем инлайн режим выбора получателя
+    Telegram.WebApp.switchInlineQuery('🎁 Cash Banni — халявные кейсы! Заходи 👉', ['users', 'groups']);
+    toast('💬 Выбери получателя', '');
+  } else if(window.Telegram && Telegram.WebApp){
+    // Fallback: обычная пересылка
+    const shareUrl = 'https://t.me/share/url?url=' + encodeURIComponent('https://t.me/CashBanni') + '&text=' + encodeURIComponent('🎁 Халявные кейсы с настоящими подарками Telegram!');
+    Telegram.WebApp.openTelegramLink(shareUrl);
+  } else {
+    window.open('https://t.me/CashBanni', '_blank');
+  }
 }
