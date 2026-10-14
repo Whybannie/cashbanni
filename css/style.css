@@ -2583,7 +2583,4 @@ h2,h3{color:#fff}
 .sg-v177-check:hover{background:rgba(34,197,94,.2) !important}
 .sg-v177-check:active{transform:scale(.98)}
 
-/* Фиолетовые акценты */
-.btn-primary{background:linear-gradient(135deg,#a855f7,#ec4899) !important;box-shadow:0 8px 26px rgba(168,85,247,.35) !important}
-.add-btn{background:linear-gradient(135deg,#a855f7,#ec4899) !important;box-shadow:0 4px 14px rgba(168,85,247,.4) !important}
-.xp-line div{background:linear-gradient(90deg,#a855f7,#ec4899) !important;box-shadow:0 0 10px rgba(168,85,247,.6) !important}
+
