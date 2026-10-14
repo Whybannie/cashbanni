@@ -1,4 +1,4 @@
-:root{--bg:#06061a;--card:rgba(255,255,255,.05);--line:rgba(255,255,255,.09);--acc:#a855f7;--acc2:#ec4899;--gold:#fbbf24;--ok:#22c55e;--bad:#ef4444;--r:22px;--nav-h:76px}
+:root{--bg:#06061a;--card:rgba(255,255,255,.05);--line:rgba(255,255,255,.09);--acc:#c0c0c0;--acc2:#e8e8e8;--gold:#fbbf24;--ok:#22c55e;--bad:#ef4444;--r:22px;--nav-h:76px}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{font-size:clamp(14px,1.5vw,16px);height:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:#fff;min-height:100%;overflow-x:hidden;-webkit-font-smoothing:antialiased}
@@ -2399,3 +2399,28 @@ h2,h3{color:#fff}
 .sg-v177-check{width:100%;padding:14px;border-radius:14px;border:1px solid rgba(34,197,94,.3);
  background:rgba(34,197,94,.12);color:#4ade80;font-weight:800;font-size:.85rem;cursor:pointer;transition:.2s}
 .sg-v177-check:active{transform:scale(.98)}
+
+/* ===== v179: SILVER STYLE + BIG PRELOADER ===== */
+.pl-pct{font-size:3.5rem !important;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,255,255,.6);margin-top:16px}
+.pl-bar{width:280px !important;height:8px !important;border-radius:50px;background:rgba(255,255,255,.1);overflow:hidden;margin:0 auto}
+.pl-fill{height:100%;background:linear-gradient(90deg,#c0c0c0,#e8e8e8,#fff);border-radius:50px;box-shadow:0 0 20px rgba(255,255,255,.5);transition:width .3s}
+
+/* Модалка подписки на 80% экрана */
+.sg-modal{max-width:90vw !important;width:90vw !important;max-height:85vh !important;padding:24px 20px}
+.sg-v177{max-width:90vw !important;width:90vw !important}
+.sg-v177-head{margin-bottom:24px}
+.sg-v177-emoji{font-size:4rem;margin-bottom:12px}
+.sg-v177-title{font-size:1.6rem;margin-bottom:8px}
+.sg-v177-desc{font-size:.9rem;line-height:1.5}
+.sg-v177-actions{gap:12px;margin-bottom:20px}
+.sg-v177-card{padding:16px;gap:14px}
+.sg-v177-card-icon{font-size:2.2rem}
+.sg-v177-card-title{font-size:.95rem;margin-bottom:4px}
+.sg-v177-card-sub{font-size:.75rem}
+.sg-v177-card-btn{padding:12px 20px;font-size:.82rem;min-width:110px}
+.sg-v177-check{padding:16px;font-size:.9rem}
+
+/* Серебристые градиенты для кнопок */
+.btn-primary{background:linear-gradient(135deg,#c0c0c0,#e8e8e8) !important;box-shadow:0 8px 26px rgba(192,192,192,.35) !important}
+.add-btn{background:linear-gradient(135deg,#c0c0c0,#e8e8e8) !important;box-shadow:0 4px 14px rgba(192,192,192,.4) !important}
+.xp-line div{background:linear-gradient(90deg,#c0c0c0,#e8e8e8) !important;box-shadow:0 0 10px rgba(192,192,192,.6) !important}
