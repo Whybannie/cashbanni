@@ -1405,13 +1405,6 @@ async function sendGiftToFriend() {
 }
 
 
- else {
-    window.open(shareUrl, '_blank');
-  }
-  
-  toast('💬 Выбери друга для пересылки', '');
-}
-
 
 // ===== v178: INLINE SHARE =====
 function sharePost(){
