@@ -11,6 +11,9 @@ crash.sparks = [];
 crash.betVal = crash.betVal || 20;
 crash.auto = crash.auto || 0;
 crash.lastFrame = Date.now();
+crash.cashTime = 0;
+crash.cashM = 0;
+crash._cashRnd = 0;
 var crashLoopOn = false;
 
 function roundNumber(){ return Math.floor(Date.now()/CR2.ROUND); }
@@ -77,7 +80,11 @@ function syncCrashBtn(){
 function doCashout(m){
   var win=Math.floor(crash.myBet*m);
   S.balance+=win; S.stats.won+=win; S.stats.crashWins=(S.stats.crashWins||0)+1;
-  crash.cashed=true; sfx.win(); if(m>=5)confetti(90);
+  crash.cashed=true;
+  crash.cashTime = Date.now();
+  crash.cashM = m;
+  crash._cashRnd = roundNumber();
+  sfx.win(); if(m>=5)confetti(90);
   toast('✅ Забрал на '+m.toFixed(2)+'× → +⭐'+fmt(win),'good');
   save(); renderHeader(); checkAch(); syncCrashBtn();
 }
@@ -102,7 +109,7 @@ function crashLoop(){
     var now=Date.now(); var rn=roundNumber(); var t0=roundStart(rn); var el=now-t0;
     if(crash._rnd!==rn){
       crash._rnd=rn; crash.myBet=0; crash.cashed=false; crash.sparks=[]; crash.lastInt=1; crash._lostRnd=0; crash._sparkRnd=0;
-      crash.crashPos=null; crash.crashTime=null; // 🔥 Сбрасываем время краша для нового раунда
+      crash.crashPos=null; crash.crashTime=null; crash.cashTime=0; crash.cashM=0; // 🔥 Сбрасываем время краша для нового раунда
       crash.hist=crashHistory(); crashHist();
     }
     crash.cp=crashPoint(rn);
@@ -171,7 +178,7 @@ function crashDraw(){
   
   x.clearRect(0,0,W,H);
   
-  // === ФОН: ЧЁРНЫЙ КОСМОС (без синевы) ===
+  // === ФОН ===
   var grad=x.createLinearGradient(0,0,0,H);
   grad.addColorStop(0,'#000000'); 
   grad.addColorStop(0.5,'#020204'); 
@@ -179,7 +186,7 @@ function crashDraw(){
   x.fillStyle=grad; 
   x.fillRect(0,0,W,H);
   
-  // Туманности - очень слабые (только намёк)
+  // Туманности
   var neb1=x.createRadialGradient(W*0.2,H*0.25,0,W*0.2,H*0.25,W*0.5);
   neb1.addColorStop(0,'rgba(30,10,50,0.3)'); 
   neb1.addColorStop(1,'rgba(0,0,0,0)');
@@ -192,7 +199,7 @@ function crashDraw(){
   x.fillStyle=neb2; 
   x.fillRect(0,0,W,H);
   
-  // === ЗВЁЗДЫ: чисто белые, параллакс ===
+  // === ЗВЁЗДЫ ===
   if(!crash._stars){
     crash._stars=[];
     for(var si=0;si<180;si++){
@@ -217,7 +224,6 @@ function crashDraw(){
     }
     var twk = 0.65 + Math.sin(now/450 + st.phase) * 0.35;
     var alpha = (0.3 + st.s*0.25) * twk;
-    // Только белые оттенки
     var brightness = 200 + Math.floor(st.s*55);
     x.fillStyle = 'rgba('+brightness+','+brightness+','+brightness+','+alpha.toFixed(3)+')';
     x.beginPath(); 
@@ -225,8 +231,13 @@ function crashDraw(){
     x.fill();
   });
   
+  // === СТАБИЛЬНЫЙ МАСШТАБ: mMax ограничен и плавный ===
+  var targetMMax = Math.max(crash.m * 1.2, 2.5);
+  if(!crash._smoothMMax) crash._smoothMMax = 2.5;
+  crash._smoothMMax += (targetMMax - crash._smoothMMax) * 0.08;
+  var mMax = crash._smoothMMax;
+  
   // === СЕТКА МНОЖИТЕЛЕЙ ===
-  var mMax = Math.max(crash.m*1.15, 2);
   x.font = (10*dpr)+'px system-ui'; 
   x.textAlign = 'right';
   [1, 1.5, 2, 3, 5, 10, 25, 50, 100].filter(function(v){return v<=mMax;}).forEach(function(v){
@@ -239,17 +250,16 @@ function crashDraw(){
   });
   
   // === КРУТАЯ ДЕТАЛИЗИРОВАННАЯ РАКЕТА ===
-  function drawRocket(px, py, rk, tilt, fireOn){
+  function drawRocket(px, py, rk, tilt, fireOn, broken){
     x.save();
     x.translate(px, py);
     if(tilt) x.rotate(tilt);
     
     // Выхлоп - только когда летит
-    if(fireOn){
+    if(fireOn && !broken){
       var flick = 1 + Math.sin(now/45) * 0.22;
       var flameLen = rk * 1.4 * flick;
       
-      // Внешний огонь
       var fg1 = x.createLinearGradient(-rk*0.22, 0, -rk*0.22-flameLen, 0);
       fg1.addColorStop(0, 'rgba(255,230,140,0.95)');
       fg1.addColorStop(0.25, 'rgba(255,160,40,0.85)');
@@ -261,7 +271,6 @@ function crashDraw(){
       x.closePath(); 
       x.fill();
       
-      // Внутренний (жёлтый)
       var fg2 = x.createLinearGradient(-rk*0.18, 0, -rk*0.18-flameLen*0.6, 0);
       fg2.addColorStop(0, 'rgba(255,255,240,1)');
       fg2.addColorStop(1, 'rgba(255,220,100,0)');
@@ -273,7 +282,76 @@ function crashDraw(){
       x.fill();
     }
     
-    // КРЫЛЬЯ - большие, с детализацией
+    // Если сломана - рисуем обломки
+    if(broken){
+      var tExplode = crash.crashTime ? (now - crash.crashTime)/1000 : 0;
+      var fadeOut = Math.max(0, 1 - tExplode * 0.8);
+      x.globalAlpha = fadeOut;
+      
+      // Обломок корпуса (левая половина)
+      x.save();
+      x.translate(-rk*0.1 - tExplode*rk*0.3, -rk*0.05 - tExplode*rk*0.5);
+      x.rotate(-tExplode * 2);
+      var bg1 = x.createLinearGradient(0, -rk*0.3, 0, rk*0.3);
+      bg1.addColorStop(0, '#f5f5f7');
+      bg1.addColorStop(1, '#c8c8d0');
+      x.fillStyle = bg1;
+      x.beginPath();
+      x.moveTo(-rk*0.3, -rk*0.26);
+      x.lineTo(-rk*0.3, rk*0.1);
+      x.lineTo(rk*0.05, rk*0.05);
+      x.lineTo(rk*0.05, -rk*0.2);
+      x.closePath();
+      x.fill();
+      x.restore();
+      
+      // Обломок носа (правая половина)
+      x.save();
+      x.translate(rk*0.15 + tExplode*rk*0.4, -rk*0.1 - tExplode*rk*0.3);
+      x.rotate(tExplode * 3);
+      x.fillStyle = '#c1121f';
+      x.beginPath();
+      x.moveTo(rk*0.55, 0);
+      x.quadraticCurveTo(rk*0.4, -rk*0.22, rk*0.1, -rk*0.22);
+      x.lineTo(rk*0.1, rk*0.22);
+      x.quadraticCurveTo(rk*0.4, rk*0.22, rk*0.55, 0);
+      x.closePath();
+      x.fill();
+      x.restore();
+      
+      // Обломки крыльев
+      x.save();
+      x.translate(-rk*0.2 - tExplode*rk*0.5, rk*0.1 + tExplode*rk*0.4);
+      x.rotate(-tExplode * 4);
+      x.fillStyle = '#c1121f';
+      x.beginPath();
+      x.moveTo(0, 0);
+      x.lineTo(-rk*0.25, -rk*0.3);
+      x.lineTo(-rk*0.15, -rk*0.3);
+      x.lineTo(0, -rk*0.15);
+      x.closePath();
+      x.fill();
+      x.restore();
+      
+      x.save();
+      x.translate(-rk*0.15 + tExplode*rk*0.3, -rk*0.15 + tExplode*rk*0.5);
+      x.rotate(tExplode * 3.5);
+      x.fillStyle = '#c1121f';
+      x.beginPath();
+      x.moveTo(0, 0);
+      x.lineTo(-rk*0.25, rk*0.3);
+      x.lineTo(-rk*0.15, rk*0.3);
+      x.lineTo(0, rk*0.15);
+      x.closePath();
+      x.fill();
+      x.restore();
+      
+      x.globalAlpha = 1;
+      x.restore();
+      return;
+    }
+    
+    // === КРЫЛЬЯ ===
     x.fillStyle = '#c1121f';
     x.beginPath(); 
     x.moveTo(-rk*0.15, -rk*0.15); 
@@ -290,17 +368,7 @@ function crashDraw(){
     x.closePath(); 
     x.fill();
     
-    // Блик на крыльях
-    x.fillStyle = 'rgba(255,255,255,0.15)';
-    x.beginPath();
-    x.moveTo(-rk*0.2, -rk*0.2);
-    x.lineTo(-rk*0.4, -rk*0.4);
-    x.lineTo(-rk*0.35, -rk*0.38);
-    x.lineTo(-rk*0.2, -rk*0.22);
-    x.closePath();
-    x.fill();
-    
-    // КОРПУС - белый с металлическим отливом
+    // === КОРПУС ===
     var bg = x.createLinearGradient(0, -rk*0.3, 0, rk*0.3);
     bg.addColorStop(0, '#f5f5f7');
     bg.addColorStop(0.5, '#ffffff');
@@ -314,17 +382,7 @@ function crashDraw(){
     x.closePath(); 
     x.fill();
     
-    // Тень на корпусе
-    x.fillStyle = 'rgba(0,0,0,0.08)';
-    x.beginPath();
-    x.moveTo(rk*0.5, rk*0.08);
-    x.quadraticCurveTo(rk*0.2, rk*0.3, -rk*0.3, rk*0.26);
-    x.lineTo(-rk*0.3, rk*0.18);
-    x.quadraticCurveTo(rk*0.2, rk*0.22, rk*0.5, rk*0.08);
-    x.closePath();
-    x.fill();
-    
-    // НОС - красный
+    // === НОС ===
     x.fillStyle = '#c1121f';
     x.beginPath();
     x.moveTo(rk*0.55, 0);
@@ -334,17 +392,7 @@ function crashDraw(){
     x.closePath(); 
     x.fill();
     
-    // Блик на носу
-    x.fillStyle = 'rgba(255,255,255,0.3)';
-    x.beginPath();
-    x.moveTo(rk*0.5, -rk*0.05);
-    x.quadraticCurveTo(rk*0.38, -rk*0.18, rk*0.3, -rk*0.18);
-    x.lineTo(rk*0.3, -rk*0.1);
-    x.quadraticCurveTo(rk*0.38, -rk*0.1, rk*0.5, -rk*0.05);
-    x.closePath();
-    x.fill();
-    
-    // ОКНО - синее с бликом
+    // === ОКНО ===
     x.fillStyle = '#0d1b2a';
     x.beginPath(); 
     x.arc(rk*0.05, 0, rk*0.14, 0, Math.PI*2); 
@@ -356,13 +404,12 @@ function crashDraw(){
     x.beginPath(); 
     x.arc(rk*0.05, 0, rk*0.12, 0, Math.PI*2); 
     x.fill();
-    // Блик
     x.fillStyle = 'rgba(255,255,255,0.7)';
     x.beginPath(); 
     x.arc(rk*0.0, -rk*0.05, rk*0.05, 0, Math.PI*2); 
     x.fill();
     
-    // Полоски на корпусе (детализация)
+    // === ПОЛОСКИ ===
     x.fillStyle = 'rgba(193,18,31,0.8)';
     x.fillRect(-rk*0.1, -rk*0.05, rk*0.1, rk*0.02);
     x.fillRect(-rk*0.1, rk*0.03, rk*0.1, rk*0.02);
@@ -374,9 +421,8 @@ function crashDraw(){
   if(crash.phase==='bet'){
     var bob = Math.sin(now/300) * 4 * dpr;
     var rk = Math.max(22*dpr, Math.min(38*dpr, H*0.18));
-    drawRocket(W*0.12, H*0.82 + bob, rk, 0, false);
+    drawRocket(W*0.12, H*0.82 + bob, rk, 0, false, false);
     
-    // Текст "СТАВКИ"
     x.font = 'bold '+(14*dpr)+'px system-ui';
     x.fillStyle = 'rgba(255,255,255,0.8)';
     x.textAlign = 'center';
@@ -384,59 +430,115 @@ function crashDraw(){
     return;
   }
   
-  // === ПОЗИЦИЯ РАКЕТЫ ===
+  // === ПОЗИЦИЯ РАКЕТЫ (стабильная) ===
   var el = now - roundStart(roundNumber());
-  var tNow = crash.phase==='fly' ? Math.max(0, el-CR2.BET) : (4500*Math.log(crash.m)||0);
+  var tNow = Math.max(0, el - CR2.BET);
   var N = 70, pts = [];
+  
+  // Ограничиваем область полёта: ракета не должна выходить за 90% ширины и 15% сверху
+  var maxX = W * 0.85;
+  var minY = H * 0.12;
+  
   for(var i=0; i<=N; i++){ 
     var tt = tNow * i / N;
     var m = Math.exp(tt/9000);
-    pts.push([W*0.05 + (W*0.88)*(i/N), crashY(Math.min(m, mMax), mMax, H)]); 
+    var xPos = W*0.08 + (maxX - W*0.08) * Math.min(1, tt / Math.max(1, tNow));
+    var yPos = crashY(Math.min(m, mMax), mMax, H);
+    yPos = Math.max(minY, yPos);
+    pts.push([xPos, yPos]); 
   }
   var tip = pts[N];
   var prev = pts[N-1] || tip;
   
-  // Защита от NaN и выхода за границы
   if(isNaN(tip[0]) || isNaN(tip[1])){
-    tip = [W*0.8, H*0.3];
-    prev = [W*0.7, H*0.35];
+    tip = [W*0.5, H*0.5];
+    prev = [W*0.4, H*0.55];
   }
-  tip[0] = Math.max(rk||40, Math.min(W-(rk||40), tip[0]));
-  tip[1] = Math.max(rk||40, Math.min(H-(rk||40), tip[1]));
   
   var dx = tip[0] - prev[0];
   var dy = tip[1] - prev[1];
   var ang = Math.atan2(dy, dx);
   
+  // === РИСУЕМ ТРАЕКТОРИЮ (линию полёта) ===
+  if(crash.phase === 'fly' || crash.phase === 'crash'){
+    x.strokeStyle = 'rgba(168,85,247,0.3)';
+    x.lineWidth = 2*dpr;
+    x.beginPath();
+    x.moveTo(pts[0][0], pts[0][1]);
+    for(var i=1; i<pts.length; i++){
+      x.lineTo(pts[i][0], pts[i][1]);
+    }
+    x.stroke();
+    
+    // Светящаяся линия
+    x.strokeStyle = 'rgba(236,72,153,0.6)';
+    x.lineWidth = 1*dpr;
+    x.beginPath();
+    x.moveTo(pts[0][0], pts[0][1]);
+    for(var i=1; i<pts.length; i++){
+      x.lineTo(pts[i][0], pts[i][1]);
+    }
+    x.stroke();
+  }
+  
+  // === ФАЗА FLY: РАКЕТА ЛЕТИТ ===
   if(crash.phase === 'fly'){
     var rk = Math.max(22*dpr, Math.min(42*dpr, H*0.22));
     var wobble = Math.sin(now/500) * 0.03;
-    // Ограничиваем позицию ракеты чтобы не уходила за экран
-    var safeX = Math.max(rk*1.5, Math.min(W - rk*1.5, tip[0]));
-    var safeY = Math.max(rk*1.5, Math.min(H - rk*1.5, tip[1]));
-    drawRocket(safeX, safeY, rk, ang + wobble, true);
-  } else if(crash.phase === 'crash') {
-    // === ФАЗА CRASH: показываем взрыв и результат ===
+    
+    // Проверяем что не было кэшаута в этом раунде
+    if(crash.cashed && crash._cashRnd === roundNumber()){
+      // Показываем эффект "ЗАБРАЛ"
+      var cashTime = crash.cashTime ? now - crash.cashTime : 0;
+      var cashProgress = Math.min(1, cashTime / 1500);
+      
+      // Зелёный свет вокруг ракеты
+      var glowR = (40 + cashProgress * 80) * dpr;
+      var cashGlow = x.createRadialGradient(tip[0], tip[1], 0, tip[0], tip[1], glowR);
+      cashGlow.addColorStop(0, 'rgba(34,197,94,'+(0.6*(1-cashProgress*0.5))+')');
+      cashGlow.addColorStop(0.5, 'rgba(34,197,94,'+(0.3*(1-cashProgress))+')');
+      cashGlow.addColorStop(1, 'rgba(34,197,94,0)');
+      x.fillStyle = cashGlow;
+      x.beginPath();
+      x.arc(tip[0], tip[1], glowR, 0, Math.PI*2);
+      x.fill();
+      
+      // Текст "ЗАБРАЛ!" над ракетой
+      if(cashProgress < 0.8){
+        var textY = tip[1] - 50*dpr - cashProgress * 30*dpr;
+        x.font = 'bold '+(20*dpr)+'px system-ui';
+        x.fillStyle = 'rgba(34,197,94,'+Math.min(1, (1-cashProgress)*2)+')';
+        x.textAlign = 'center';
+        x.textBaseline = 'middle';
+        x.fillText('ЗАБРАЛ! ×' + crash.cashM.toFixed(2), tip[0], textY);
+      }
+    }
+    
+    drawRocket(tip[0], tip[1], rk, ang + wobble, true, false);
+  }
+  
+  // === ФАЗА CRASH: ВЗРЫВ + ОБЛОМКИ ===
+  else if(crash.phase === 'crash') {
     var ex, ey;
     if(crash.crashPos){
       ex = crash.crashPos.x; 
       ey = crash.crashPos.y;
     } else {
-      ex = Math.max(40, Math.min(W - 40, tip[0]));
-      ey = Math.max(40, Math.min(H - 40, tip[1]));
+      ex = Math.max(60, Math.min(W - 60, tip[0]));
+      ey = Math.max(60, Math.min(H - 60, tip[1]));
     }
     
     var tExplode = crash.crashTime ? now - crash.crashTime : 0;
-    var explodeProgress = Math.min(1, tExplode / 1000);
+    var explodeProgress = Math.min(1, tExplode / 1500);
     
     // Расширяющееся кольцо взрыва
-    var blastR = (20 + explodeProgress * 50) * dpr;
+    var blastR = (20 + explodeProgress * 60) * dpr;
     var fadeOut = 1 - explodeProgress;
     
     // Внешнее кольцо (огненное)
-    var blastG = x.createRadialGradient(ex, ey, blastR*0.5, ex, ey, blastR*2);
-    blastG.addColorStop(0, 'rgba(255,180,60,'+(fadeOut*0.6)+')');
-    blastG.addColorStop(0.5, 'rgba(239,68,68,'+(fadeOut*0.4)+')');
+    var blastG = x.createRadialGradient(ex, ey, blastR*0.3, ex, ey, blastR*2);
+    blastG.addColorStop(0, 'rgba(255,180,60,'+(fadeOut*0.8)+')');
+    blastG.addColorStop(0.4, 'rgba(239,68,68,'+(fadeOut*0.6)+')');
     blastG.addColorStop(1, 'rgba(100,20,20,0)');
     x.fillStyle = blastG;
     x.beginPath(); 
@@ -444,19 +546,40 @@ function crashDraw(){
     x.fill();
     
     // Ядро
-    var coreR = blastR * 0.5 * (1 - explodeProgress*0.6);
+    var coreR = blastR * 0.6 * (1 - explodeProgress*0.7);
     x.fillStyle = 'rgba(255,240,200,'+fadeOut+')';
     x.beginPath(); 
     x.arc(ex, ey, coreR, 0, Math.PI*2); 
     x.fill();
     
-    // Текст результата
-    if(explodeProgress > 0.3){
-      x.font = 'bold '+(24*dpr)+'px system-ui';
-      x.fillStyle = 'rgba(239,68,68,'+Math.min(1, (explodeProgress-0.3)*2)+')';
+    // Ударная волна (кольцо)
+    var shockR = blastR * (1 + explodeProgress * 1.5);
+    x.strokeStyle = 'rgba(255,255,255,'+(fadeOut*0.4)+')';
+    x.lineWidth = 2*dpr;
+    x.beginPath();
+    x.arc(ex, ey, shockR, 0, Math.PI*2);
+    x.stroke();
+    
+    // Рисуем РАЗВАЛИВШУЮСЯ ракету в точке взрыва
+    var rk = Math.max(22*dpr, Math.min(38*dpr, H*0.20));
+    drawRocket(ex, ey, rk, ang + tExplode/500, false, true);
+    
+    // Текст "КРАШ" появляется через 0.3 сек
+    if(explodeProgress > 0.2){
+      var textAlpha = Math.min(1, (explodeProgress-0.2)*3);
+      x.font = 'bold '+(28*dpr)+'px system-ui';
+      x.fillStyle = 'rgba(239,68,68,'+textAlpha+')';
       x.textAlign = 'center';
       x.textBaseline = 'middle';
-      x.fillText('КРАШ '+crash.cp.toFixed(2)+'×', W*0.5, H*0.2);
+      x.fillText('💥 КРАШ ' + crash.cp.toFixed(2) + '×', W*0.5, H*0.15);
+      
+      // Если была ставка и не забрали - показываем минус
+      if(crash.myBet > 0 && !crash.cashed && crash._betRnd === roundNumber() && explodeProgress > 0.4){
+        var lossAlpha = Math.min(1, (explodeProgress-0.4)*3);
+        x.font = 'bold '+(18*dpr)+'px system-ui';
+        x.fillStyle = 'rgba(239,68,68,'+lossAlpha+')';
+        x.fillText('−⭐' + crash.myBet, W*0.5, H*0.25);
+      }
     }
   }
   
