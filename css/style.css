@@ -2584,3 +2584,225 @@ h2,h3{color:#fff}
 .sg-v177-check:active{transform:scale(.98)}
 
 
+
+/* ===== REFERRAL MODAL ===== */
+.ref-modal{
+  max-width:420px;
+  width:90vw;
+  padding:28px 24px;
+  background:linear-gradient(180deg,#1a1a2e 0%,#16162a 100%);
+  border-radius:20px;
+  position:relative;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.ref-modal .x{
+  position:absolute;
+  top:16px;
+  right:16px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  width:32px;
+  height:32px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  color:#fff;
+  transition:all .2s;
+}
+
+.ref-modal .x:hover{background:rgba(255,255,255,.12)}
+
+.ref-head{text-align:center;margin-bottom:24px}
+
+.ref-icon{
+  width:72px;
+  height:72px;
+  margin:0 auto 16px;
+  background:linear-gradient(135deg,rgba(192,192,192,.15),rgba(232,232,232,.08));
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(192,192,192,.2);
+}
+
+.ref-icon svg{stroke:#c0c0c0}
+
+.ref-title{
+  font-size:1.4rem;
+  font-weight:700;
+  margin:0 0 8px;
+  color:#fff;
+  letter-spacing:-.3px;
+}
+
+.ref-desc{
+  font-size:.85rem;
+  color:rgba(255,255,255,.6);
+  margin:0;
+  line-height:1.6;
+}
+
+.ref-desc b{color:#e8e8e8;font-weight:600}
+
+.ref-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+
+.ref-stat-card{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  padding:16px 12px;
+  text-align:center;
+  transition:all .2s;
+}
+
+.ref-stat-card:hover{
+  background:rgba(255,255,255,.06);
+  border-color:rgba(192,192,192,.3);
+}
+
+.ref-stat-value{
+  font-size:1.6rem;
+  font-weight:700;
+  color:#e8e8e8;
+  margin-bottom:4px;
+  font-variant-numeric:tabular-nums;
+}
+
+.ref-stat-label{
+  font-size:.72rem;
+  color:rgba(255,255,255,.5);
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+.ref-link-box{margin-bottom:20px}
+
+.ref-link-label{
+  display:block;
+  font-size:.72rem;
+  font-weight:600;
+  color:rgba(255,255,255,.5);
+  margin-bottom:8px;
+  text-transform:uppercase;
+  letter-spacing:.8px;
+}
+
+.ref-link-input{
+  background:rgba(0,0,0,.3);
+  border:1px solid rgba(192,192,192,.2);
+  border-radius:10px;
+  padding:4px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  transition:all .2s;
+}
+
+.ref-link-input:focus-within{
+  border-color:rgba(192,192,192,.4);
+  box-shadow:0 0 0 3px rgba(192,192,192,.1);
+}
+
+.ref-link-text{
+  flex:1;
+  background:transparent;
+  border:none;
+  color:#c0c0c0;
+  font-size:.82rem;
+  font-weight:500;
+  padding:10px 12px;
+  outline:none;
+  min-width:0;
+  font-family:'SF Mono','Consolas','Monaco',monospace;
+  letter-spacing:.3px;
+  cursor:text;
+  user-select:all;
+}
+
+.ref-copy-btn{
+  background:linear-gradient(135deg,#c0c0c0,#e8e8e8);
+  border:none;
+  color:#1a1a2e;
+  padding:10px 14px;
+  border-radius:8px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-weight:600;
+  font-size:.78rem;
+  transition:all .2s;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+
+.ref-copy-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(192,192,192,.3);
+}
+
+.ref-copy-btn:active{transform:translateY(0)}
+
+.ref-copy-btn.copied{
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:#fff;
+}
+
+.ref-share-btn{
+  width:100%;
+  margin-bottom:20px;
+  background:linear-gradient(135deg,#c0c0c0,#e8e8e8);
+  color:#1a1a2e;
+  border:none;
+  padding:14px;
+  border-radius:10px;
+  font-weight:600;
+  font-size:.88rem;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  transition:all .2s;
+}
+
+.ref-share-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 6px 20px rgba(192,192,192,.3);
+}
+
+.ref-share-btn:active{transform:translateY(0)}
+
+.ref-info{
+  background:rgba(192,192,192,.06);
+  border:1px solid rgba(192,192,192,.12);
+  border-radius:10px;
+  padding:14px 16px;
+}
+
+.ref-info-item{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin-bottom:10px;
+  font-size:.82rem;
+  color:rgba(255,255,255,.7);
+  line-height:1.5;
+}
+
+.ref-info-item:last-child{margin-bottom:0}
+
+.ref-info-icon{font-size:1rem;flex-shrink:0;margin-top:1px}
+
+@media (max-width:480px){
+  .ref-modal{padding:24px 18px}
+  .ref-title{font-size:1.25rem}
+  .ref-stat-value{font-size:1.4rem}
+  .ref-copy-btn span{display:none}
+  .ref-copy-btn{padding:10px}
+}

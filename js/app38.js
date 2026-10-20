@@ -1459,3 +1459,84 @@ function sharePost(){
     toast('⚠️ Шаринг недоступен на этом устройстве', 'bad');
   }
 }
+
+
+// ===== REFERRAL MODAL =====
+function openReferralModal(){
+  const refCount = S.refs || 0;
+  const refEarned = refCount * 5;
+  
+  const countEl = $('refCountModal');
+  const earnedEl = $('refEarnedModal');
+  const linkInput = $('refLinkInput');
+  
+  if(countEl) countEl.textContent = refCount;
+  if(earnedEl) earnedEl.textContent = refEarned;
+  
+  let refLink = '';
+  let tgId = S.tgId || (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user && Telegram.WebApp.initDataUnsafe.user.id);
+  
+  if(tgId){
+    refLink = 'https://t.me/CashBanni_bot?start=ref_' + tgId;
+  } else {
+    refLink = 'https://t.me/CashBanni_bot';
+  }
+  
+  modalOpen('referralModal');
+  
+  setTimeout(() => {
+    if(linkInput){
+      linkInput.value = refLink;
+    }
+  }, 100);
+}
+
+function copyRefLink(){
+  const input = $('refLinkInput');
+  const btn = document.querySelector('.ref-copy-btn');
+  const btnText = $('copyBtnText');
+  
+  if(!input) return;
+  
+  input.select();
+  input.setSelectionRange(0, 99999);
+  
+  navigator.clipboard.writeText(input.value).then(() => {
+    if(btn){
+      btn.classList.add('copied');
+      if(btnText) btnText.textContent = 'Скопировано!';
+      
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        if(btnText) btnText.textContent = 'Копировать';
+      }, 2000);
+    }
+    
+    toast('📋 Ссылка скопирована!', 'good');
+    sfx.click();
+  }).catch(() => {
+    document.execCommand('copy');
+    toast('📋 Ссылка скопирована!', 'good');
+  });
+}
+
+function shareRefLink(){
+  const input = $('refLinkInput');
+  if(!input) return;
+  
+  const shareUrl = input.value;
+  const shareText = '🎁 Заходи в Cash Banni — кейсы с настоящими подарками Telegram!';
+  
+  if(window.Telegram && Telegram.WebApp && Telegram.WebApp.openTelegramLink){
+    const tgShare = 'https://t.me/share/url?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(shareText);
+    Telegram.WebApp.openTelegramLink(tgShare);
+  } else {
+    copyRefLink();
+    toast('📋 Ссылка скопирована! Отправь её другу', 'good');
+  }
+}
+
+// Обновляю существующую функцию
+function copyRef(){
+  openReferralModal();
+}
