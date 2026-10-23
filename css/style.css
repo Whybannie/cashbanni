@@ -3104,3 +3104,116 @@ h2,h3{color:#fff}
   .pl-progress{max-width:220px}
   .pl-progress-pct{font-size:1.2rem}
 }
+
+.ic-box.purple{background:linear-gradient(135deg,#a855f7,#c084fc)}
+
+/* ===== FREE CASE MODAL ===== */
+.free-case-modal{
+  max-width:380px;
+  padding:24px;
+}
+
+.free-head{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.free-icon{
+  font-size:3rem;
+  margin-bottom:12px;
+  animation:float 3s ease-in-out infinite;
+}
+
+.free-title{
+  font-size:1.4rem;
+  font-weight:900;
+  margin:0 0 8px;
+  background:linear-gradient(135deg,#fbbf24,#f59e0b);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.free-desc{
+  font-size:.85rem;
+  color:rgba(255,255,255,.6);
+  margin:0;
+}
+
+.free-requirements{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:16px;
+}
+
+.free-req-title{
+  font-size:.75rem;
+  font-weight:700;
+  color:rgba(255,255,255,.5);
+  text-transform:uppercase;
+  letter-spacing:.8px;
+  margin-bottom:12px;
+}
+
+.free-req-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:12px;
+  margin-bottom:10px;
+}
+
+.free-req-item:last-child{
+  margin-bottom:0;
+}
+
+.free-req-ico{
+  font-size:1.8rem;
+  flex-shrink:0;
+}
+
+.free-req-info{
+  flex:1;
+  min-width:0;
+}
+
+.free-req-info b{
+  display:block;
+  font-size:.9rem;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:2px;
+}
+
+.free-req-info span{
+  font-size:.75rem;
+  color:rgba(255,255,255,.5);
+}
+
+.free-req-item .btn{
+  flex-shrink:0;
+  padding:8px 14px;
+  font-size:.8rem;
+}
+
+.free-note{
+  font-size:.8rem;
+  color:rgba(255,255,255,.5);
+  text-align:center;
+  line-height:1.5;
+  padding:12px;
+  background:rgba(168,85,247,.08);
+  border:1px solid rgba(168,85,247,.2);
+  border-radius:12px;
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+

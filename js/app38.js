@@ -1540,3 +1540,71 @@ function shareRefLink(){
 function copyRef(){
   openReferralModal();
 }
+
+// ===== ПОДПИСКА НА ГРУППУ =====
+const GROUP_CHANNEL = '@Cash_Banni_Chat';
+
+function checkGroupSub(){
+  if(!TG || !TG.openTelegramLink) return;
+  api('/api/check_group_sub').then(r => {
+    const el = $('groupSubState');
+    const btn = $('groupSubBtn');
+    if(r && r.sub){
+      if(el) el.textContent = '✅ Активна';
+      if(btn){ btn.textContent = 'Готово'; btn.disabled = true; }
+      S.groupSub = true;
+    } else {
+      if(el) el.textContent = 'Не активна';
+      if(btn){ btn.textContent = 'Вступить'; btn.disabled = false; }
+      S.groupSub = false;
+    }
+    saveLocal();
+  }).catch(() => {
+    const el = $('groupSubState');
+    if(el) el.textContent = 'Ошибка проверки';
+  });
+}
+
+function doGroupSub(){
+  if(S.groupSub){
+    toast('✅ Вы уже подписаны на группу!', 'good');
+    return;
+  }
+  if(TG && TG.openTelegramLink){
+    TG.openTelegramLink('https://t.me/Cash_Banni_Chat');
+    toast('📢 Подпишитесь на группу, затем обновите страницу', 'good');
+    setTimeout(checkGroupSub, 3000);
+  } else {
+    window.open('https://t.me/Cash_Banni_Chat', '_blank');
+  }
+}
+
+// Обновляю функцию открытия бесплатного кейса
+const oldOpenFree = window.openFreeCaseModal;
+window.openFreeCaseModal = function(){
+  const subOk = S.subDone || false;
+  const groupOk = S.groupSub || false;
+  
+  if(!subOk && !groupOk){
+    modalOpen('freeCaseSubscribe');
+    return;
+  }
+  if(!subOk){
+    toast('📢 Сначала подпишитесь на канал!', 'bad');
+    doSub();
+    return;
+  }
+  if(!groupOk){
+    toast('👥 Сначала подпишитесь на группу!', 'bad');
+    doGroupSub();
+    return;
+  }
+  
+  if(oldOpenFree) oldOpenFree();
+};
+
+// Проверяю подписки при загрузке
+setTimeout(() => {
+  checkGroupSub();
+}, 1000);
+

@@ -470,16 +470,24 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
       <div class="task-info"><b>Подписка на канал</b><span id="subState">Не активна</span></div>
       <button class="btn btn-secondary task-btn" id="subBtn2" onclick="doSub()">Получить</button>
     </div>
+    <div class="task-card">
+      <div class="ic-box purple"><svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-info"><b>Подписка на группу</b><span id="groupSubState">Не активна</span></div>
+      <button class="btn btn-secondary task-btn" id="groupSubBtn" onclick="doGroupSub()">Вступить</button>
+    </div>
+
     <div class="task-card mt" id="supProfileBtn" onclick="openWriteUsModal()">
       <div class="ic-box silver"><svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M3 18v-6a9 9 0 0 1 18 0v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5ZM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5Z" fill="currentColor"/></svg></div>
       <div class="task-info"><b>Связаться с нами</b><span>banni.support@gmail.com</span></div>
       <div class="hero-go">›</div>
     </div>
-    <h2 class="mt">Топ-50 лидеров</h2>
-    <div id="topList"></div>
     <h2 class="mt">Мои предметы</h2>
     <div class="sec-head mb"><span class="muted" id="invValue"></span><button class="btn btn-sell" onclick="sellAll()">Продать всё</button></div>
     <div class="inventory-grid" id="inventoryGrid"></div>
+
+    <h2 class="mt">Топ-50 лидеров</h2>
+    <div id="topList"></div>
+
     <h3 class="mt">Промокод</h3>
     <div class="row"><input id="promoInput" placeholder="ВВЕДИ КОД"><button class="btn btn-primary" onclick="applyPromo()">OK</button></div>
     <h3 class="mt">Настройки</h3>
@@ -898,6 +906,46 @@ window.addEventListener("error",function(e){try{if(!(window.S&&window.S.isAdmin)
         <span class="ref-info-icon">✓</span>
         <span>Ты получаешь ⭐5 на баланс</span>
       </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== FREE CASE SUBSCRIBE MODAL ===== -->
+<div id="freeCaseSubscribe" class="modal-overlay">
+  <div class="modal free-case-modal">
+    <button class="x" onclick="modalClose('freeCaseSubscribe')"><svg class="ic s"><use href="#i-x"/></svg></button>
+    
+    <div class="free-head">
+      <div class="free-icon">🎁</div>
+      <h3 class="free-title">Бесплатный кейс</h3>
+      <p class="free-desc">Открывай бесплатный кейс раз в 24 часа!</p>
+    </div>
+    
+    <div class="free-requirements">
+      <div class="free-req-title">Выполни оба условия:</div>
+      
+      <div class="free-req-item">
+        <div class="free-req-ico">📢</div>
+        <div class="free-req-info">
+          <b>Подписка на канал</b>
+          <span>Новости и акции</span>
+        </div>
+        <button class="btn btn-s" onclick="doSub(); modalClose('freeCaseSubscribe');">Подписаться</button>
+      </div>
+      
+      <div class="free-req-item">
+        <div class="free-req-ico">👥</div>
+        <div class="free-req-info">
+          <b>Подписка на группу</b>
+          <span>Сообщество игроков</span>
+        </div>
+        <button class="btn btn-s" onclick="doGroupSub(); modalClose('freeCaseSubscribe');">Вступить</button>
+      </div>
+    </div>
+    
+    <div class="free-note">
+      После подписки на обе площадки — откроется бесплатный кейс с гарантированным подарком! 🎉
     </div>
   </div>
 </div>
