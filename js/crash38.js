@@ -442,7 +442,7 @@ function crashDraw(){
   for(var i=0; i<=N; i++){ 
     var tt = tNow * i / N;
     var m = Math.exp(tt/9000);
-    var xPos = W*0.08 + (maxX - W*0.08) * Math.min(1, tt / Math.max(1, tNow));
+    var xPos = W*0.08 + (maxX - W*0.08) * (i / N);
     var yPos = crashY(Math.min(m, mMax), mMax, H);
     yPos = Math.max(minY, yPos);
     pts.push([xPos, yPos]); 
@@ -486,6 +486,10 @@ function crashDraw(){
     var rk = Math.max(22*dpr, Math.min(42*dpr, H*0.22));
     var wobble = Math.sin(now/500) * 0.03;
     
+    // Жёсткое ограничение координат ракеты
+    var safeX = Math.max(rk, Math.min(W - rk, tip[0]));
+    var safeY = Math.max(rk, Math.min(H - rk, tip[1]));
+    
     // Проверяем что не было кэшаута в этом раунде
     if(crash.cashed && crash._cashRnd === roundNumber()){
       // Показываем эффект "ЗАБРАЛ"
@@ -494,27 +498,27 @@ function crashDraw(){
       
       // Зелёный свет вокруг ракеты
       var glowR = (40 + cashProgress * 80) * dpr;
-      var cashGlow = x.createRadialGradient(tip[0], tip[1], 0, tip[0], tip[1], glowR);
+      var cashGlow = x.createRadialGradient(safeX, safeY, 0, safeX, safeY, glowR);
       cashGlow.addColorStop(0, 'rgba(34,197,94,'+(0.6*(1-cashProgress*0.5))+')');
       cashGlow.addColorStop(0.5, 'rgba(34,197,94,'+(0.3*(1-cashProgress))+')');
       cashGlow.addColorStop(1, 'rgba(34,197,94,0)');
       x.fillStyle = cashGlow;
       x.beginPath();
-      x.arc(tip[0], tip[1], glowR, 0, Math.PI*2);
+      x.arc(safeX, safeY, glowR, 0, Math.PI*2);
       x.fill();
       
       // Текст "ЗАБРАЛ!" над ракетой
       if(cashProgress < 0.8){
-        var textY = tip[1] - 50*dpr - cashProgress * 30*dpr;
+        var textY = safeY - 50*dpr - cashProgress * 30*dpr;
         x.font = 'bold '+(20*dpr)+'px system-ui';
         x.fillStyle = 'rgba(34,197,94,'+Math.min(1, (1-cashProgress)*2)+')';
         x.textAlign = 'center';
         x.textBaseline = 'middle';
-        x.fillText('ЗАБРАЛ! ×' + crash.cashM.toFixed(2), tip[0], textY);
+        x.fillText('ЗАБРАЛ! ×' + crash.cashM.toFixed(2), safeX, textY);
       }
     }
     
-    drawRocket(tip[0], tip[1], rk, ang + wobble, true, false);
+    drawRocket(safeX, safeY, rk, ang + wobble, true, false);
   }
   
   // === ФАЗА CRASH: ВЗРЫВ + ОБЛОМКИ ===
