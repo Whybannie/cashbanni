@@ -3824,200 +3824,16 @@ body::after{
   50%{opacity:1}
 }
 
-/* ===== ТАЙМЕР В КАРТОЧКЕ ПРОФИЛЯ ===== */
-.ny-timer-card{
-  position:relative;
-  background:linear-gradient(135deg,
-    rgba(34,197,94,0.12) 0%,
-    rgba(220,38,38,0.08) 50%,
-    rgba(59,130,246,0.10) 100%);
-  border:1px solid rgba(147,197,253,0.3);
-  border-radius:18px;
-  padding:16px;
-  overflow:hidden;
-  box-shadow:0 8px 24px rgba(0,0,0,0.25), 0 0 30px rgba(147,197,253,0.1);
+
 }
 
-/* Декоративные снежинки внутри карточки */
-.ny-timer-card::before{
-  content:'❄';
-  position:absolute;
-  top:12px;
-  right:14px;
-  font-size:1.4rem;
-  color:rgba(147,197,253,0.25);
-  animation:spin 12s linear infinite;
-  pointer-events:none;
-}
 
-.ny-timer-card::after{
-  content:'❄';
-  position:absolute;
-  bottom:12px;
-  left:14px;
-  font-size:1.1rem;
-  color:rgba(147,197,253,0.2);
-  animation:spin 15s linear infinite reverse;
-  pointer-events:none;
-}
-
-.ny-timer-top{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-bottom:14px;
-}
-
-.ny-timer-ico{
-  font-size:1.4rem;
-  filter:drop-shadow(0 0 6px rgba(34,197,94,0.5));
-  animation:floatTree 3s ease-in-out infinite;
-}
-
-@keyframes floatTree{
-  0%,100%{transform:translateY(0) rotate(-5deg)}
-  50%{transform:translateY(-3px) rotate(5deg)}
-}
-
-.ny-timer-title{
-  font-size:.85rem;
-  font-weight:700;
-  color:#fff;
-  letter-spacing:.5px;
-  flex:1;
-}
-
-.ny-timer-sparkle{
-  font-size:1rem;
-  animation:twinkle 2s ease-in-out infinite;
-  filter:drop-shadow(0 0 6px rgba(251,191,36,0.6));
-}
-
-@keyframes twinkle{
-  0%,100%{opacity:1;transform:scale(1) rotate(0deg)}
-  50%{opacity:0.6;transform:scale(0.9) rotate(180deg)}
-}
-
-.ny-timer-digits{
-  display:grid;
-  grid-template-columns:repeat(7, auto);
-  align-items:center;
-  justify-content:space-between;
-  gap:6px;
-  padding:12px 8px;
-  background:rgba(0,0,0,0.25);
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.05);
-  backdrop-filter:blur(4px);
-  -webkit-backdrop-filter:blur(4px);
-}
-
-.ny-timer-unit{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:2px;
-  flex:1;
-  min-width:0;
-}
-
-.ny-timer-num{
-  font-size:1.5rem;
-  font-weight:800;
-  color:#fff;
-  font-variant-numeric:tabular-nums;
-  font-family:'SF Mono','Consolas','Monaco',monospace;
-  line-height:1;
-  text-shadow:0 0 12px rgba(251,191,36,0.5), 0 2px 4px rgba(0,0,0,0.3);
-  background:linear-gradient(180deg,#fff 0%,#fbbf24 100%);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  background-clip:text;
-}
-
-.ny-timer-txt{
-  font-size:.58rem;
-  font-weight:600;
-  color:rgba(255,255,255,0.55);
-  text-transform:uppercase;
-  letter-spacing:.8px;
-}
-
-.ny-timer-sep{
-  font-size:1.3rem;
-  font-weight:700;
-  color:rgba(251,191,36,0.6);
-  animation:blinkSep 1s ease-in-out infinite;
-  line-height:1;
-  align-self:flex-start;
-  padding-top:4px;
-}
-
-@keyframes blinkSep{
-  0%,100%{opacity:1}
-  50%{opacity:0.25}
-}
-
-.ny-timer-decor{
-  display:flex;
-  justify-content:space-around;
-  margin-top:12px;
-  padding-top:10px;
-  border-top:1px dashed rgba(255,255,255,0.1);
-  font-size:.9rem;
-  opacity:0.7;
-}
-
-.ny-timer-decor span{
-  animation:decorFloat 3s ease-in-out infinite;
-}
-
-.ny-timer-decor span:nth-child(1){animation-delay:0s}
-.ny-timer-decor span:nth-child(2){animation-delay:0.7s}
-.ny-timer-decor span:nth-child(3){animation-delay:1.4s}
-.ny-timer-decor span:nth-child(4){animation-delay:2.1s}
-
-@keyframes decorFloat{
-  0%,100%{transform:translateY(0) rotate(-8deg)}
-  50%{transform:translateY(-3px) rotate(8deg)}
-}
-
-/* Праздничный режим когда НГ наступил */
-.ny-timer-card.celebrating{
-  background:linear-gradient(135deg,
-    rgba(220,38,38,0.2) 0%,
-    rgba(34,197,94,0.2) 50%,
-    rgba(251,191,36,0.15) 100%);
-  border-color:rgba(251,191,36,0.5);
-  animation:celebrateTimer 2s ease-in-out infinite;
-}
-
-.ny-timer-card.celebrating .ny-timer-num{
-  background:linear-gradient(180deg,#fbbf24 0%,#dc2626 100%);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  background-clip:text;
-}
-
-@keyframes celebrateTimer{
-  0%,100%{transform:scale(1);box-shadow:0 8px 24px rgba(0,0,0,0.25), 0 0 30px rgba(251,191,36,0.2)}
-  50%{transform:scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,0.25), 0 0 50px rgba(251,191,36,0.4)}
-}
-
-/* Мобильная адаптация */
-@media (max-width:480px){
-  .ny-timer-card{padding:14px}
-  .ny-timer-num{font-size:1.25rem}
   .ny-timer-sep{font-size:1.1rem}
   .ny-timer-title{font-size:.8rem}
   .ny-timer-decor{font-size:.8rem}
 }
 
-/* Слабые устройства */
-@media (prefers-reduced-motion: reduce), (max-width:380px){
-  body::before, body::after{
-    display:none;
-  }
+
   .ny-timer-card::before,
   .ny-timer-card::after,
   .ny-timer-decor span,
@@ -4025,5 +3841,338 @@ body::after{
   .ny-timer-sparkle{
     animation:none !important;
   }
+}
+
+
+
+/* ===== ТАЙМЕР ДО НОВОГО ГОДА (ПРЕМИУМ) ===== */
+.ny-timer-card{
+  position:relative;
+  background:linear-gradient(145deg,
+    #0a0e1a 0%,
+    #111827 45%,
+    #0a0e1a 100%);
+  border:1px solid rgba(251,191,36,0.2);
+  border-radius:20px;
+  padding:18px 16px 16px;
+  overflow:hidden;
+  box-shadow:
+    0 12px 32px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 0 40px rgba(251,191,36,0.08);
+}
+
+/* Светящийся шар внутри карточки */
+.ny-timer-card::before{
+  content:'';
+  position:absolute;
+  top:-40%;
+  left:50%;
+  transform:translateX(-50%);
+  width:200%;
+  height:120%;
+  background:radial-gradient(ellipse at 50% 0%, 
+    rgba(251,191,36,0.10) 0%, 
+    rgba(251,191,36,0.04) 30%,
+    transparent 60%);
+  pointer-events:none;
+  animation:nyGlow 6s ease-in-out infinite;
+}
+
+@keyframes nyGlow{
+  0%,100%{opacity:0.7}
+  50%{opacity:1}
+}
+
+/* Декоративные углы (золотые скобки) */
+.ny-corner{
+  position:absolute;
+  width:18px;
+  height:18px;
+  pointer-events:none;
+  z-index:2;
+}
+
+.ny-corner::before,
+.ny-corner::after{
+  content:'';
+  position:absolute;
+  background:linear-gradient(135deg,#fbbf24,#f59e0b);
+  box-shadow:0 0 8px rgba(251,191,36,0.4);
+}
+
+.ny-corner-tl{top:8px;left:8px}
+.ny-corner-tr{top:8px;right:8px;transform:scaleX(-1)}
+.ny-corner-bl{bottom:8px;left:8px;transform:scaleY(-1)}
+.ny-corner-br{bottom:8px;right:8px;transform:scale(-1)}
+
+.ny-corner::before{width:18px;height:1.5px;top:0;left:0}
+.ny-corner::after{width:1.5px;height:18px;top:0;left:0}
+
+/* === Заголовок === */
+.ny-timer-top{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:16px;
+  position:relative;
+  z-index:1;
+}
+
+.ny-timer-icon{
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(220,38,38,0.1));
+  border:1px solid rgba(251,191,36,0.25);
+  border-radius:10px;
+  flex-shrink:0;
+  box-shadow:0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.ny-timer-icon svg{
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3)) drop-shadow(0 0 6px rgba(251,191,36,0.4));
+}
+
+.ny-timer-label{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  flex:1;
+  min-width:0;
+}
+
+.ny-timer-subtitle{
+  font-size:.62rem;
+  font-weight:600;
+  color:rgba(255,255,255,0.5);
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+}
+
+.ny-timer-title{
+  font-size:1.05rem;
+  font-weight:800;
+  color:#fff;
+  letter-spacing:.3px;
+  line-height:1.2;
+  text-shadow:0 2px 8px rgba(0,0,0,0.4);
+}
+
+.ny-timer-badge{
+  flex-shrink:0;
+  padding:5px 10px;
+  background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(220,38,38,0.1));
+  border:1px solid rgba(251,191,36,0.3);
+  border-radius:8px;
+  font-size:.85rem;
+  font-weight:800;
+  color:#fbbf24;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:1px;
+  text-shadow:0 0 10px rgba(251,191,36,0.5);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* === Цифры === */
+.ny-timer-digits{
+  display:grid;
+  grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;
+  align-items:center;
+  gap:6px;
+  position:relative;
+  z-index:1;
+}
+
+.ny-timer-unit{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+}
+
+/* Стеклянная панель для цифры */
+.ny-timer-num-wrap{
+  position:relative;
+  width:100%;
+  min-height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(180deg,
+    rgba(255,255,255,0.06) 0%,
+    rgba(255,255,255,0.02) 100%);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    inset 0 -2px 6px rgba(0,0,0,0.2),
+    0 4px 12px rgba(0,0,0,0.3);
+  overflow:hidden;
+}
+
+/* Блик на панели */
+.ny-timer-num-wrap::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:50%;
+  background:linear-gradient(180deg,rgba(255,255,255,0.04),transparent);
+  pointer-events:none;
+}
+
+.ny-timer-num{
+  font-size:1.75rem;
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+  font-family:'SF Mono','Consolas','Monaco','Menlo',monospace;
+  line-height:1;
+  color:#fbbf24;
+  text-shadow:
+    0 0 12px rgba(251,191,36,0.5),
+    0 0 24px rgba(251,191,36,0.25),
+    0 2px 4px rgba(0,0,0,0.5);
+  letter-spacing:-0.5px;
+}
+
+.ny-timer-txt{
+  font-size:.56rem;
+  font-weight:700;
+  color:rgba(255,255,255,0.4);
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  white-space:nowrap;
+}
+
+/* === Разделители (две светящиеся точки) === */
+.ny-timer-sep{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  align-self:flex-start;
+  padding-top:16px;
+  height:100%;
+}
+
+.ny-timer-sep span{
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#fbbf24,#f59e0b);
+  box-shadow:
+    0 0 6px rgba(251,191,36,0.7),
+    0 0 12px rgba(251,191,36,0.4);
+  animation:nySepBlink 1s ease-in-out infinite;
+}
+
+.ny-timer-sep span:nth-child(2){
+  animation-delay:0.5s;
+}
+
+@keyframes nySepBlink{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:0.3;transform:scale(0.8)}
+}
+
+/* === Декоративная линия === */
+.ny-timer-line{
+  position:relative;
+  height:1px;
+  margin:14px 0 10px;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(251,191,36,0.3) 20%,
+    rgba(251,191,36,0.5) 50%,
+    rgba(251,191,36,0.3) 80%,
+    transparent 100%);
+  overflow:hidden;
+}
+
+.ny-timer-line::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:-50%;
+  width:50%;
+  height:100%;
+  background:linear-gradient(90deg,transparent,#fbbf24,transparent);
+  animation:nyLineShine 3s ease-in-out infinite;
+}
+
+@keyframes nyLineShine{
+  0%{left:-50%}
+  100%{left:150%}
+}
+
+/* === Пожелание === */
+.ny-timer-wish{
+  text-align:center;
+  font-size:.68rem;
+  font-weight:500;
+  color:rgba(255,255,255,0.35);
+  letter-spacing:0.5px;
+  font-style:italic;
+}
+
+/* === Праздничный режим === */
+.ny-timer-card.celebrating{
+  background:linear-gradient(145deg,
+    rgba(220,38,38,0.15) 0%,
+    rgba(251,191,36,0.15) 50%,
+    rgba(34,197,94,0.15) 100%);
+  border-color:rgba(251,191,36,0.5);
+  animation:celebrateTimer 2.5s ease-in-out infinite;
+}
+
+.ny-timer-card.celebrating .ny-timer-num{
+  background:linear-gradient(135deg,#fbbf24,#dc2626);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.ny-timer-card.celebrating .ny-corner::before,
+.ny-timer-card.celebrating .ny-corner::after{
+  background:linear-gradient(135deg,#22c55e,#fbbf24);
+}
+
+@keyframes celebrateTimer{
+  0%,100%{
+    transform:scale(1);
+    box-shadow:0 12px 32px rgba(0,0,0,0.45), 0 0 40px rgba(251,191,36,0.15);
+  }
+  50%{
+    transform:scale(1.015);
+    box-shadow:0 12px 32px rgba(0,0,0,0.45), 0 0 60px rgba(251,191,36,0.3);
+  }
+}
+
+/* === Мобильные === */
+@media (max-width:480px){
+  .ny-timer-card{padding:16px 14px 14px}
+  .ny-timer-num{font-size:1.45rem}
+  .ny-timer-num-wrap{min-height:46px}
+  .ny-timer-title{font-size:.95rem}
+  .ny-timer-subtitle{font-size:.58rem;letter-spacing:1px}
+  .ny-timer-badge{font-size:.78rem;padding:4px 8px}
+  .ny-timer-icon{width:34px;height:34px}
+  .ny-timer-icon svg{width:19px;height:19px}
+  .ny-timer-txt{font-size:.52rem;letter-spacing:1px}
+  .ny-timer-wish{font-size:.62rem}
+}
+
+/* === Слабые устройства === */
+@media (prefers-reduced-motion: reduce), (max-width:380px){
+  .ny-timer-card::before,
+  .ny-timer-sep span,
+  .ny-timer-line::before{
+    animation:none !important;
+  }
+  .ny-corner{display:none}
 }
 
