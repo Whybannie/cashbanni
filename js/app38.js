@@ -193,6 +193,11 @@ async function checkSub(){ const r=await api('/api/check_sub'); return !!(r&&r.s
 function openChannel(){ try{ TG&&TG.openTelegramLink?TG.openTelegramLink(CHANNEL):window.open(CHANNEL); }catch(e){ window.open(CHANNEL); } }
 
 function caseArt(c){ const col=CASE_COLORS[c.rarity]||CASE_COLORS.common;
+  if(c.img){
+    return '<div class="case-art case-has-img" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+
+      '<img src="'+c.img+'" alt="'+c.name+'" class="case-img-bg">'+
+      '<div class="case-name-tag">'+c.name+'</div></div>';
+  }
   return '<div class="case-art" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+
     '<div class="bow"></div><div class="lid"></div><div class="body"></div><div class="rv"></div><div class="rh"></div><div class="em">'+c.em+'</div></div>'; }
 function freeReady(){ return Date.now()-(S.freeLast||0)>=FREE_CASE_COOLDOWN; }

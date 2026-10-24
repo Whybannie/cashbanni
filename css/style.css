@@ -4176,3 +4176,70 @@ body::after{
   .ny-corner{display:none}
 }
 
+
+/* ===== КАРТИНКИ КЕЙСОВ ===== */
+.case-has-img{
+  position:relative;
+  padding:0;
+  overflow:hidden;
+}
+
+.case-img-bg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  z-index:1;
+  transition:transform .4s ease;
+}
+
+.case-has-img:hover .case-img-bg{
+  transform:scale(1.08);
+}
+
+/* Свечение редкости поверх картинки */
+.case-has-img::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse at center, transparent 40%, var(--glow) 120%);
+  mix-blend-mode:screen;
+  pointer-events:none;
+  z-index:2;
+}
+
+/* Тег с названием на картинке */
+.case-name-tag{
+  position:absolute;
+  bottom:8px;
+  left:8px;
+  right:8px;
+  padding:6px 10px;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%);
+  color:#fff;
+  font-size:.78rem;
+  font-weight:700;
+  text-align:center;
+  text-shadow:0 1px 3px rgba(0,0,0,0.8);
+  z-index:3;
+  border-radius:6px;
+  letter-spacing:.3px;
+  pointer-events:none;
+}
+
+/* Градиентная рамка редкости */
+.case-has-img::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border:2px solid transparent;
+  border-radius:16px;
+  background:linear-gradient(135deg, var(--c0), var(--c1), var(--c2)) border-box;
+  -webkit-mask:linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  z-index:3;
+  pointer-events:none;
+}
