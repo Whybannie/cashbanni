@@ -88,7 +88,16 @@ const CASE_COLORS = {
   epic:      ['#3b1656','#7e22ce','#c084fc'],
   legendary: ['#4a2c0a','#b45309','#fbbf24'],
   streamer:  ['#4a0e3a','#be185d','#f472b6']
-};
+},
+  { id:'case_ronaldo', name:'Роналду', em:'⚽', img:'case_ronaldo.jpg', price:15, rarity:'epic',
+    drops:[['dust',0.05],['coin',0.12],['spark',0.30],['bear',0.22],['heart',0.18],['rose',0.08],['box',0.03],['trophy',0.015],['ring',0.005]] },
+  { id:'case_messi', name:'Месси', em:'🐐', img:'case_messi.jpg', price:15, rarity:'epic',
+    drops:[['dust',0.04],['coin',0.10],['spark',0.28],['bear',0.25],['heart',0.20],['rose',0.08],['box',0.03],['trophy',0.015],['ring',0.005]] },
+  { id:'case_newyear', name:'Новогодний', em:'🎄', img:'case_newyear.jpg', price:30, rarity:'legendary',
+    drops:[['spark',0.12],['bear',0.15],['heart',0.12],['rose',0.10],['box',0.10],['cake',0.12],['bouquet',0.08],['beer',0.07],['ring',0.05],['trophy',0.05],['diamond',0.04]] },
+  { id:'case_sheikh', name:'Шейх', em:'👑', img:'case_sheikh.jpg', price:159, rarity:'legendary',
+    drops:[['ring',0.25],['trophy',0.18],['diamond',0.15],['rose',0.05],['box',0.05],['cake',0.08],['bouquet',0.06],['rocket',0.04],['beer',0.03],['nft_dog',0.05],['nft_cigar_snoop',0.03],['nft_sword',0.03]] }
+;
 
 const QUESTS = [
   { id:'q1', type:'open',        target:3,  reward:10, name:'Открой 3 кейса' },
