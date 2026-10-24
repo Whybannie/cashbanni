@@ -3217,3 +3217,461 @@ h2,h3{color:#fff}
   50%{transform:translateY(-8px)}
 }
 
+
+/* ===== WINTER THEME v195 ===== */
+
+/* Падающие снежинки */
+.snowflakes{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  z-index:9999;
+  overflow:hidden;
+}
+
+.snowflake{
+  position:absolute;
+  top:-10%;
+  color:rgba(255,255,255,0.9);
+  font-size:1rem;
+  text-shadow:0 0 5px rgba(255,255,255,0.6);
+  animation:snowfall linear infinite;
+  user-select:none;
+}
+
+.snowflake:nth-child(1){left:5%;animation-duration:12s;animation-delay:0s;font-size:.8rem;opacity:.7}
+.snowflake:nth-child(2){left:15%;animation-duration:15s;animation-delay:2s;font-size:1.2rem;opacity:.9}
+.snowflake:nth-child(3){left:25%;animation-duration:18s;animation-delay:4s;font-size:.6rem;opacity:.6}
+.snowflake:nth-child(4){left:35%;animation-duration:11s;animation-delay:1s;font-size:1rem;opacity:.8}
+.snowflake:nth-child(5){left:45%;animation-duration:16s;animation-delay:3s;font-size:.9rem;opacity:.75}
+.snowflake:nth-child(6){left:55%;animation-duration:14s;animation-delay:5s;font-size:1.1rem;opacity:.85}
+.snowflake:nth-child(7){left:65%;animation-duration:17s;animation-delay:2.5s;font-size:.7rem;opacity:.65}
+.snowflake:nth-child(8){left:75%;animation-duration:13s;animation-delay:4.5s;font-size:1rem;opacity:.8}
+.snowflake:nth-child(9){left:85%;animation-duration:19s;animation-delay:1.5s;font-size:.85rem;opacity:.7}
+.snowflake:nth-child(10){left:95%;animation-duration:12s;animation-delay:3.5s;font-size:1.15rem;opacity:.9}
+.snowflake:nth-child(11){left:10%;animation-duration:20s;animation-delay:6s;font-size:.75rem;opacity:.6}
+.snowflake:nth-child(12){left:30%;animation-duration:14s;animation-delay:0.5s;font-size:1.05rem;opacity:.82}
+.snowflake:nth-child(13){left:50%;animation-duration:16s;animation-delay:5.5s;font-size:.95rem;opacity:.78}
+.snowflake:nth-child(14){left:70%;animation-duration:18s;animation-delay:2s;font-size:.8rem;opacity:.7}
+.snowflake:nth-child(15){left:90%;animation-duration:15s;animation-delay:4s;font-size:1.1rem;opacity:.88}
+
+@keyframes snowfall{
+  0%{
+    transform:translateY(-10%) translateX(0) rotate(0deg);
+    opacity:0;
+  }
+  10%{opacity:1}
+  90%{opacity:1}
+  100%{
+    transform:translateY(110vh) translateX(100px) rotate(360deg);
+    opacity:0;
+  }
+}
+
+/* Рождественские огоньки сверху */
+.christmas-lights{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:24px;
+  z-index:9998;
+  pointer-events:none;
+  display:flex;
+  justify-content:space-around;
+  align-items:flex-start;
+  padding:0 4px;
+  box-sizing:border-box;
+}
+
+.christmas-lights::before{
+  content:'';
+  position:absolute;
+  top:6px;
+  left:0;
+  width:100%;
+  height:1px;
+  background:rgba(34,197,94,0.4);
+  box-shadow:0 0 4px rgba(34,197,94,0.3);
+}
+
+.christmas-lights .light{
+  position:relative;
+  top:4px;
+  width:8px;
+  height:12px;
+  border-radius:50% 50% 40% 40%;
+  animation:blink 1.5s ease-in-out infinite;
+  box-shadow:0 0 8px currentColor, 0 0 16px currentColor;
+}
+
+.christmas-lights .light::before{
+  content:'';
+  position:absolute;
+  top:-4px;
+  left:50%;
+  transform:translateX(-50%);
+  width:3px;
+  height:4px;
+  background:rgba(100,100,100,0.6);
+  border-radius:1px;
+}
+
+.christmas-lights .light:nth-child(4n+1){
+  background:radial-gradient(circle,#ef4444,#b91c1c);
+  color:#ef4444;
+  animation-delay:0s;
+}
+.christmas-lights .light:nth-child(4n+2){
+  background:radial-gradient(circle,#22c55e,#15803d);
+  color:#22c55e;
+  animation-delay:0.3s;
+}
+.christmas-lights .light:nth-child(4n+3){
+  background:radial-gradient(circle,#fbbf24,#d97706);
+  color:#fbbf24;
+  animation-delay:0.6s;
+}
+.christmas-lights .light:nth-child(4n){
+  background:radial-gradient(circle,#3b82f6,#1d4ed8);
+  color:#3b82f6;
+  animation-delay:0.9s;
+}
+
+@keyframes blink{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:0.4;transform:scale(0.9)}
+}
+
+/* Шапка Санты - надевается на заголовки */
+.santa-hat{
+  position:relative;
+  display:inline-block;
+}
+
+.santa-hat::before{
+  content:'';
+  position:absolute;
+  top:-0.75em;
+  left:50%;
+  transform:translateX(-50%) rotate(-12deg);
+  width:1.4em;
+  height:0.9em;
+  background:linear-gradient(180deg,#dc2626 0%,#b91c1c 100%);
+  border-radius:50% 50% 40% 40% / 80% 80% 30% 30%;
+  box-shadow:0 2px 8px rgba(220,38,38,0.4);
+  z-index:10;
+  pointer-events:none;
+}
+
+.santa-hat::after{
+  content:'';
+  position:absolute;
+  top:-0.1em;
+  left:50%;
+  transform:translateX(-50%) rotate(-12deg);
+  width:1.6em;
+  height:0.35em;
+  background:#fff;
+  border-radius:4px;
+  box-shadow:0 2px 4px rgba(0,0,0,0.15), inset 0 -2px 4px rgba(0,0,0,0.05);
+  z-index:9;
+  pointer-events:none;
+}
+
+/* Пушистый помпон на шапке Санты */
+.santa-hat::before{
+  position:relative;
+}
+
+/* Для прелоадера - крупная шапка */
+.pl-title.santa-hat::before{
+  width:2.5em;
+  height:1.6em;
+  top:-1.2em;
+}
+
+.pl-title.santa-hat::after{
+  width:2.8em;
+  height:0.5em;
+  top:-0.15em;
+}
+
+/* Помпон сверху */
+.pl-title.santa-hat{
+  position:relative;
+}
+
+/* Для h2 - шапка Санты */
+h2.santa-hat::before{
+  width:1.2em;
+  height:0.75em;
+  top:-0.6em;
+}
+
+h2.santa-hat::after{
+  width:1.4em;
+  height:0.3em;
+  top:-0.05em;
+}
+
+/* Зимние акценты на модалках */
+.winter-modal{
+  position:relative;
+  overflow:visible;
+}
+
+.winter-modal::before{
+  content:'❄ ❅ ❆';
+  position:absolute;
+  top:-14px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:0.9rem;
+  color:rgba(147,197,253,0.8);
+  letter-spacing:6px;
+  text-shadow:0 0 8px rgba(147,197,253,0.5);
+  z-index:10;
+  pointer-events:none;
+}
+
+.winter-modal::after{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:3px;
+  background:linear-gradient(90deg,
+    #ef4444 0%, #ef4444 20%,
+    #22c55e 20%, #22c55e 40%,
+    #fbbf24 40%, #fbbf24 60%,
+    #3b82f6 60%, #3b82f6 80%,
+    #ef4444 80%, #ef4444 100%
+  );
+  background-size:50px 100%;
+  animation:stripesMove 3s linear infinite;
+}
+
+@keyframes stripesMove{
+  0%{background-position:0 0}
+  100%{background-position:50px 0}
+}
+
+/* Зимние звёздочки в углах карточек */
+.task-card, .case-card, .game-card, .rank-card, .pcard{
+  position:relative;
+}
+
+/* Снежная изморозь на кнопках */
+.btn-primary{
+  position:relative;
+  overflow:hidden;
+}
+
+.btn-primary::before{
+  content:'';
+  position:absolute;
+  top:-50%;
+  left:-50%;
+  width:200%;
+  height:200%;
+  background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 40%);
+  pointer-events:none;
+  animation:winterShine 4s ease-in-out infinite;
+}
+
+@keyframes winterShine{
+  0%,100%{transform:rotate(0deg)}
+  50%{transform:rotate(180deg)}
+}
+
+/* Зимний gradient на активных вкладках */
+.bottom-nav button.active{
+  background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(147,197,253,0.1));
+  border-top:2px solid rgba(147,197,253,0.5);
+  box-shadow:0 -2px 10px rgba(147,197,253,0.2);
+}
+
+/* Снежинки в заголовках секций */
+.sec-title h2::before{
+  content:'❄ ';
+  color:rgba(147,197,253,0.7);
+  margin-right:4px;
+}
+
+.sec-title h2::after{
+  content:' ❄';
+  color:rgba(147,197,253,0.7);
+  margin-left:4px;
+}
+
+/* Зимние звёздочки для заголовков h3 */
+h3.mt::before{
+  content:'✨ ';
+  color:rgba(251,191,36,0.7);
+}
+
+/* Рождественский акцент на рейтинге */
+.rank-card{
+  border:1px solid rgba(147,197,253,0.2);
+  background:linear-gradient(135deg,rgba(147,197,253,0.05),rgba(59,130,246,0.03));
+}
+
+/* Зимние звёздочки у кнопок */
+.crash-main-btn.cash::before{
+  content:'🎄 ';
+}
+
+/* Снежинка в углу прелоадера */
+.pl-center::before{
+  content:'❄';
+  position:absolute;
+  top:-40px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:2rem;
+  color:rgba(255,255,255,0.8);
+  text-shadow:0 0 12px rgba(147,197,253,0.6);
+  animation:floatSnowflake 3s ease-in-out infinite;
+}
+
+@keyframes floatSnowflake{
+  0%,100%{transform:translateX(-50%) translateY(0) rotate(0deg)}
+  50%{transform:translateX(-50%) translateY(-10px) rotate(180deg)}
+}
+
+/* Зимний эффект на иконке подарка прелоадера */
+.pl-logo-icon{
+  background:linear-gradient(135deg, rgba(220,38,38,.15), rgba(34,197,94,.1)) !important;
+  border-color:rgba(220,38,38,0.3) !important;
+  box-shadow:0 20px 60px rgba(220,38,38,.3), 0 0 40px rgba(34,197,94,.2) !important;
+}
+
+/* Зимние огоньки вокруг прелоадера */
+.pl-glow.pl-g1{
+  background:radial-gradient(circle, rgba(220,38,38,.4) 0%, transparent 70%) !important;
+}
+
+.pl-glow.pl-g2{
+  background:radial-gradient(circle, rgba(34,197,94,.35) 0%, transparent 70%) !important;
+}
+
+.pl-glow.pl-g3{
+  background:radial-gradient(circle, rgba(251,191,36,.3) 0%, transparent 70%) !important;
+}
+
+/* Прогресс-бар в рождественских цветах */
+.pl-progress-fill{
+  background:linear-gradient(90deg,#dc2626,#22c55e,#fbbf24,#dc2626) !important;
+  background-size:200% 100% !important;
+  animation:progressStripes 3s linear infinite !important;
+}
+
+@keyframes progressStripes{
+  0%{background-position:0% 0%}
+  100%{background-position:200% 0%}
+}
+
+/* Текст прелоадера в рождественском градиенте */
+.pl-title{
+  background:linear-gradient(135deg,#dc2626 0%,#fff 50%,#22c55e 100%) !important;
+  -webkit-background-clip:text !important;
+  -webkit-text-fill-color:transparent !important;
+  background-clip:text !important;
+}
+
+/* Зимние карточки кейсов */
+.case-card{
+  border:1px solid rgba(147,197,253,0.15);
+  box-shadow:0 4px 20px rgba(147,197,253,0.05);
+}
+
+.case-card:hover{
+  border-color:rgba(147,197,253,0.3);
+  box-shadow:0 8px 30px rgba(147,197,253,0.15);
+}
+
+/* Снежинка на бесплатном кейсе */
+.task-row.green{
+  position:relative;
+}
+
+.task-row.green::after{
+  content:'❄';
+  position:absolute;
+  top:8px;
+  right:12px;
+  font-size:1.2rem;
+  color:rgba(147,197,253,0.6);
+  animation:spin 8s linear infinite;
+}
+
+@keyframes spin{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+
+/* Звёздочки на рефералах */
+.task-row.blue::after{
+  content:'⭐';
+  position:absolute;
+  top:8px;
+  right:12px;
+  font-size:1.1rem;
+  animation:twinkle 2s ease-in-out infinite;
+}
+
+@keyframes twinkle{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:0.5;transform:scale(0.9)}
+}
+
+/* Рождественские элементы на кнопке пополнить */
+.task-card .ic-box.gold{
+  position:relative;
+}
+
+.task-card .ic-box.gold::after{
+  content:'🎄';
+  position:absolute;
+  top:-8px;
+  right:-8px;
+  font-size:0.9rem;
+  animation:floatTree 3s ease-in-out infinite;
+}
+
+@keyframes floatTree{
+  0%,100%{transform:translateY(0) rotate(-5deg)}
+  50%{transform:translateY(-3px) rotate(5deg)}
+}
+
+/* На мобильных снежинки меньше */
+@media (max-width:480px){
+  .snowflake{font-size:.8rem}
+  .christmas-lights .light{width:6px;height:10px}
+  .christmas-lights{height:18px}
+  .santa-hat::before{width:1.2em;height:0.75em}
+  .santa-hat::after{width:1.4em;height:0.28em}
+}
+
+/* Зимние иконки в меню */
+.bottom-nav button[data-tab="home"] .ic{
+  filter:drop-shadow(0 0 4px rgba(147,197,253,0.4));
+}
+
+.bottom-nav button[data-tab="tasks"] .ic{
+  filter:drop-shadow(0 0 4px rgba(34,197,94,0.4));
+}
+
+/* Рождественская рамка для админки */
+#adminBlock{
+  border:1px solid rgba(220,38,38,0.2);
+  background:linear-gradient(180deg,rgba(220,38,38,0.03),rgba(34,197,94,0.02));
+  border-radius:16px;
+  padding:16px;
+  margin-top:20px;
+}
