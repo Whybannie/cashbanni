@@ -464,10 +464,11 @@ async function retryConnect(){ const b=$('connBanner');
     saveLocal(); renderHeader(); renderSection('profile'); toast('🟢 Подключено','good'); }
   else if(b) b.innerHTML='<span>⚠️ Нет соединения</span><button class="btn btn-secondary" onclick="retryConnect()">Повторить</button>'; }
 function renderRank(){ const rc=$('rankCard'); if(!rc)return;
-  if(!S.serverMode){ rc.innerHTML='<div class="ic-box gold"><svg class="ic"><use href="#i-trophy"/></svg></div><div><b>Твоё место: #1</b><span>Лидерборд живых — в Telegram</span></div>'; return; }
+  const snowman = '<div class="rank-snowman" aria-hidden="true">⛄</div>';
+  if(!S.serverMode){ rc.innerHTML='<div class="ic-box gold"><svg class="ic"><use href="#i-trophy"/></svg></div><div><b>Твоё место: #1</b><span>Лидерборд живых — в Telegram</span></div>'+snowman; return; }
   apiR('/api/rank').then(r=>{ if(r.error)return;
     rc.innerHTML='<div class="ic-box gold"><svg class="ic"><use href="#i-trophy"/></svg></div>'+
-      '<div><b>Твоё место: #'+r.rank+' из '+r.total+'</b><span>Выиграно: ⭐'+fmt(r.won)+'</span></div>'; }); }
+      '<div><b>Твоё место: #'+r.rank+' из '+r.total+'</b><span>Выиграно: ⭐'+fmt(r.won)+'</span></div>'+snowman; }); }
 function renderTop(){ const tl=$('topList'); if(!tl)return;
   if(!S.serverMode){ tl.innerHTML='<div class="top-row me"><div class="pos">🥇</div><b>😎 '+(S.tgName||'ТЫ')+'</b><div class="won">⭐'+fmt(S.stats.won)+'</div></div>'; return; }
   apiR('/api/top?limit=50').then(r=>{ const rows=(r&&r.rows)||[];

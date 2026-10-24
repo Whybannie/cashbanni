@@ -3670,3 +3670,225 @@ h3.mt::before{
   .christmas-lights .light{box-shadow:0 0 6px currentColor, 0 0 12px currentColor}
 }
 
+
+
+/* ===== ИНЕЙ ПО КРАЯМ ЭКРАНА ===== */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:9997;
+  background:
+    radial-gradient(ellipse at top left, rgba(147,197,253,0.18) 0%, transparent 25%),
+    radial-gradient(ellipse at top right, rgba(147,197,253,0.15) 0%, transparent 25%),
+    radial-gradient(ellipse at bottom left, rgba(147,197,253,0.12) 0%, transparent 20%),
+    radial-gradient(ellipse at bottom right, rgba(147,197,253,0.12) 0%, transparent 20%);
+  animation:frostShimmer 8s ease-in-out infinite;
+}
+
+@keyframes frostShimmer{
+  0%,100%{opacity:0.8}
+  50%{opacity:1}
+}
+
+/* Декоративные "кристаллы льда" в углах */
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:9997;
+  background-image:
+    radial-gradient(circle at 3% 3%, rgba(255,255,255,0.4) 1px, transparent 3px),
+    radial-gradient(circle at 97% 3%, rgba(255,255,255,0.35) 1px, transparent 3px),
+    radial-gradient(circle at 3% 97%, rgba(255,255,255,0.3) 1px, transparent 3px),
+    radial-gradient(circle at 97% 97%, rgba(255,255,255,0.3) 1px, transparent 3px),
+    radial-gradient(circle at 15% 8%, rgba(255,255,255,0.25) 1px, transparent 2px),
+    radial-gradient(circle at 85% 12%, rgba(255,255,255,0.25) 1px, transparent 2px);
+  background-size:100% 100%;
+  filter:blur(0.5px);
+}
+
+/* ===== НОВОГОДНИЙ ТАЙМЕР ===== */
+.newyear-timer{
+  position:fixed;
+  top:42px;
+  right:12px;
+  z-index:9996;
+  background:linear-gradient(135deg,rgba(15,23,42,0.92),rgba(30,41,59,0.88));
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(147,197,253,0.25);
+  border-radius:14px;
+  padding:8px 12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4), 0 0 20px rgba(147,197,253,0.15);
+  font-family:'SF Mono','Consolas',monospace;
+  max-width:280px;
+}
+
+.newyear-timer::before{
+  content:'🎄';
+  font-size:1.1rem;
+  filter:drop-shadow(0 0 4px rgba(34,197,94,0.5));
+  animation:floatTree 3s ease-in-out infinite;
+}
+
+@keyframes floatTree{
+  0%,100%{transform:translateY(0) rotate(-5deg)}
+  50%{transform:translateY(-3px) rotate(5deg)}
+}
+
+.newyear-timer .ny-label{
+  font-size:.62rem;
+  font-weight:700;
+  color:rgba(255,255,255,0.7);
+  text-transform:uppercase;
+  letter-spacing:.8px;
+  margin-right:4px;
+}
+
+.newyear-timer .ny-digits{
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+
+.newyear-timer .ny-unit{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-width:28px;
+}
+
+.newyear-timer .ny-num{
+  font-size:.9rem;
+  font-weight:800;
+  color:#fff;
+  font-variant-numeric:tabular-nums;
+  line-height:1;
+  text-shadow:0 0 8px rgba(251,191,36,0.4);
+}
+
+.newyear-timer .ny-txt{
+  font-size:.5rem;
+  color:rgba(255,255,255,0.5);
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  margin-top:2px;
+}
+
+.newyear-timer .ny-sep{
+  color:rgba(255,255,255,0.3);
+  font-size:.85rem;
+  font-weight:700;
+  animation:blinkSep 1s ease-in-out infinite;
+  margin-top:-10px;
+}
+
+@keyframes blinkSep{
+  0%,100%{opacity:1}
+  50%{opacity:0.3}
+}
+
+/* Праздничный режим когда НГ наступил */
+.newyear-timer.celebrating{
+  background:linear-gradient(135deg,rgba(220,38,38,0.9),rgba(34,197,94,0.85));
+  animation:celebrate 2s ease-in-out infinite;
+}
+
+.newyear-timer.celebrating .ny-num{
+  color:#fbbf24;
+  text-shadow:0 0 12px rgba(251,191,36,0.8);
+}
+
+@keyframes celebrate{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.05)}
+}
+
+/* Мобильная адаптация таймера */
+@media (max-width:480px){
+  .newyear-timer{
+    top:auto;
+    bottom:72px;
+    right:8px;
+    left:8px;
+    max-width:none;
+    padding:6px 10px;
+    border-radius:12px;
+    justify-content:center;
+  }
+  .newyear-timer .ny-label{display:none}
+  .newyear-timer .ny-num{font-size:.85rem}
+  .newyear-timer .ny-unit{min-width:24px}
+}
+
+/* Скрываем иней на слабых устройствах */
+@media (prefers-reduced-motion: reduce), (max-width:380px){
+  body::before, body::after{display:none}
+  .newyear-timer{position:absolute;right:12px;top:42px}
+}
+
+/* ===== СНЕГОВИК В КАРТОЧКЕ РЕЙТИНГА ===== */
+.rank-card{
+  position:relative;
+  overflow:hidden;
+  padding-right:70px !important;
+}
+
+.rank-snowman{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:2.4rem;
+  line-height:1;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3)) drop-shadow(0 0 12px rgba(147,197,253,0.3));
+  animation:snowmanWobble 4s ease-in-out infinite;
+  pointer-events:none;
+  z-index:1;
+}
+
+@keyframes snowmanWobble{
+  0%,100%{transform:translateY(-50%) rotate(-3deg)}
+  50%{transform:translateY(-52%) rotate(3deg)}
+}
+
+/* Снежинки вокруг снеговика */
+.rank-snowman::before{
+  content:'❄';
+  position:absolute;
+  top:-8px;
+  left:-6px;
+  font-size:.6rem;
+  color:rgba(147,197,253,0.8);
+  animation:snowflakeOrbit 3s linear infinite;
+  transform-origin:18px 20px;
+}
+
+.rank-snowman::after{
+  content:'❄';
+  position:absolute;
+  bottom:-4px;
+  right:-4px;
+  font-size:.5rem;
+  color:rgba(147,197,253,0.7);
+  animation:snowflakeOrbit 4s linear infinite reverse;
+  transform-origin:-4px -12px;
+}
+
+@keyframes snowflakeOrbit{
+  from{transform:rotate(0deg) translateX(8px) rotate(0deg)}
+  to{transform:rotate(360deg) translateX(8px) rotate(-360deg)}
+}
+
+/* Мобильные: снеговик меньше */
+@media (max-width:480px){
+  .rank-card{padding-right:56px !important}
+  .rank-snowman{font-size:2rem}
+}
+
