@@ -4243,3 +4243,43 @@ body::after{
   z-index:3;
   pointer-events:none;
 }
+
+/* ===== ОПТИМИЗАЦИЯ ПРОИЗВОДИТЕЛЬНОСТИ ===== */
+
+/* GPU-ускорение для анимированных элементов */
+.snowflakes, .christmas-lights, .case-card, .btn-primary{
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Отключаем тяжёлые анимации на слабых устройствах */
+@media (prefers-reduced-motion: reduce), (max-width:380px){
+  .snowflakes, .christmas-lights{
+    display:none !important;
+  }
+  .case-card:hover{
+    transform:none !important;
+  }
+  .btn-primary::before{
+    animation:none !important;
+  }
+}
+
+/* Уменьшаем количество снежинок на мобилках */
+@media (max-width:480px){
+  .snowflakes div:nth-child(n+11){
+    display:none;
+  }
+}
+
+/* Оптимизация скролла */
+.page-content{
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+/* Lazy loading для картинок */
+.case-img-bg{
+  loading: lazy;
+  decoding: async;
+}

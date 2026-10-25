@@ -201,6 +201,28 @@ function caseArt(c){ const col=CASE_COLORS[c.rarity]||CASE_COLORS.common;
   return '<div class="case-art" style="--c0:'+col[0]+';--c1:'+col[1]+';--c2:'+col[2]+';--glow:'+RAR[c.rarity].glow+'">'+
     '<div class="bow"></div><div class="lid"></div><div class="body"></div><div class="rv"></div><div class="rh"></div><div class="em">'+c.em+'</div></div>'; }
 function freeReady(){ return Date.now()-(S.freeLast||0)>=FREE_CASE_COOLDOWN; }
+
+// 🔥 Прелоад картинок кейсов
+function preloadCaseImages(){
+  const imgs = CASES.filter(c=>c.img).map(c=>c.img);
+  if(!imgs.length) return Promise.resolve();
+  
+  const loader = $('preloader');
+  if(loader) loader.style.display = 'flex';
+  
+  return Promise.all(imgs.map(src=>{
+    return new Promise((resolve,reject)=>{
+      const img = new Image();
+      img.onload = resolve;
+      img.onerror = resolve; // даже если ошибка - продолжаем
+      img.src = src;
+    });
+  })).then(()=>{
+    if(loader) loader.style.opacity = '0';
+    setTimeout(()=>{ if(loader) loader.style.display = 'none'; }, 300);
+  });
+}
+
 function renderCases(){ setT('casesStat','Открыто: '+S.stats.opened);
   setT('csfCount','Найдено: '+csfList().length);
   setH('casesGrid',csfList().map(c=>
