@@ -73,6 +73,8 @@ const CASES = [
     drops:[['dust',0.54994],['coin',0.25],['spark',0.12],['bear',0.05],['heart',0.02],['rose',0.01],['nft_bag',2e-05],['nft_snoop_hand',2e-05],['nft_cat',1e-05],['nft_cap',1e-05]] },
   { id:'mini', name:'Мини', em:'🎁', price:5, rarity:'common',
     drops:[['dust',0.3991],['coin',0.3],['spark',0.15],['bear',0.1],['heart',0.04],['rose',0.01],['nft_dog',0.0001],['nft_doshirak',0.0001],['nft_lolipop',0.0001],['nft_backpack',0.0001],['nft_poop',0.0001],['nft_socks',0.0001],['nft_sword',0.0001],['nft_monkey',0.0001],['nft_egg',0.0001]] },
+  { id:'case_bomj', name:'Бомж', em:'🗑️', img:'case_bomj.jpg', price:9, rarity:'common',
+    drops:[['dust',0.38],['coin',0.25],['spark',0.15],['bear',0.10],['heart',0.05],['rose',0.03],['box',0.015],['cake',0.008],['bouquet',0.007],['rocket',0.005],['nft_dog',0.0001],['nft_doshirak',0.0001],['nft_lolipop',0.0001],['nft_backpack',0.0001],['nft_poop',0.0001]] },
   { id:'starter', name:'Стартер', em:'🎁', price:20, rarity:'rare',
     drops:[['dust',0.2466],['bear',0.3],['heart',0.25],['rose',0.12],['box',0.08],['nft_dog',0.0003],['nft_doshirak',0.0003],['nft_lolipop',0.0003],['nft_backpack',0.0003],['nft_poop',0.0003],['nft_socks',0.0003],['nft_sword',0.0003],['nft_monkey',0.0003],['nft_egg',0.0003],['nft_cigar_snoop',0.0001],['nft_candybox',0.0001],['nft_cylinder',0.0001],['nft_shoes',0.0001],['nft_hairdryer',0.0001],['nft_pumpkin',0.0001],['nft_watch',0.0001]] },
   { id:'hype', name:'Хайп', em:'🔥', price:45, rarity:'rare',
