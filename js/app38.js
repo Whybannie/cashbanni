@@ -253,8 +253,266 @@ function sellWon(u){ const idx=S.inv.findIndex(i=>i.uid===u); if(idx<0)return;
   qEvent('sell'); sfx.win(); toast('Продано: '+g.name+' +⭐'+fmt(g.price),'good');
   save(); renderHeader(); refreshInv(); checkAch(); }
 function keepWon(u){ sfx.click(); refreshInv(); }
-async function spin(n){ if(spinning) return; spinning=true;
-  toast('⏳ Обновление…',''); spinning=false; }
+async function spin(n){ 
+  if(spinning) return; 
+  spinning=true;
+  
+  const cid = window.__curCaseId;
+  if(!cid){ spinning=false; return; }
+  
+  const cost = curCase.price * n;
+  if(cost > 0 && S.balance < cost){
+    toast('Недостаточно Stars','bad');
+    spinning = false;
+    return;
+  }
+  
+  // Отключаем кнопки
+  const btn1=$('btnX1'), btn3=$('btnX3'), btn5=$('btnX5');
+  [btn1,btn3,btn5].forEach(b=>{ if(b) b.disabled = true; });
+  
+  // Показываем индикатор загрузки
+  const strips = $('cfStrips');
+  if(strips){
+    strips.innerHTML = '<div class="spin-loader"><div class="spin-loader_bar"></div></div>';
+  }
+  
+  try{
+    // API запрос
+    const res = await apiR('/api/case_open', {
+      method:'POST',
+      body:JSON.stringify({id:cid, count:n})
+    });
+    
+    if(!res || !res.ok){
+      throw new Error(res?.error || 'Ошибка открытия кейса');
+    }
+    
+    // Обновляем локальное состояние
+    S.balance = res.balance;
+    S.inv = res.inv;
+    S.stats = res.stats;
+    S.xp = res.xp;
+    save();
+    
+    // Получаем предметы
+    const items = res.results.map(gid => Object.assign({}, gift(gid), {gid:gid, uid:Math.random().toString(36).substr(2,9)}));
+    
+    // Анимация рулетки для каждого предмета
+    if(strips){
+      strips.innerHTML = '';
+      
+      for(let i = 0; i < items.length; i++){
+        const g = items[i];
+        const stripDiv = document.createElement('div');
+        stripDiv.className = 'strip-wrap';
+        
+        const marker = document.createElement('div');
+        marker.className = 'strip-marker';
+        marker.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8Z" fill="currentColor"/></svg>';
+        
+        const strip = document.createElement('div');
+        strip.className = 'strip';
+        
+        stripDiv.appendChild(marker);
+        stripDiv.appendChild(strip);
+        strips.appendChild(stripDiv);
+        
+        // Строим рулетку
+        buildStrip(strip, g);
+        
+        // Задержка перед запуском
+        await new Promise(r => setTimeout(r, 100));
+        
+        // Запускаем анимацию
+        const dur = 2800 + i * 200;
+        await animateStrip(strip, dur);
+        
+        // Звуковой эффект победы
+        sfx.win();
+        
+        // Пауза между предметами
+        if(i < items.length - 1){
+          await new Promise(r => setTimeout(r, 400));
+        }
+      }
+    }
+    
+    // Показываем модалку результатов
+    await new Promise(r => setTimeout(r, 500));
+    showResultsModal(items);
+    
+  }catch(e){
+    toast(e.message || 'Ошибка','bad');
+  }finally{
+    spinning = false;
+    [btn1,btn3,btn5].forEach(b=>{ if(b) b.disabled = false; });
+    renderHeader();
+    refreshInv();
+    checkAch();
+  }
+}
+
+// === Показываем модалку результатов ===
+window.__caseResults = [];
+
+function showResultsModal(items){
+  window.__caseResults = items;
+  
+  const modal = $('caseResultModal');
+  const badge = $('crBadge');
+  const title = $('crTitle');
+  const itemsDiv = $('crItems');
+  const totalSpan = $('crTotal');
+  
+  // Определяем редкость (самая высокая)
+  let bestRarity = 'common';
+  const rarityOrder = {common:0, rare:1, epic:2, legendary:3, nft:4};
+  items.forEach(it => {
+    if(rarityOrder[it.rarity] > rarityOrder[bestRarity]) bestRarity = it.rarity;
+  });
+  
+  // Бейдж редкости
+  badge.textContent = RAR[bestRarity].name;
+  badge.style.background = RAR[bestRarity].color;
+  badge.style.boxShadow = '0 0 20px ' + RAR[bestRarity].glow;
+  
+  // Заголовок
+  title.textContent = items.length === 1 ? 'Ваш приз' : 'Ваши призы (' + items.length + ')';
+  
+  // Список предметов
+  itemsDiv.innerHTML = items.map((it, idx) => {
+    const rColor = RAR[it.rarity].color;
+    const rGlow = RAR[it.rarity].glow;
+    return '<div class="cr-item" style="--r-color:'+rColor+'; --r-glow:'+rGlow+'" data-idx="'+idx+'">' +
+      '<div class="cr-item-glow"></div>' +
+      '<div class="cr-item-art">' + gImg(it) + '</div>' +
+      '<div class="cr-item-info">' +
+        '<div class="cr-item-name">' + it.name + '</div>' +
+        '<div class="cr-item-rarity">' + RAR[it.rarity].name + '</div>' +
+      '</div>' +
+      '<div class="cr-item-price">⭐' + fmt(it.price) + '</div>' +
+      '<div class="cr-item-actions">' +
+        '<button class="cr-item-btn keep" onclick="keepResult('+idx+')"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>' +
+        '<button class="cr-item-btn sell" onclick="sellResult('+idx+')"><span>⭐'+fmt(it.price)+'</span></button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  
+  // Общая стоимость
+  const total = items.reduce((a, it) => a + it.price, 0);
+  totalSpan.textContent = '⭐' + fmt(total);
+  
+  // Показываем модалку
+  modal.classList.add('active');
+  setTimeout(() => modal.querySelector('.modal').classList.add('show'), 10);
+}
+
+// === Продажа одного предмета ===
+window.sellResult = function(idx){
+  const items = window.__caseResults;
+  if(!items[idx]) return;
+  
+  const it = items[idx];
+  // Удаляем из инвентаря
+  const invIdx = S.inv.findIndex(i => i.uid === it.uid);
+  if(invIdx >= 0){
+    S.inv.splice(invIdx, 1);
+    S.balance += it.price;
+    S.stats.sells++;
+    save();
+    renderHeader();
+    refreshInv();
+  }
+  
+  // Помечаем как проданный
+  const el = document.querySelector('.cr-item[data-idx="'+idx+'"]');
+  if(el){
+    el.classList.add('sold');
+    el.innerHTML = '<div class="cr-item-sold"><span>Продано</span><span class="cr-sold-price">+⭐'+fmt(it.price)+'</span></div>';
+  }
+  
+  items[idx] = null;
+  updateTotalAndActions();
+  
+  sfx.win();
+  toast('Продано: '+it.name+' +⭐'+fmt(it.price),'good');
+};
+
+// === Оставить один предмет ===
+window.keepResult = function(idx){
+  const items = window.__caseResults;
+  if(!items[idx]) return;
+  
+  const it = items[idx];
+  const el = document.querySelector('.cr-item[data-idx="'+idx+'"]');
+  if(el){
+    el.classList.add('kept');
+    el.innerHTML = '<div class="cr-item-kept"><span>В инвентаре</span></div>';
+  }
+  
+  items[idx] = null;
+  updateTotalAndActions();
+  
+  sfx.click();
+};
+
+// === Обновляем общую стоимость и кнопки ===
+function updateTotalAndActions(){
+  const items = window.__caseResults;
+  const remaining = items.filter(it => it !== null);
+  
+  if(remaining.length === 0){
+    setTimeout(() => closeResultsModal(), 600);
+    return;
+  }
+  
+  const total = remaining.reduce((a, it) => a + it.price, 0);
+  const totalSpan = $('crTotal');
+  if(totalSpan) totalSpan.textContent = '⭐' + fmt(total);
+  
+  // Обновляем текст кнопок
+  const keepBtn = document.querySelector('.cr-btn-keep span:last-child');
+  const sellBtn = document.querySelector('.cr-btn-sell span:last-child');
+  if(keepBtn) keepBtn.textContent = 'Оставить всё (' + remaining.length + ')';
+  if(sellBtn) sellBtn.textContent = 'Продать всё (⭐' + fmt(total) + ')';
+}
+
+// === Оставить всё ===
+window.keepAllResults = function(){
+  const items = window.__caseResults;
+  items.forEach((it, idx) => {
+    if(it) keepResult(idx);
+  });
+};
+
+// === Продать всё ===
+window.sellAllResults = function(){
+  const items = window.__caseResults;
+  items.forEach((it, idx) => {
+    if(it) sellResult(idx);
+  });
+};
+
+// === Закрыть модалку ===
+function closeResultsModal(){
+  const modal = $('caseResultModal');
+  if(!modal) return;
+  
+  modal.querySelector('.modal').classList.remove('show');
+  setTimeout(() => {
+    modal.classList.remove('active');
+    // Закрываем также модалку кейса
+    closeCaseModal();
+  }, 300);
+}
+
+// Закрытие по клику вне модалки
+document.addEventListener('click', function(e){
+  if(e.target.id === 'caseResultModal'){
+    // Не закрываем автоматически - пусть пользователь решит что делать с предметами
+  }
+});
 
 const MINES_RTP = 0.94;
 const mines={active:false,bet:20,m:3,field:[],rev:[],picks:0,mult:1};

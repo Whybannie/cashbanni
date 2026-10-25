@@ -4283,3 +4283,618 @@ body::after{
   loading: lazy;
   decoding: async;
 }
+
+/* ===== МОДАЛКА РЕЗУЛЬТАТОВ КЕЙСА ===== */
+.case-result-modal{
+  position:relative;
+  max-width:460px;
+  width:92%;
+  background:linear-gradient(145deg, #0a0e1a 0%, #111827 45%, #0a0e1a 100%);
+  border:1px solid rgba(251,191,36,0.25);
+  border-radius:24px;
+  padding:24px 20px 20px;
+  overflow:hidden;
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 0 80px rgba(251,191,36,0.15);
+  opacity:0;
+  transform:scale(0.9) translateY(20px);
+  transition:opacity .4s ease, transform .4s cubic-bezier(.34,1.56,.64,1);
+}
+
+.case-result-modal.show{
+  opacity:1;
+  transform:scale(1) translateY(0);
+}
+
+#caseResultModal{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+
+#caseResultModal.active{
+  display:flex;
+}
+
+/* Фоновое свечение */
+.cr-glow{
+  position:absolute;
+  top:-60%;
+  left:50%;
+  transform:translateX(-50%);
+  width:250%;
+  height:150%;
+  background:radial-gradient(ellipse at 50% 0%, 
+    rgba(251,191,36,0.18) 0%, 
+    rgba(251,191,36,0.06) 35%,
+    transparent 70%);
+  pointer-events:none;
+  animation:crGlow 4s ease-in-out infinite;
+}
+
+@keyframes crGlow{
+  0%,100%{opacity:0.8}
+  50%{opacity:1}
+}
+
+/* Декоративные углы */
+.case-result-modal::before,
+.case-result-modal::after{
+  content:'';
+  position:absolute;
+  width:32px;
+  height:32px;
+  pointer-events:none;
+}
+
+.case-result-modal::before{
+  top:10px;
+  left:10px;
+  border-top:1.5px solid rgba(251,191,36,0.4);
+  border-left:1.5px solid rgba(251,191,36,0.4);
+  box-shadow:-2px -2px 8px rgba(251,191,36,0.1);
+}
+
+.case-result-modal::after{
+  bottom:10px;
+  right:10px;
+  border-bottom:1.5px solid rgba(251,191,36,0.4);
+  border-right:1.5px solid rgba(251,191,36,0.4);
+  box-shadow:2px 2px 8px rgba(251,191,36,0.1);
+}
+
+/* Заголовок */
+.cr-head{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.cr-badge{
+  display:inline-block;
+  padding:4px 14px;
+  font-size:.68rem;
+  font-weight:700;
+  color:#fff;
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  border-radius:20px;
+  margin-bottom:10px;
+  animation:crBadgePulse 2s ease-in-out infinite;
+}
+
+@keyframes crBadgePulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.05)}
+}
+
+.cr-head h3{
+  font-size:1.4rem;
+  font-weight:800;
+  color:#fff;
+  letter-spacing:.5px;
+  text-shadow:0 2px 8px rgba(0,0,0,0.5);
+  margin:0;
+}
+
+/* Список предметов */
+.cr-items{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  max-height:320px;
+  overflow-y:auto;
+  margin-bottom:16px;
+  padding:2px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(251,191,36,0.3) transparent;
+}
+
+.cr-items::-webkit-scrollbar{
+  width:4px;
+}
+
+.cr-items::-webkit-scrollbar-track{
+  background:rgba(255,255,255,0.03);
+  border-radius:2px;
+}
+
+.cr-items::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg, rgba(251,191,36,0.4), rgba(251,191,36,0.2));
+  border-radius:2px;
+}
+
+.cr-item{
+  position:relative;
+  display:grid;
+  grid-template-columns:50px 1fr auto auto;
+  align-items:center;
+  gap:12px;
+  padding:10px 12px;
+  background:linear-gradient(135deg, 
+    rgba(255,255,255,0.04) 0%, 
+    rgba(255,255,255,0.01) 100%);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;
+  transition:all .3s ease;
+  overflow:hidden;
+  animation:crItemIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+.cr-item:nth-child(1){ animation-delay:0s; }
+.cr-item:nth-child(2){ animation-delay:0.08s; }
+.cr-item:nth-child(3){ animation-delay:0.16s; }
+.cr-item:nth-child(4){ animation-delay:0.24s; }
+.cr-item:nth-child(5){ animation-delay:0.32s; }
+
+@keyframes crItemIn{
+  from{
+    opacity:0;
+    transform:translateX(-20px);
+  }
+  to{
+    opacity:1;
+    transform:translateX(0);
+  }
+}
+
+.cr-item:hover{
+  border-color:var(--r-color);
+  box-shadow:0 0 20px var(--r-glow);
+}
+
+/* Свечение по цвету редкости */
+.cr-item-glow{
+  position:absolute;
+  top:0;
+  left:0;
+  width:4px;
+  height:100%;
+  background:linear-gradient(180deg, var(--r-color), transparent);
+  box-shadow:0 0 12px var(--r-glow);
+}
+
+.cr-item-art{
+  width:50px;
+  height:50px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.3);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.06);
+  font-size:1.8rem;
+  overflow:hidden;
+}
+
+.cr-item-art img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.cr-item-info{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  min-width:0;
+}
+
+.cr-item-name{
+  font-size:.9rem;
+  font-weight:700;
+  color:#fff;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  text-shadow:0 1px 2px rgba(0,0,0,0.3);
+}
+
+.cr-item-rarity{
+  font-size:.68rem;
+  font-weight:600;
+  color:var(--r-color);
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+}
+
+.cr-item-price{
+  font-size:.9rem;
+  font-weight:700;
+  color:#fbbf24;
+  font-variant-numeric:tabular-nums;
+  text-shadow:0 0 8px rgba(251,191,36,0.3);
+}
+
+.cr-item-actions{
+  display:flex;
+  gap:6px;
+}
+
+.cr-item-btn{
+  padding:6px 10px;
+  border:none;
+  border-radius:8px;
+  font-size:.72rem;
+  font-weight:700;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  transition:all .2s ease;
+}
+
+.cr-item-btn.keep{
+  background:linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08));
+  border:1px solid rgba(34,197,94,0.3);
+  color:#22c55e;
+}
+
+.cr-item-btn.keep:hover{
+  background:linear-gradient(135deg, rgba(34,197,94,0.25), rgba(34,197,94,0.15));
+  border-color:rgba(34,197,94,0.5);
+  box-shadow:0 0 12px rgba(34,197,94,0.3);
+  transform:scale(1.05);
+}
+
+.cr-item-btn.sell{
+  background:linear-gradient(135deg, rgba(251,191,36,0.15), rgba(251,191,36,0.08));
+  border:1px solid rgba(251,191,36,0.3);
+  color:#fbbf24;
+}
+
+.cr-item-btn.sell:hover{
+  background:linear-gradient(135deg, rgba(251,191,36,0.25), rgba(251,191,36,0.15));
+  border-color:rgba(251,191,36,0.5);
+  box-shadow:0 0 12px rgba(251,191,36,0.3);
+  transform:scale(1.05);
+}
+
+/* Состояния продано/оставлено */
+.cr-item.sold, .cr-item.kept{
+  padding:0;
+  height:70px;
+  display:block;
+}
+
+.cr-item-sold, .cr-item-kept{
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  border-radius:14px;
+  font-weight:700;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  font-size:.75rem;
+  animation:crItemState .4s ease;
+}
+
+@keyframes crItemState{
+  0%{transform:scale(0.9); opacity:0}
+  50%{transform:scale(1.05)}
+  100%{transform:scale(1); opacity:1}
+}
+
+.cr-item-sold{
+  background:linear-gradient(135deg, rgba(34,197,94,0.2), rgba(34,197,94,0.05));
+  border:1px solid rgba(34,197,94,0.4);
+  color:#22c55e;
+}
+
+.cr-sold-price{
+  font-size:1rem;
+  color:#fbbf24;
+  text-shadow:0 0 10px rgba(251,191,36,0.5);
+  letter-spacing:0;
+  text-transform:none;
+}
+
+.cr-item-kept{
+  background:linear-gradient(135deg, rgba(96,165,250,0.2), rgba(96,165,250,0.05));
+  border:1px solid rgba(96,165,250,0.4);
+  color:#60a5fa;
+}
+
+/* Общая стоимость */
+.cr-total{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px;
+  background:linear-gradient(135deg,
+    rgba(251,191,36,0.12) 0%,
+    rgba(251,191,36,0.04) 100%);
+  border:1px solid rgba(251,191,36,0.25);
+  border-radius:14px;
+  margin-bottom:16px;
+  position:relative;
+  overflow:hidden;
+}
+
+.cr-total::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:100%;
+  height:100%;
+  background:linear-gradient(90deg, transparent, rgba(251,191,36,0.15), transparent);
+  animation:crTotalShine 3s ease-in-out infinite;
+}
+
+@keyframes crTotalShine{
+  0%{left:-100%}
+  50%,100%{left:100%}
+}
+
+.cr-total-label{
+  font-size:.82rem;
+  font-weight:600;
+  color:rgba(255,255,255,0.6);
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.cr-total-value{
+  font-size:1.6rem;
+  font-weight:800;
+  color:#fbbf24;
+  font-variant-numeric:tabular-nums;
+  text-shadow:0 0 16px rgba(251,191,36,0.5), 0 2px 4px rgba(0,0,0,0.4);
+  letter-spacing:-0.5px;
+}
+
+/* Кнопки действий */
+.cr-actions{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.cr-btn-keep, .cr-btn-sell{
+  padding:14px 16px;
+  border-radius:14px;
+  font-size:.88rem;
+  font-weight:700;
+  letter-spacing:.3px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  cursor:pointer;
+  transition:all .25s ease;
+  position:relative;
+  overflow:hidden;
+}
+
+.cr-btn-keep{
+  background:linear-gradient(135deg, rgba(96,165,250,0.15), rgba(96,165,250,0.05));
+  border:1px solid rgba(96,165,250,0.3);
+  color:#60a5fa;
+}
+
+.cr-btn-keep:hover{
+  background:linear-gradient(135deg, rgba(96,165,250,0.25), rgba(96,165,250,0.12));
+  border-color:rgba(96,165,250,0.5);
+  box-shadow:0 8px 24px rgba(96,165,250,0.2);
+  transform:translateY(-2px);
+}
+
+.cr-btn-sell{
+  background:linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border:1px solid rgba(251,191,36,0.5);
+  color:#0a0e1a;
+  box-shadow:0 4px 16px rgba(251,191,36,0.25);
+}
+
+.cr-btn-sell:hover{
+  background:linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+  box-shadow:0 8px 24px rgba(251,191,36,0.4);
+  transform:translateY(-2px);
+}
+
+.cr-btn-ico{
+  font-size:1.1rem;
+}
+
+/* Рулетка */
+.strip-wrap{
+  position:relative;
+  height:100px;
+  overflow:hidden;
+  border-radius:14px;
+  background:linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2));
+  border:1px solid rgba(255,255,255,0.06);
+  margin-bottom:10px;
+}
+
+.strip-marker{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  width:3px;
+  height:100%;
+  background:linear-gradient(180deg, transparent, #fbbf24, transparent);
+  z-index:3;
+  pointer-events:none;
+  box-shadow:0 0 12px rgba(251,191,36,0.6);
+}
+
+.strip-marker svg{
+  position:absolute;
+  top:6px;
+  left:50%;
+  transform:translateX(-50%);
+  color:#fbbf24;
+  filter:drop-shadow(0 0 6px rgba(251,191,36,0.8));
+}
+
+.strip{
+  position:absolute;
+  top:50%;
+  left:0;
+  transform:translateY(-50%);
+  display:flex;
+  gap:8px;
+  height:80px;
+}
+
+.roulette-item{
+  width:80px;
+  height:80px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.1);
+  padding:4px;
+  flex-shrink:0;
+  transition:all .2s ease;
+}
+
+.roulette-item .name{
+  font-size:.6rem;
+  color:rgba(255,255,255,0.7);
+  margin-top:2px;
+  text-align:center;
+  line-height:1.1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:72px;
+}
+
+/* Индикатор загрузки */
+.spin-loader{
+  height:100px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.3);
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.06);
+}
+
+.spin-loader_bar{
+  width:120px;
+  height:3px;
+  background:rgba(255,255,255,0.1);
+  border-radius:2px;
+  overflow:hidden;
+  position:relative;
+}
+
+.spin-loader_bar::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:-50%;
+  width:50%;
+  height:100%;
+  background:linear-gradient(90deg, transparent, #fbbf24, transparent);
+  animation:spinLoaderMove 1.2s ease-in-out infinite;
+}
+
+@keyframes spinLoaderMove{
+  0%{left:-50%}
+  100%{left:100%}
+}
+
+/* Мобильная адаптация */
+@media (max-width:480px){
+  .case-result-modal{
+    padding:20px 16px 16px;
+    border-radius:20px;
+  }
+  
+  .cr-head h3{
+    font-size:1.2rem;
+  }
+  
+  .cr-item{
+    grid-template-columns:44px 1fr auto auto;
+    gap:10px;
+    padding:8px 10px;
+  }
+  
+  .cr-item-art{
+    width:44px;
+    height:44px;
+    font-size:1.5rem;
+  }
+  
+  .cr-item-name{
+    font-size:.82rem;
+  }
+  
+  .cr-item-rarity{
+    font-size:.62rem;
+  }
+  
+  .cr-item-price{
+    font-size:.82rem;
+  }
+  
+  .cr-total-value{
+    font-size:1.3rem;
+  }
+  
+  .cr-btn-keep, .cr-btn-sell{
+    padding:12px 12px;
+    font-size:.8rem;
+  }
+}
+
+/* Слабые устройства */
+@media (prefers-reduced-motion: reduce){
+  .cr-glow,
+  .cr-badge,
+  .cr-total::before{
+    animation:none !important;
+  }
+  
+  .cr-item{
+    animation:none !important;
+  }
+  
+  .case-result-modal{
+    transition:none;
+  }
+}
