@@ -255,10 +255,20 @@ function sellWon(u){ const idx=S.inv.findIndex(i=>i.uid===u); if(idx<0)return;
 function keepWon(u){ sfx.click(); refreshInv(); }
 async function spin(n){ 
   if(spinning) return; 
-  spinning=true;
   
   const cid = window.__curCaseId;
-  if(!cid){ spinning=false; return; }
+  if(!cid){ return; }
+  
+  // === Проверка подписки для бесплатных кейсов ===
+  let c = null;
+  try{ c = CASES.find(function(x){return x.id===cid;}); }catch(e){}
+  if(c && c.price===0 && c.id!=='secret' && !(S && S.subDone)){
+    console.log('[SPIN] gate: бесплатный кейс без подписки');
+    gateSub();
+    return;
+  }
+  
+  spinning=true;
   
   const cost = curCase.price * n;
   if(cost > 0 && S.balance < cost){
@@ -351,7 +361,15 @@ async function spin(n){
     }
     
   }catch(e){
-    toast(e.message || 'Ошибка','bad');
+    console.error('[SPIN] Ошибка:', e);
+    const msg = String(e.message || e);
+    // Если ошибка связана с подпиской — показываем gate
+    if(msg.indexOf('подписк') !== -1 || msg.indexOf('sub') !== -1 || msg.indexOf('403') !== -1){
+      console.log('[SPIN] caught 403/sub error, showing gate');
+      gateSub();
+    }else{
+      toast(e.message || 'Ошибка','bad');
+    }
   }finally{
     spinning = false;
     [btn1,btn3,btn5].forEach(b=>{ if(b) b.disabled = false; });
@@ -1158,39 +1176,7 @@ window.addEventListener('load', function(){
     };
   }
   
-  // Перехватываем spin с try/catch для перехвата 403
-  var sp = window.spin;
-  if(sp){
-    window.spin = async function(n){
-      var id = window.__curCaseId;
-      var c = null;
-      try{ c = CASES.find(function(x){return x.id===id;}); }catch(e){}
-      
-      // Проверка подписки ДО вызова спин
-      if(c && c.price===0 && c.id!=='secret' && !(S && S.subDone)){
-        console.log('[v107] gate: бесплатный кейс без подписки');
-        gateSub();
-        return;
-      }
-      
-      // Вызываем оригинальный спин с перехватом ошибок
-      try{
-        var result = await sp(n);
-        return result;
-      }catch(e){
-        console.error('[v107] spin error:', e);
-        // Если ошибка связана с подпиской или 403 — показываем модалку
-        var msg = String(e.message || e);
-        if(msg.indexOf('подписк') !== -1 || msg.indexOf('sub') !== -1 || msg.indexOf('403') !== -1){
-          console.log('[v107] caught 403/sub error, showing gate');
-          gateSub();
-        }else{
-          toast('Ошибка: ' + msg, 'bad');
-        }
-      }
-    };
-  }
-  console.log('[v107] free-case gate + 403 catcher ready');
+  console.log('[v2006] spin interceptor removed');
 });
 
 
