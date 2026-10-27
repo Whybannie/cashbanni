@@ -278,6 +278,7 @@ async function spin(n){
   }
   
   try{
+    console.log('[SPIN] Открываем кейс:', cid, 'x', n);
     // API запрос
     const res = await apiR('/api/case_open', {
       method:'POST',
@@ -339,8 +340,15 @@ async function spin(n){
     }
     
     // Показываем модалку результатов
+    console.log('[SPIN] Предметы получены:', items);
+    console.log('[SPIN] showResultsModal exists:', typeof showResultsModal);
     await new Promise(r => setTimeout(r, 500));
-    showResultsModal(items);
+    if(typeof showResultsModal === 'function'){
+      showResultsModal(items);
+    }else{
+      console.error('[SPIN] showResultsModal не существует!');
+      toast('Ошибка модалки','bad');
+    }
     
   }catch(e){
     toast(e.message || 'Ошибка','bad');
