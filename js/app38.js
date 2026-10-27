@@ -259,11 +259,10 @@ async function spin(n){
   const cid = window.__curCaseId;
   if(!cid){ return; }
   
-  // === Проверка подписки для бесплатных кейсов ===
+  // Проверка подписки для бесплатных кейсов
   let c = null;
   try{ c = CASES.find(function(x){return x.id===cid;}); }catch(e){}
   if(c && c.price===0 && c.id!=='secret' && !(S && S.subDone)){
-    console.log('[SPIN] gate: бесплатный кейс без подписки');
     gateSub();
     return;
   }
@@ -277,19 +276,15 @@ async function spin(n){
     return;
   }
   
-  // Отключаем кнопки
   const btn1=$('btnX1'), btn3=$('btnX3'), btn5=$('btnX5');
   [btn1,btn3,btn5].forEach(b=>{ if(b) b.disabled = true; });
   
-  // Показываем индикатор загрузки
   const strips = $('cfStrips');
   if(strips){
-    strips.innerHTML = '<div class="spin-loader"><div class="spin-loader_bar"></div></div>';
+    strips.innerHTML = '<div style="height:100px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5)">Загрузка...</div>';
   }
   
   try{
-    console.log('[SPIN] Открываем кейс:', cid, 'x', n);
-    // API запрос
     const res = await apiR('/api/case_open', {
       method:'POST',
       body:JSON.stringify({id:cid, count:n})
@@ -299,73 +294,98 @@ async function spin(n){
       throw new Error(res?.error || 'Ошибка открытия кейса');
     }
     
-    // Обновляем локальное состояние
     S.balance = res.balance;
     S.inv = res.inv;
     S.stats = res.stats;
     S.xp = res.xp;
     save();
     
-    // Получаем предметы
     const items = res.results.map(gid => Object.assign({}, gift(gid), {gid:gid, uid:Math.random().toString(36).substr(2,9)}));
     
-    // Анимация рулетки для каждого предмета
+    // Показываем рулетку для каждого предмета
     if(strips){
       strips.innerHTML = '';
       
       for(let i = 0; i < items.length; i++){
         const g = items[i];
-        const stripDiv = document.createElement('div');
-        stripDiv.className = 'strip-wrap';
         
+        // Создаём контейнер рулетки
+        const stripDiv = document.createElement('div');
+        stripDiv.className = 'strip';
+        
+        // Маркер
         const marker = document.createElement('div');
         marker.className = 'strip-marker';
-        marker.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8Z" fill="currentColor"/></svg>';
-        
-        const strip = document.createElement('div');
-        strip.className = 'strip';
-        
         stripDiv.appendChild(marker);
-        stripDiv.appendChild(strip);
+        
+        // Лента
+        const inner = document.createElement('div');
+        inner.className = 'strip-inner';
+        
+        // Генерируем 50 элементов (49 случайных + 1 выигрышный на позиции 42)
+        const winIdx = 42;
+        for(let j = 0; j < 50; j++){
+          const it = (j === winIdx) ? g : gift(pick(curCase.drops)[0]);
+          const item = document.createElement('div');
+          item.className = 'strip-item';
+          
+          // Если есть картинка - показываем её, иначе эмодзи
+          if(it.tgs || GIFT_IMG[it.id]){
+            const img = document.createElement('img');
+            img.src = GIFT_IMG[it.id] || '';
+            img.alt = it.name;
+            item.appendChild(img);
+          } else {
+            const emoji = document.createElement('div');
+            emoji.className = 'strip-emoji';
+            emoji.textContent = it.emoji;
+            item.appendChild(emoji);
+          }
+          
+          const name = document.createElement('div');
+          name.className = 'strip-name';
+          name.textContent = it.name;
+          item.appendChild(name);
+          
+          inner.appendChild(item);
+        }
+        
+        stripDiv.appendChild(inner);
         strips.appendChild(stripDiv);
         
-        // Строим рулетку
-        buildStrip(strip, g);
+        // Задержка перед анимацией
+        await new Promise(r => setTimeout(r, 150));
         
-        // Задержка перед запуском
-        await new Promise(r => setTimeout(r, 100));
+        // Анимация прокрутки
+        const itemWidth = 94; // 90px + 4px gap
+        const offset = winIdx * itemWidth - (stripDiv.offsetWidth / 2) + (itemWidth / 2) + (Math.random() * 40 - 20);
         
-        // Запускаем анимацию
-        const dur = 2800 + i * 200;
-        await animateStrip(strip, dur);
-        
-        // Звуковой эффект победы
-        sfx.win();
+        await new Promise(resolve => {
+          requestAnimationFrame(() => {
+            inner.style.transform = 'translateX(-' + offset + 'px)';
+            sfx.tick();
+            setTimeout(() => {
+              sfx.win();
+              resolve();
+            }, 3100);
+          });
+        });
         
         // Пауза между предметами
         if(i < items.length - 1){
-          await new Promise(r => setTimeout(r, 400));
+          await new Promise(r => setTimeout(r, 500));
         }
       }
     }
     
-    // Показываем модалку результатов
-    console.log('[SPIN] Предметы получены:', items);
-    console.log('[SPIN] showResultsModal exists:', typeof showResultsModal);
-    await new Promise(r => setTimeout(r, 500));
-    if(typeof showResultsModal === 'function'){
-      showResultsModal(items);
-    }else{
-      console.error('[SPIN] showResultsModal не существует!');
-      toast('Ошибка модалки','bad');
-    }
+    // Показываем простую модалку с результатами
+    await new Promise(r => setTimeout(r, 600));
+    showSimpleResults(items);
     
   }catch(e){
     console.error('[SPIN] Ошибка:', e);
     const msg = String(e.message || e);
-    // Если ошибка связана с подпиской — показываем gate
     if(msg.indexOf('подписк') !== -1 || msg.indexOf('sub') !== -1 || msg.indexOf('403') !== -1){
-      console.log('[SPIN] caught 403/sub error, showing gate');
       gateSub();
     }else{
       toast(e.message || 'Ошибка','bad');
@@ -378,6 +398,75 @@ async function spin(n){
     checkAch();
   }
 }
+
+// Простая модалка результатов
+function showSimpleResults(items){
+  const modal = document.getElementById('caseResultModal');
+  if(!modal){
+    console.error('caseResultModal not found');
+    toast('Ошибка модалки','bad');
+    return;
+  }
+  
+  window.__caseResults = items;
+  
+  // Заполняем данные
+  const title = document.getElementById('crTitle');
+  const itemsDiv = document.getElementById('crItems');
+  const totalSpan = document.getElementById('crTotal');
+  const badge = document.getElementById('crBadge');
+  
+  if(title){
+    title.textContent = items.length === 1 ? 'Ваш приз' : 'Ваши призы (' + items.length + ')';
+  }
+  
+  // Определяем лучшую редкость
+  let bestRarity = 'common';
+  const rarityOrder = {common:0, rare:1, epic:2, legendary:3, nft:4};
+  items.forEach(it => {
+    if(rarityOrder[it.rarity] > rarityOrder[bestRarity]) bestRarity = it.rarity;
+  });
+  
+  if(badge){
+    badge.textContent = RAR[bestRarity].name;
+    badge.style.background = RAR[bestRarity].color;
+    badge.style.boxShadow = '0 0 20px ' + RAR[bestRarity].glow;
+  }
+  
+  if(itemsDiv){
+    itemsDiv.innerHTML = items.map((it, idx) => {
+      const rColor = RAR[it.rarity].color;
+      return '<div class="cr-item" style="--r-color:'+rColor+'" data-idx="'+idx+'">' +
+        '<div class="cr-item-glow"></div>' +
+        '<div class="cr-item-art">' + gImg(it) + '</div>' +
+        '<div class="cr-item-info">' +
+          '<div class="cr-item-name">' + it.name + '</div>' +
+          '<div class="cr-item-rarity">' + RAR[it.rarity].name + '</div>' +
+        '</div>' +
+        '<div class="cr-item-price">⭐' + fmt(it.price) + '</div>' +
+        '<div class="cr-item-actions">' +
+          '<button class="cr-item-btn keep" onclick="keepResult('+idx+')">✓</button>' +
+          '<button class="cr-item-btn sell" onclick="sellResult('+idx+')">⭐'+fmt(it.price)+'</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  
+  if(totalSpan){
+    const total = items.reduce((a, it) => a + it.price, 0);
+    totalSpan.textContent = '⭐' + fmt(total);
+  }
+  
+  // Показываем модалку
+  modal.style.display = 'flex';
+  modal.classList.add('active');
+  
+  const innerModal = modal.querySelector('.modal');
+  if(innerModal){
+    setTimeout(() => innerModal.classList.add('show'), 50);
+  }
+}
+
 
 // === Показываем модалку результатов ===
 window.__caseResults = [];
